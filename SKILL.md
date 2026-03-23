@@ -365,6 +365,62 @@ Assemble the digest following `prompts.digest_intro`.
 - Do NOT guess job titles. Use the `bio` field or just the person's name.
 - Do NOT visit x.com, search the web, or call any API.
 
+### Step 4.5: Save structured digest
+
+After remixing, produce a structured JSON object and save it for the visual digest viewer.
+
+Assemble this exact JSON structure (fill in the actual remix content):
+
+```json
+{
+  "date": "YYYY-MM-DD",
+  "generatedAt": "ISO timestamp",
+  "language": "en",
+  "builders": [
+    {
+      "name": "Guillermo Rauch",
+      "handle": "rauchg",
+      "bio": "bio text from JSON",
+      "summary": "Your 2-4 sentence remix summary for this builder.",
+      "tweets": [
+        {
+          "url": "https://x.com/rauchg/status/...",
+          "text": "original tweet text from JSON",
+          "createdAt": "ISO timestamp",
+          "likes": 1806,
+          "retweets": 176,
+          "replies": 188,
+          "quotes": 42
+        }
+      ],
+      "totalLikes": 1928,
+      "totalRetweets": 180,
+      "totalReplies": 205,
+      "totalQuotes": 58
+    }
+  ],
+  "podcasts": [
+    {
+      "name": "Latent Space",
+      "title": "Episode Title from JSON",
+      "url": "https://youtube.com/watch?v=...",
+      "summary": "Your 200-400 word remix summary for this podcast."
+    }
+  ]
+}
+```
+
+Rules:
+- `summary` fields must contain your remixed text (not raw transcript or tweets)
+- `tweets` array preserves original data from the feed JSON — do not modify it
+- `totalLikes/Retweets/Replies/Quotes` must be the sum across all tweets for that builder
+- Only include builders that had new content; skip others
+
+Then save it by running:
+```bash
+echo '<your JSON>' | cd ${CLAUDE_SKILL_DIR}/scripts && node save-digest.js 2>/dev/null
+```
+
 ### Step 5: Apply language
 
 Read `config.language` from the JSON:
@@ -406,6 +462,12 @@ If delivery fails, show the digest in the terminal as fallback.
 
 **If "stdout" (default):**
 Just output the digest directly.
+
+After delivering, automatically open the visual digest in the user's browser:
+```bash
+open ${CLAUDE_SKILL_DIR}/digest.html
+```
+Then tell the user: "Visual digest opened in your browser. You can also re-open it anytime at `digest.html`."
 
 ---
 

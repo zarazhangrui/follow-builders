@@ -2,3 +2,4 @@ scripts/node_modules/
 .env
 *.log
 .DS_Store
+digest-data.js

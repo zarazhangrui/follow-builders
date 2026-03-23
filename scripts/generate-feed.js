@@ -246,6 +246,7 @@ async function fetchXContent(xAccounts, bearerToken, state, errors) {
           likes: t.public_metrics?.like_count || 0,
           retweets: t.public_metrics?.retweet_count || 0,
           replies: t.public_metrics?.reply_count || 0,
+          quotes: t.public_metrics?.quote_count || 0,
           isQuote: t.referenced_tweets?.some(r => r.type === 'quoted') || false,
           quotedTweetId: t.referenced_tweets?.find(r => r.type === 'quoted')?.id || null
         });
