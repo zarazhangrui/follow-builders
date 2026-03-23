@@ -26,7 +26,8 @@ Agent 会询问你：
 - 语言偏好
 - 推送方式（Telegram、邮件或直接在聊天中显示）
 
-不需要任何 API key——所有内容由中心化服务统一抓取。
+本地模式：prompt 和已准备好的 feed 文件都从你的本地仓库读取。
+运行时不会再从 GitHub 中心化来源静默拉取 prompt 或 feed。
 设置完成后，你的第一期摘要会立即推送。
 
 ## 修改设置
@@ -38,7 +39,8 @@ Agent 会询问你：
 - "把摘要写得更简短一些"
 - "显示我当前的设置"
 
-信息源列表（建造者和播客）由中心化统一管理和更新——你无需做任何操作即可获得最新的信息源。
+信息源列表（建造者和播客）保存在你的本地仓库里。
+如果你想更新它们，请更新本地仓库或自行编辑对应的配置/源文件。
 
 ## 自定义摘要风格
 
@@ -89,23 +91,28 @@ cd ~/.claude/skills/follow-builders/scripts && npm install
 ## 系统要求
 
 - 一个 AI agent（OpenClaw、Claude Code 或类似工具）
-- 网络连接（用于获取中心化 feed）
+- 此仓库的本地 checkout
+- 仅当你选择运行本地 feed 生成器并访问上游 API 时才需要网络连接
 
-仅此而已。不需要任何 API key。所有内容（YouTube 字幕 + X/Twitter 帖子）由中心化服务每日抓取更新。
+Prompt 和已准备好的 feed 文件都从本地仓库读取。运行时不会再从 GitHub 自动拉取 prompt 或 feed。
 
 ## 工作原理
 
-1. 中心化 feed 每日更新，抓取所有信息源的最新内容（YouTube 字幕通过 Supadata，X/Twitter 通过官方 API）
-2. 你的 agent 获取 feed——一次 HTTP 请求，不需要 API key
+1. 你在仓库中维护本地 feed 文件（`feed-x.json` 和 `feed-podcasts.json`）
+2. 你的 agent 从磁盘读取这些本地 feed 文件和本地 prompt 文件
 3. 你的 agent 根据你的偏好将原始内容重新混编为易消化的摘要
 4. 摘要推送到你的通讯工具（或直接在聊天中显示）
+
+可选：如果你主动运行 `scripts/generate-feed.js`，它可以从上游 API 刷新这些本地 feed 文件。
+这是显式的本地操作，不是运行时的静默远程拉取。
 
 查看 [examples/sample-digest.md](examples/sample-digest.md) 了解输出示例。
 
 ## 隐私
 
-- 不发送任何 API key——所有内容由中心化服务获取
+- Prompt 和已准备好的 feed 文件都从你的本地 checkout 读取
 - 如果你使用 Telegram/邮件推送，相关 key 仅存储在本地 `~/.follow-builders/.env`
+- 如果你运行本地 feed 生成器，它会直接访问配置好的上游 API
 - Skill 只读取公开内容（公开的 YouTube 视频和 X 帖子）
 - 你的配置、偏好和阅读记录都保留在你自己的设备上
 

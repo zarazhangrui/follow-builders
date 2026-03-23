@@ -30,7 +30,8 @@ The agent will ask you:
 - What language you prefer
 - How you want it delivered (Telegram, email, or in-chat)
 
-No API keys needed — all content is fetched centrally.
+Local-only mode: prompts and prepared feed files are read from your local checkout.
+Nothing is pulled from a central GitHub feed or prompt source at runtime.
 Your first digest arrives immediately after setup.
 
 ## Changing Settings
@@ -42,8 +43,8 @@ Your delivery preferences are configurable through conversation. Just tell your 
 - "Make the summaries shorter"
 - "Show me my current settings"
 
-The source list (builders and podcasts) is curated centrally and updates
-automatically — you always get the latest sources without doing anything.
+The source list (builders and podcasts) lives in your local checkout.
+If you want changes, update your local repo or edit the config/source files yourself.
 
 ## Customizing the Summaries
 
@@ -96,25 +97,29 @@ cd ~/.claude/skills/follow-builders/scripts && npm install
 ## Requirements
 
 - An AI agent (OpenClaw, Claude Code, or similar)
-- Internet connection (to fetch the central feed)
+- A local checkout of this repository
+- Internet connection only if you choose to run the local feed generator against upstream APIs
 
-That's it. No API keys needed. All content (YouTube transcripts + X/Twitter posts)
-is fetched centrally and updated daily.
+Prompts and prepared feed files are read locally from this repo. Nothing in the
+runtime digest path auto-fetches prompts or feeds from GitHub.
 
 ## How It Works
 
-1. A central feed is updated daily with the latest content from all sources
-   (YouTube transcripts via Supadata, X/Twitter via official API)
-2. Your agent fetches the feed — one HTTP request, no API keys
+1. You keep local feed files in the repository (`feed-x.json` and `feed-podcasts.json`)
+2. Your agent reads those local feed files and local prompt files from disk
 3. Your agent remixes the raw content into a digestible summary using your preferences
 4. The digest is delivered to your messaging app (or shown in-chat)
+
+Optional: if you choose to run `scripts/generate-feed.js`, it can refresh those local
+feed files from upstream APIs. That is a deliberate local action, not a silent runtime fetch.
 
 See [examples/sample-digest.md](examples/sample-digest.md) for what the output looks like.
 
 ## Privacy
 
-- No API keys are sent anywhere — all content is fetched centrally
+- Prompts and prepared feed files are loaded locally from your checkout
 - If you use Telegram/email delivery, those keys are stored locally in `~/.follow-builders/.env`
+- If you run the local feed generator, it will talk directly to the configured upstream APIs
 - The skill only reads public content (public YouTube videos, public X posts)
 - Your configuration, preferences, and reading history stay on your machine
 
