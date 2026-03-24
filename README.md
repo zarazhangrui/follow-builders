@@ -18,6 +18,7 @@ WhatsApp, etc.) with:
 - Key posts and insights from 25 curated AI builders on X/Twitter
 - Links to all original content
 - Available in English, Chinese, or bilingual
+- A local visual digest viewer (`digest.html`) available when using web delivery mode
 
 ## Quick Start
 
@@ -110,6 +111,31 @@ is fetched centrally and updated daily.
 4. The digest is delivered to your messaging app (or shown in-chat)
 
 See [examples/sample-digest.md](examples/sample-digest.md) for what the output looks like.
+
+## Visual Digest Viewer
+
+When you choose `"web"` as your delivery method, a local browser viewer opens automatically with your digest.
+
+**Features:**
+- Builder cards with engagement metrics (likes, retweets, replies, quotes)
+- Sorting by total engagement or alphabetical order
+- Date picker to browse the last 30 days of digests
+- Works entirely offline — no server needed
+
+**How it works:**
+After each digest run, `scripts/save-digest.js` writes the structured content into
+`digest-data.js` (a JS file that sets `window.DIGEST_DATA`). The HTML viewer loads
+this file directly as a `<script>` tag, which works even when opened as a local
+`file://` URL without any server.
+
+**Re-open anytime:**
+```bash
+open ~/.claude/skills/follow-builders/digest.html   # Claude Code
+open ~/skills/follow-builders/digest.html           # OpenClaw
+```
+
+`digest-data.js` is auto-generated and excluded from version control (`.gitignore`).
+It lives only on your machine and is never committed to the repo.
 
 ## Privacy
 

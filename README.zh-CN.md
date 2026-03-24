@@ -14,6 +14,7 @@
 - 25 位精选 AI 建造者在 X/Twitter 上的关键观点和洞察
 - 所有原始内容的链接
 - 支持英文、中文或双语版本
+- 选择 web 交付方式后，每次生成摘要会自动在浏览器中打开可视化查看器（`digest.html`）
 
 ## 快速开始
 
@@ -101,6 +102,27 @@ cd ~/.claude/skills/follow-builders/scripts && npm install
 4. 摘要推送到你的通讯工具（或直接在聊天中显示）
 
 查看 [examples/sample-digest.md](examples/sample-digest.md) 了解输出示例。
+
+## 可视化摘要查看器
+
+选择 `"web"` 交付方式后，每次运行 `/ai` 时，`digest.html` 会自动在浏览器中打开。
+
+**功能：**
+- Builder 卡片，展示互动数据（点赞、转发、回复、引用）
+- 按总互动量或字母顺序排序
+- 日期选择器，可浏览最近 30 天的历史摘要
+- 完全离线运行，无需服务器
+
+**工作原理：**
+每次生成摘要后，`scripts/save-digest.js` 将结构化内容写入 `digest-data.js`（一个设置 `window.DIGEST_DATA` 的 JS 文件）。HTML 查看器通过 `<script>` 标签直接加载该文件，因此即使以本地 `file://` URL 方式打开也能正常工作，无需搭建任何服务器。
+
+**随时重新打开：**
+```bash
+open ~/.claude/skills/follow-builders/digest.html   # Claude Code
+open ~/skills/follow-builders/digest.html           # OpenClaw
+```
+
+`digest-data.js` 由程序自动生成，已加入 `.gitignore`，仅保存在你的本地设备上，不会提交到仓库。
 
 ## 隐私
 

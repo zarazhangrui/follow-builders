@@ -74,13 +74,13 @@ and move on.
 Tell the user:
 
 "Since you're not using a persistent agent, I need a way to send you the digest
-when you're not in this terminal. You have two options:
+when you're not in this terminal. You have three options:
 
 1. **Telegram** — I'll send it as a Telegram message (free, takes ~5 min to set up)
 2. **Email** — I'll email it to you (requires a free Resend account)
+3. **Web viewer** — I'll save a visual digest page that opens automatically in your browser each time you run /ai (no API keys needed)
 
-Or you can skip this and just type /ai whenever you want your digest — but it
-won't arrive automatically."
+Or you can skip this and just type /ai whenever you want your digest in plain text."
 
 **If they choose Telegram:**
 Guide the user step by step:
@@ -109,9 +109,15 @@ Then they need a Resend API key:
 
 Add the key to the .env file.
 
+**If they choose Web viewer:**
+Set `delivery.method` to `"web"`. No API keys or setup needed.
+Tell them: "Great! Each time you run /ai, your digest will be saved and opened
+automatically in your browser. You can also re-open it anytime."
+Skip Step 5 (no API keys needed).
+
 **If they choose on-demand:**
 Set `delivery.method` to `"stdout"`. Tell them: "No problem — just type /ai
-whenever you want your digest. No automatic delivery will be set up."
+whenever you want your digest as plain text. No automatic delivery will be set up."
 
 ### Step 4: Language
 
@@ -122,7 +128,7 @@ Ask: "What language do you prefer for your digest?"
 
 ### Step 5: API Keys
 
-**If the user chose "stdout" or "right here" delivery:** No API keys needed at all!
+**If the user chose "stdout", "web", or "right here" delivery:** No API keys needed at all!
 All content is fetched centrally. Skip to Step 6.
 
 **If the user chose Telegram or Email delivery:**
@@ -176,7 +182,7 @@ cat > ~/.follow-builders/config.json << 'CFGEOF'
   "deliveryTime": "<HH:MM>",
   "weeklyDay": "<day of week, only if weekly>",
   "delivery": {
-    "method": "<stdout, telegram, or email>",
+    "method": "<stdout, telegram, email, or web>",
     "chatId": "<telegram chat ID, only if telegram>",
     "email": "<email address, only if email>"
   },
@@ -272,9 +278,12 @@ bypassing the agent entirely. The digest won't be remixed by an LLM — it will
 deliver the raw JSON. For full remixed digests, the user should use /ai manually
 or switch to OpenClaw.
 
-**Non-persistent agent + on-demand only (no Telegram/Email):**
-Skip cron setup entirely. Tell the user: "Since you chose on-demand delivery,
-there's no scheduled job. Just type /ai whenever you want your digest."
+**Non-persistent agent + web viewer or on-demand (no Telegram/Email):**
+Skip cron setup entirely.
+- **Web:** Tell the user: "Web viewer works on-demand — just type /ai whenever you want
+  your digest. It will open automatically in your browser each time."
+- **On-demand:** Tell the user: "Since you chose on-demand delivery, there's no scheduled
+  job. Just type /ai whenever you want your digest."
 
 ### Step 9: Welcome Digest
 
@@ -297,6 +306,7 @@ Just tell me and I'll adjust."
 Then add the appropriate closing line based on their setup:
 - **OpenClaw or Telegram/Email delivery:** "Your next digest will arrive
   automatically at [their chosen time]."
+- **Web viewer:** "Type /ai anytime you want your next digest — it will open in your browser."
 - **On-demand only:** "Type /ai anytime you want your next digest."
 
 Wait for their response and apply any feedback (update config.json or prompt files
@@ -367,15 +377,19 @@ Assemble the digest following `prompts.digest_intro`.
 
 ### Step 4.5: Save structured digest
 
+**Only run this step if `config.delivery.method` is `"web"`. If the delivery method is anything else (`stdout`, `telegram`, `email`), skip Step 4.5 entirely and go to Step 5.**
+
 After remixing, produce a structured JSON object and save it for the visual digest viewer.
 
 Assemble this exact JSON structure (fill in the actual remix content):
+
+**If `config.language` is `"en"` or `"zh"`** — use a single `summary` field per builder/podcast:
 
 ```json
 {
   "date": "YYYY-MM-DD",
   "generatedAt": "ISO timestamp",
-  "language": "en",
+  "language": "<use the actual value from config.language: en or zh>",
   "builders": [
     {
       "name": "Guillermo Rauch",
@@ -410,8 +424,44 @@ Assemble this exact JSON structure (fill in the actual remix content):
 }
 ```
 
+**If `config.language` is `"bilingual"`** — use `summary_en` + `summary_zh` instead of `summary`:
+
+```json
+{
+  "date": "YYYY-MM-DD",
+  "generatedAt": "ISO timestamp",
+  "language": "bilingual",
+  "builders": [
+    {
+      "name": "Guillermo Rauch",
+      "handle": "rauchg",
+      "bio": "bio text from JSON",
+      "summary_en": "Your 2-4 sentence English remix summary for this builder.",
+      "summary_zh": "用中文写的 2-4 句摘要。",
+      "tweets": [...],
+      "totalLikes": 1928,
+      "totalRetweets": 180,
+      "totalReplies": 205,
+      "totalQuotes": 58
+    }
+  ],
+  "podcasts": [
+    {
+      "name": "Latent Space",
+      "title": "Episode Title from JSON",
+      "url": "https://youtube.com/watch?v=...",
+      "summary_en": "Your 200-400 word English podcast summary.",
+      "summary_zh": "中文播客摘要，200-400字。"
+    }
+  ]
+}
+```
+
 Rules:
-- `summary` fields must contain your remixed text (not raw transcript or tweets)
+- `language` must be the actual value from `config.language` — never hardcode `"en"`
+- For `en` or `zh`: use `summary` (single field)
+- For `bilingual`: use `summary_en` + `summary_zh` (two fields, no `summary`)
+- All `summary` fields must contain your remixed text (not raw transcript or tweets)
 - `tweets` array preserves original data from the feed JSON — do not modify it
 - `totalLikes/Retweets/Replies/Quotes` must be the sum across all tweets for that builder
 - Only include builders that had new content; skip others
@@ -461,13 +511,15 @@ cd ${CLAUDE_SKILL_DIR}/scripts && node deliver.js --file /tmp/fb-digest.txt 2>/d
 If delivery fails, show the digest in the terminal as fallback.
 
 **If "stdout" (default):**
-Just output the digest directly.
+Just output the digest directly. Do NOT open `digest.html`.
 
-After delivering, automatically open the visual digest in the user's browser:
+**If "web":**
+The structured digest was already saved in Step 4.5. Just open the viewer:
 ```bash
 open ${CLAUDE_SKILL_DIR}/digest.html
 ```
-Then tell the user: "Visual digest opened in your browser. You can also re-open it anytime at `digest.html`."
+Tell the user: "Your visual digest is ready — opened in your browser.
+Re-open anytime with: `open <skill-path>/digest.html`"
 
 ---
 
@@ -491,8 +543,9 @@ open an issue at https://github.com/zarazhangrui/follow-builders."
 
 ### Delivery Changes
 - "Switch to Telegram/email" → Update `delivery.method` in config.json, guide user through setup if needed
+- "Switch to web viewer" → Update `delivery.method` to `"web"` in config.json (no additional setup needed)
 - "Change my email" → Update `delivery.email` in config.json
-- "Send to this chat instead" → Set `delivery.method` to "stdout"
+- "Send to this chat instead" / "Stop opening the browser" → Set `delivery.method` to `"stdout"`
 
 ### Prompt Changes
 When a user wants to customize how their digest sounds, copy the relevant prompt

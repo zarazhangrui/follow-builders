@@ -175,6 +175,13 @@
     .btn.sort-rt.active     { background: rgba(120,140,93,0.1);  border-color: rgba(120,140,93,0.4);  color: var(--green);  }
     .btn.sort-reply.active  { background: rgba(106,155,204,0.1); border-color: rgba(106,155,204,0.4); color: var(--blue);   }
     .btn.sort-quote.active  { background: rgba(155,123,200,0.1); border-color: rgba(155,123,200,0.4); color: var(--quote);  }
+    .btn.lang-btn.active    { background: var(--accent-dim); border-color: rgba(217,119,87,0.4); color: var(--accent); }
+
+    .summary-divider {
+      border: none;
+      border-top: 1px dashed var(--light-gray);
+      margin: 0.65rem 0;
+    }
 
     /* Date picker */
     .date-select {
@@ -593,6 +600,14 @@
       <button class="btn sort-quote"        id="sort-quote"  onclick="setSort('totalQuotes')">⤤ Quotes</button>
     </div>
   </div>
+  <div class="ctrl-group" id="lang-ctrl" style="display:none">
+    <span class="ctrl-label">Lang</span>
+    <div class="btn-row">
+      <button class="btn lang-btn" id="lang-en"  onclick="setLang('en')">EN</button>
+      <button class="btn lang-btn" id="lang-zh"  onclick="setLang('zh')">中</button>
+      <button class="btn lang-btn active" id="lang-all" onclick="setLang('all')">双语</button>
+    </div>
+  </div>
 </div>
 
 <main id="main"></main>
@@ -611,6 +626,7 @@
   let allDigests = {};   // { "2026-03-23": digestObj, ... }
   let data = null;       // currently selected day
   let sortKey = 'totalLikes';
+  let langMode = 'all';  // 'en', 'zh', 'all' — only active when data.language === 'bilingual'
 
   // ── Avatar palette (Anthropic brand colors) ─────────────────────────────────
   const PALETTE = [
@@ -690,7 +706,7 @@
             ${bio ? `<div class="builder-bio">${esc(bio)}</div>` : ''}
           </div>
         </div>
-        <div class="summary">${esc(builder.summary || 'No summary available.')}</div>
+        <div class="summary">${summaryHTML(builder)}</div>
         ${tweetChips ? `<div class="tweet-links">${tweetChips}</div>` : ''}
         <div class="card-metrics">
           <div class="metric metric-likes">
@@ -726,7 +742,7 @@
         <div class="pod-eyebrow">🎙 Podcast</div>
         <div class="pod-title">${esc(p.title)}</div>
         <div class="pod-show">${esc(p.name)}</div>
-        <div class="pod-summary">${esc(p.summary || 'No summary available.')}</div>
+        <div class="pod-summary">${summaryHTML(p)}</div>
         <a class="pod-link" href="${esc(p.url)}" target="_blank" rel="noopener">
           Watch on YouTube →
         </a>
@@ -791,6 +807,37 @@
     });
   }
 
+  // ── Summary rendering (handles single summary or bilingual summary_en/summary_zh) ──
+  function summaryHTML(item) {
+    if (item.summary_en || item.summary_zh) {
+      // Bilingual data: render based on current langMode
+      if (langMode === 'en') return esc(item.summary_en || 'No summary available.');
+      if (langMode === 'zh') return esc(item.summary_zh || 'No summary available.');
+      // 'all': show both with a divider
+      const parts = [];
+      if (item.summary_en) parts.push(esc(item.summary_en));
+      if (item.summary_zh) parts.push(esc(item.summary_zh));
+      return parts.join('<hr class="summary-divider">');
+    }
+    return esc(item.summary || 'No summary available.');
+  }
+
+  // ── Language control ─────────────────────────────────────────────────────────
+  function setLang(mode) {
+    langMode = mode;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('lang-' + mode).classList.add('active');
+    render();
+  }
+
+  function updateLangCtrl() {
+    // Show lang ctrl only if current data has bilingual fields
+    const isBilingual = data && data.language === 'bilingual' &&
+      (data.builders || []).some(b => b.summary_en || b.summary_zh);
+    const ctrl = document.getElementById('lang-ctrl');
+    if (ctrl) ctrl.style.display = isBilingual ? 'flex' : 'none';
+  }
+
   // ── Sort control ────────────────────────────────────────────────────────────
   function setSort(key) {
     sortKey = key;
@@ -810,6 +857,7 @@
   function setDate(dateKey) {
     data = allDigests[dateKey] || null;
     updateHeaderMeta();
+    updateLangCtrl();
     render();
   }
 
@@ -870,6 +918,7 @@
 
     buildDatePicker(dates, latestDate);
     updateHeaderMeta();
+    updateLangCtrl();
     document.getElementById('controls').style.display = 'flex';
     render();
   }
