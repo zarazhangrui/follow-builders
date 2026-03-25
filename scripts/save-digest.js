@@ -109,6 +109,7 @@ async function main() {
     date: data.date,
     builders: data.builders.length,
     podcasts: data.podcasts.length,
+    blogs: (data.blogs || []).length,
     storedDates: dates,
   }));
 }

@@ -412,6 +412,7 @@
 
     /* ── Podcast card ── */
     .podcast-section { margin-bottom: 3.5rem; }
+    .podcast-section .cards-grid { grid-template-columns: 1fr; }
 
     .podcast-card {
       background: var(--dark);
@@ -481,6 +482,81 @@
     .pod-link:hover {
       background: rgba(217,119,87,0.12);
       border-color: rgba(217,119,87,0.7);
+    }
+
+    /* ── Blog card ── */
+    .blog-section { margin-bottom: 3.5rem; }
+
+    .blog-card {
+      background: var(--dark);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-left: 3px solid var(--green);
+      border-radius: 8px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .blog-card:hover {
+      box-shadow: 0 12px 40px rgba(20,20,19,0.2);
+      transform: translateY(-2px);
+      border-left-color: var(--green);
+    }
+
+    .blog-eyebrow {
+      font-family: 'Poppins', Arial, sans-serif;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green);
+    }
+
+    .blog-title {
+      font-family: 'Poppins', Arial, sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--light);
+      letter-spacing: -0.01em;
+    }
+
+    .blog-meta {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 0.78rem;
+      color: var(--mid-gray);
+    }
+
+    .blog-summary {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 0.88rem;
+      line-height: 1.8;
+      color: #c8c6be;
+      font-weight: 400;
+    }
+
+    .blog-link {
+      font-family: 'Poppins', Arial, sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--green);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      width: fit-content;
+      padding: 0.4rem 0.85rem;
+      border: 1px solid rgba(120,140,93,0.4);
+      border-radius: 4px;
+      transition: all 0.15s;
+      margin-top: 0.25rem;
+    }
+
+    .blog-link:hover {
+      background: rgba(120,140,93,0.12);
+      border-color: rgba(120,140,93,0.7);
     }
 
     /* ── Empty / no-data state ── */
@@ -749,6 +825,23 @@
       </div>`;
   }
 
+  // ── Render blog card ─────────────────────────────────────────────────────────
+  function blogCardHTML(b) {
+    const metaParts = [b.name];
+    if (b.author) metaParts.push(b.author);
+    if (b.publishedAt) metaParts.push(friendlyDate(b.publishedAt));
+    return `
+      <div class="blog-card">
+        <div class="blog-eyebrow">✦ Blog Post</div>
+        <div class="blog-title">${esc(b.title)}</div>
+        <div class="blog-meta">${metaParts.map(esc).join(' · ')}</div>
+        <div class="blog-summary">${summaryHTML(b)}</div>
+        <a class="blog-link" href="${esc(b.url)}" target="_blank" rel="noopener">
+          Read Article →
+        </a>
+      </div>`;
+  }
+
   // ── No-data state ───────────────────────────────────────────────────────────
   function renderNoData() {
     document.getElementById('main').innerHTML = `
@@ -779,6 +872,20 @@
           </div>
           <div class="cards-grid">
             ${data.podcasts.map(podcastCardHTML).join('')}
+          </div>
+        </div>`;
+    }
+
+    // Blogs
+    if (data.blogs && data.blogs.length > 0) {
+      html += `
+        <div class="blog-section">
+          <div class="section-head">
+            <div class="section-title">Blog Posts</div>
+            <div class="section-count">${data.blogs.length} article${data.blogs.length !== 1 ? 's' : ''}</div>
+          </div>
+          <div class="cards-grid">
+            ${data.blogs.map(blogCardHTML).join('')}
           </div>
         </div>`;
     }
@@ -833,7 +940,8 @@
   function updateLangCtrl() {
     // Show lang ctrl only if current data has bilingual fields
     const isBilingual = data && data.language === 'bilingual' &&
-      (data.builders || []).some(b => b.summary_en || b.summary_zh);
+      ((data.builders || []).some(b => b.summary_en || b.summary_zh) ||
+       (data.blogs || []).some(b => b.summary_en || b.summary_zh));
     const ctrl = document.getElementById('lang-ctrl');
     if (ctrl) ctrl.style.display = isBilingual ? 'flex' : 'none';
   }
@@ -884,6 +992,9 @@
       `<span class="meta-item"><span class="meta-pip"></span>${totalTweets} tweets</span>`,
       (data.podcasts || []).length
         ? `<span class="meta-item"><span class="meta-pip"></span>${data.podcasts.length} podcast episode${data.podcasts.length !== 1 ? 's' : ''}</span>`
+        : '',
+      (data.blogs || []).length
+        ? `<span class="meta-item"><span class="meta-pip"></span>${data.blogs.length} blog post${data.blogs.length !== 1 ? 's' : ''}</span>`
         : '',
       data.language && data.language !== 'en'
         ? `<span class="meta-item"><span class="meta-pip"></span>${data.language}</span>`
