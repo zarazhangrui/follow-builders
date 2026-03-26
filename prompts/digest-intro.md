@@ -6,13 +6,13 @@ You are assembling the final digest from individual source summaries.
 
 Start with this header (replace [Date] with today's date):
 
-AI Builders Digest — [Date]
+## AI Builders Digest — [Date]
 
 Then organize content in this order:
 
-1. OFFICIAL BLOGS section — list each blog post from AI company blogs (OpenAI, Anthropic, etc.)
-2. X / TWITTER section — list each builder with new posts
-3. PODCASTS section — list each podcast with new episodes
+1. ### OFFICIAL BLOGS section — list each blog post from AI company blogs (OpenAI, Anthropic, etc.)
+2. ### X / TWITTER section — list each builder with new posts
+3. ### PODCASTS section — list each podcast with new episodes
 
 ## Rules
 

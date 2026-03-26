@@ -16,7 +16,7 @@
 // Output: JSON to stdout
 // ============================================================================
 
-import { readFile, mkdir } from 'fs/promises';
+import { readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
@@ -25,6 +25,7 @@ import { homedir } from 'os';
 
 const USER_DIR = join(homedir(), '.follow-builders');
 const CONFIG_PATH = join(USER_DIR, 'config.json');
+const SEEN_PATH = join(USER_DIR, 'seen-content.json');
 
 const FEED_X_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json';
 const FEED_PODCASTS_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json';
@@ -53,6 +54,36 @@ async function fetchText(url) {
   return res.text();
 }
 
+// -- Local deduplication -----------------------------------------------------
+
+async function loadSeen() {
+  if (!existsSync(SEEN_PATH)) {
+    return { tweets: {}, videos: {}, articles: {} };
+  }
+  try {
+    return JSON.parse(await readFile(SEEN_PATH, 'utf-8'));
+  } catch {
+    return { tweets: {}, videos: {}, articles: {} };
+  }
+}
+
+async function saveSeen(seen) {
+  await mkdir(USER_DIR, { recursive: true });
+  await writeFile(SEEN_PATH, JSON.stringify(seen, null, 2));
+}
+
+function filterNew(items, seenMap, idField) {
+  const newItems = [];
+  for (const item of items) {
+    const id = item[idField];
+    if (!seenMap[id]) {
+      newItems.push(item);
+      seenMap[id] = Date.now();
+    }
+  }
+  return newItems;
+}
+
 // -- Main --------------------------------------------------------------------
 
 async function main() {
@@ -72,7 +103,10 @@ async function main() {
     }
   }
 
-  // 2. Fetch all three feeds
+  // 2. Load seen content
+  const seen = await loadSeen();
+
+  // 3. Fetch all three feeds
   const [feedX, feedPodcasts, feedBlogs] = await Promise.all([
     fetchJSON(FEED_X_URL),
     fetchJSON(FEED_PODCASTS_URL),
@@ -83,12 +117,16 @@ async function main() {
   if (!feedPodcasts) errors.push('Could not fetch podcast feed');
   if (!feedBlogs) errors.push('Could not fetch blog feed');
 
-  // 3. Load prompts with priority: user custom > remote (GitHub) > local default
-  //
-  // If the user has a custom prompt at ~/.follow-builders/prompts/<file>,
-  // use that (they personalized it — don't overwrite with remote updates).
-  // Otherwise, fetch the latest from GitHub so they get central improvements.
-  // If GitHub is unreachable, fall back to the local copy shipped with the skill.
+  // 4. Filter out already-seen content
+  const filteredX = (feedX?.x || []).map(builder => ({
+    ...builder,
+    tweets: filterNew(builder.tweets, seen.tweets, 'id')
+  })).filter(b => b.tweets.length > 0);
+
+  const filteredPodcasts = filterNew(feedPodcasts?.podcasts || [], seen.videos, 'videoId');
+  const filteredBlogs = filterNew(feedBlogs?.blogs || [], seen.articles, 'url');
+
+  // 5. Load prompts with priority: user custom > remote (GitHub) > local default
   const prompts = {};
   const scriptDir = decodeURIComponent(new URL('.', import.meta.url).pathname);
   const localPromptsDir = join(scriptDir, '..', 'prompts');
@@ -99,20 +137,17 @@ async function main() {
     const userPath = join(userPromptsDir, filename);
     const localPath = join(localPromptsDir, filename);
 
-    // Priority 1: user's custom prompt (they personalized it)
     if (existsSync(userPath)) {
       prompts[key] = await readFile(userPath, 'utf-8');
       continue;
     }
 
-    // Priority 2: latest from GitHub (central updates)
     const remote = await fetchText(`${PROMPTS_BASE}/${filename}`);
     if (remote) {
       prompts[key] = remote;
       continue;
     }
 
-    // Priority 3: local copy shipped with the skill
     if (existsSync(localPath)) {
       prompts[key] = await readFile(localPath, 'utf-8');
     } else {
@@ -120,36 +155,37 @@ async function main() {
     }
   }
 
-  // 4. Build the output — everything the LLM needs in one blob
+  // 6. Save updated seen content
+  await saveSeen(seen);
+
+  // 7. Build the output
+  const hasContent = filteredPodcasts.length > 0 || filteredX.length > 0 || filteredBlogs.length > 0;
+
+  if (!hasContent) {
+    // No new content - output a simple message
+    console.log('今天没有新的内容更新。');
+    return;
+  }
+
   const output = {
     status: 'ok',
     generatedAt: new Date().toISOString(),
-
-    // User preferences
     config: {
       language: config.language || 'en',
       frequency: config.frequency || 'daily',
       delivery: config.delivery || { method: 'stdout' }
     },
-
-    // Content to remix
-    podcasts: feedPodcasts?.podcasts || [],
-    x: feedX?.x || [],
-    blogs: feedBlogs?.blogs || [],
-
-    // Stats for the LLM to reference
+    podcasts: filteredPodcasts,
+    x: filteredX,
+    blogs: filteredBlogs,
     stats: {
-      podcastEpisodes: feedPodcasts?.podcasts?.length || 0,
-      xBuilders: feedX?.x?.length || 0,
-      totalTweets: (feedX?.x || []).reduce((sum, a) => sum + a.tweets.length, 0),
-      blogPosts: feedBlogs?.blogs?.length || 0,
+      podcastEpisodes: filteredPodcasts.length,
+      xBuilders: filteredX.length,
+      totalTweets: filteredX.reduce((sum, a) => sum + a.tweets.length, 0),
+      blogPosts: filteredBlogs.length,
       feedGeneratedAt: feedX?.generatedAt || feedPodcasts?.generatedAt || feedBlogs?.generatedAt || null
     },
-
-    // Prompts — the LLM reads these and follows the instructions
     prompts,
-
-    // Non-fatal errors
     errors: errors.length > 0 ? errors : undefined
   };
 

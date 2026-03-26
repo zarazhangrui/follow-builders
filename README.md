@@ -19,6 +19,7 @@ WhatsApp, etc.) with:
 - Full articles from official AI company blogs (Anthropic Engineering, Claude Blog)
 - Links to all original content
 - Available in English, Chinese, or bilingual
+- Optional sync to append each digest to your Obsidian Daily note
 
 ## Quick Start
 
@@ -30,6 +31,7 @@ The agent will ask you:
 - How often you want your digest (daily or weekly) and what time
 - What language you prefer
 - How you want it delivered (Telegram, email, or in-chat)
+- Whether to also archive a copy to your Obsidian vault
 
 No API keys needed — all content is fetched centrally.
 Your first digest arrives immediately after setup.
