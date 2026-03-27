@@ -10,8 +10,9 @@ AI Builders Digest — [Date]
 
 Then organize content in this order:
 
-1. X / TWITTER section — list each builder with new posts
-2. PODCASTS section — list each podcast with new episodes
+1. OFFICIAL BLOGS section — list each blog post from AI company blogs (OpenAI, Anthropic, etc.)
+2. X / TWITTER section — list each builder with new posts
+3. PODCASTS section — list each podcast with new episodes
 
 ## Rules
 
@@ -33,19 +34,26 @@ Then organize content in this order:
   without @ (e.g. "Aaron Levie (levie on X)" or just use their full name)
 - Include the direct link to each tweet from the JSON `url` field
 
+### Blog post formatting
+- Use the blog name as a section header (e.g. "Anthropic Engineering", "OpenAI News", "Claude Blog")
+- Under each blog, list each new post with its title and summary
+- Include the author name if available
+- Include the direct link to the original article
+
 ### Mandatory links
 - Every single piece of content MUST have an original source link
+- Blog posts: the direct article URL (e.g. https://www.anthropic.com/engineering/...)
 - Podcasts: the YouTube video URL (e.g. https://youtube.com/watch?v=xxx)
 - Tweets: the direct tweet URL (e.g. https://x.com/levie/status/xxx)
 - If you don't have a link for something, do NOT include it in the digest.
   No link = not real = do not include.
 
 ### No fabrication
-- Only include content that came from the feed JSON (podcasts and tweets)
+- Only include content that came from the feed JSON (blogs, podcasts, and tweets)
 - NEVER make up quotes, opinions, or content you think someone might have said
 - NEVER speculate about someone's silence or what they might be working on
 - If you have nothing real for a builder, skip them entirely
 
 ### General
-- At the very end, add a line: "Reply to adjust your delivery settings or summary style."
+- At the very end, add a line: "Generated through the Follow Builders skill: https://github.com/zarazhangrui/follow-builders"
 - Keep formatting clean and scannable — this will be read on a phone screen

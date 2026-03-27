@@ -3,13 +3,13 @@
 // ============================================================================
 // Follow Builders — Central Feed Generator
 // ============================================================================
-// Runs on GitHub Actions (every 6h for tweets, every 24h for podcasts) to
-// fetch content and publish feed-x.json and feed-podcasts.json.
+// Runs on GitHub Actions (daily at 6am UTC) to fetch content and publish
+// feed-x.json, feed-podcasts.json, and feed-blogs.json.
 //
-// Deduplication: tracks previously seen tweet IDs and video IDs in
-// state-feed.json so content is never repeated across runs.
+// Deduplication: tracks previously seen tweet IDs, video IDs, and article
+// URLs in state-feed.json so content is never repeated across runs.
 //
-// Usage: node generate-feed.js [--tweets-only | --podcasts-only]
+// Usage: node generate-feed.js [--tweets-only | --podcasts-only | --blogs-only]
 // Env vars needed: X_BEARER_TOKEN, SUPADATA_API_KEY
 // ============================================================================
 
@@ -23,7 +23,9 @@ const SUPADATA_BASE = 'https://api.supadata.ai/v1';
 const X_API_BASE = 'https://api.x.com/2';
 const TWEET_LOOKBACK_HOURS = 24;
 const PODCAST_LOOKBACK_HOURS = 72;
+const BLOG_LOOKBACK_HOURS = 72;
 const MAX_TWEETS_PER_USER = 3;
+const MAX_ARTICLES_PER_BLOG = 3;
 
 // State file lives in the repo root so it gets committed by GitHub Actions
 const SCRIPT_DIR = decodeURIComponent(new URL('.', import.meta.url).pathname);
@@ -36,12 +38,15 @@ const STATE_PATH = join(SCRIPT_DIR, '..', 'state-feed.json');
 
 async function loadState() {
   if (!existsSync(STATE_PATH)) {
-    return { seenTweets: {}, seenVideos: {} };
+    return { seenTweets: {}, seenVideos: {}, seenArticles: {} };
   }
   try {
-    return JSON.parse(await readFile(STATE_PATH, 'utf-8'));
+    const state = JSON.parse(await readFile(STATE_PATH, 'utf-8'));
+    // Ensure seenArticles exists for older state files
+    if (!state.seenArticles) state.seenArticles = {};
+    return state;
   } catch {
-    return { seenTweets: {}, seenVideos: {} };
+    return { seenTweets: {}, seenVideos: {}, seenArticles: {} };
   }
 }
 
@@ -53,6 +58,9 @@ async function saveState(state) {
   }
   for (const [id, ts] of Object.entries(state.seenVideos)) {
     if (ts < cutoff) delete state.seenVideos[id];
+  }
+  for (const [id, ts] of Object.entries(state.seenArticles || {})) {
+    if (ts < cutoff) delete state.seenArticles[id];
   }
   await writeFile(STATE_PATH, JSON.stringify(state, null, 2));
 }
@@ -273,21 +281,336 @@ async function fetchXContent(xAccounts, bearerToken, state, errors) {
   return results;
 }
 
+// -- Blog Fetching (HTML scraping) -------------------------------------------
+
+// Scrapes the Anthropic Engineering blog index page.
+// The page is a Next.js app that embeds article data as JSON in <script> tags.
+// We parse that JSON to extract article metadata (title, slug, date, summary).
+// Falls back to regex-based HTML parsing if the JSON approach fails.
+function parseAnthropicEngineeringIndex(html) {
+  const articles = [];
+
+  // Strategy 1: Look for article data in Next.js __NEXT_DATA__ script tag
+  const nextDataMatch = html.match(/<script[^>]*id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i);
+  if (nextDataMatch) {
+    try {
+      const data = JSON.parse(nextDataMatch[1]);
+      // Navigate the Next.js page props to find article entries
+      const pageProps = data?.props?.pageProps;
+      const posts = pageProps?.posts || pageProps?.articles || pageProps?.entries || [];
+      for (const post of posts) {
+        const slug = post.slug?.current || post.slug || '';
+        articles.push({
+          title: post.title || 'Untitled',
+          url: `https://www.anthropic.com/engineering/${slug}`,
+          publishedAt: post.publishedOn || post.publishedAt || post.date || null,
+          description: post.summary || post.description || ''
+        });
+      }
+      if (articles.length > 0) return articles;
+    } catch {
+      // JSON parsing failed, fall through to regex approach
+    }
+  }
+
+  // Strategy 2: Regex-based extraction from the rendered HTML.
+  // Anthropic engineering articles follow the pattern /engineering/<slug>
+  const linkRegex = /href="\/engineering\/([a-z0-9-]+)"/gi;
+  const seenSlugs = new Set();
+  let linkMatch;
+  while ((linkMatch = linkRegex.exec(html)) !== null) {
+    const slug = linkMatch[1];
+    if (seenSlugs.has(slug)) continue;
+    seenSlugs.add(slug);
+    articles.push({
+      title: '', // Will be filled when we fetch the article page
+      url: `https://www.anthropic.com/engineering/${slug}`,
+      publishedAt: null,
+      description: ''
+    });
+  }
+  return articles;
+}
+
+// Scrapes the Claude Blog index page (claude.com/blog).
+// This is a Webflow site. We extract article links, titles, and dates
+// from the HTML structure.
+function parseClaudeBlogIndex(html) {
+  const articles = [];
+  const seenSlugs = new Set();
+
+  // Match blog post links — they follow the pattern /blog/<slug>
+  // We capture surrounding context to extract titles and dates
+  const linkRegex = /href="\/blog\/([a-z0-9-]+)"/gi;
+  let linkMatch;
+  while ((linkMatch = linkRegex.exec(html)) !== null) {
+    const slug = linkMatch[1];
+    if (seenSlugs.has(slug)) continue;
+    seenSlugs.add(slug);
+    articles.push({
+      title: '', // Will be filled when we fetch the article page
+      url: `https://claude.com/blog/${slug}`,
+      publishedAt: null,
+      description: ''
+    });
+  }
+  return articles;
+}
+
+// Extracts the main text content from an Anthropic Engineering article page.
+// Tries the embedded JSON first (Next.js SSR data), then falls back to
+// stripping HTML tags from the article body.
+function extractAnthropicArticleContent(html) {
+  let title = '';
+  let author = '';
+  let publishedAt = null;
+  let content = '';
+
+  // Try to get structured data from Next.js __NEXT_DATA__
+  const nextDataMatch = html.match(/<script[^>]*id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i);
+  if (nextDataMatch) {
+    try {
+      const data = JSON.parse(nextDataMatch[1]);
+      const pageProps = data?.props?.pageProps;
+      const post = pageProps?.post || pageProps?.article || pageProps?.entry || pageProps;
+      title = post?.title || '';
+      author = post?.author?.name || post?.authors?.[0]?.name || '';
+      publishedAt = post?.publishedOn || post?.publishedAt || post?.date || null;
+
+      // Extract text from the body blocks (Sanity CMS portable text format)
+      const body = post?.body || post?.content || [];
+      if (Array.isArray(body)) {
+        const textParts = [];
+        for (const block of body) {
+          if (block._type === 'block' && block.children) {
+            const text = block.children.map(c => c.text || '').join('');
+            if (text.trim()) textParts.push(text.trim());
+          }
+        }
+        content = textParts.join('\n\n');
+      }
+      if (content) return { title, author, publishedAt, content };
+    } catch {
+      // Fall through to HTML stripping
+    }
+  }
+
+  // Fallback: extract title from <h1> and body from <article> or main content
+  const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+  if (h1Match) title = h1Match[1].replace(/<[^>]+>/g, '').trim();
+
+  // Try to find the article body and strip HTML tags
+  const articleMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/i);
+  const bodyHtml = articleMatch ? articleMatch[1] : html;
+
+  // Strip script/style tags first, then all remaining HTML tags
+  content = bodyHtml
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return { title, author, publishedAt, content };
+}
+
+// Extracts the main text content from a Claude Blog article page.
+// Uses JSON-LD schema data if present, then falls back to the rich text body.
+function extractClaudeBlogArticleContent(html) {
+  let title = '';
+  let author = '';
+  let publishedAt = null;
+  let content = '';
+
+  // Try JSON-LD structured data first (most reliable for metadata)
+  const jsonLdRegex = /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi;
+  let jsonLdMatch;
+  while ((jsonLdMatch = jsonLdRegex.exec(html)) !== null) {
+    try {
+      const ld = JSON.parse(jsonLdMatch[1]);
+      if (ld['@type'] === 'BlogPosting' || ld['@type'] === 'Article') {
+        title = ld.headline || ld.name || '';
+        author = ld.author?.name || '';
+        publishedAt = ld.datePublished || null;
+        break;
+      }
+    } catch {
+      // Not valid JSON-LD, skip
+    }
+  }
+
+  // Extract body text from the Webflow rich text container
+  const richTextMatch = html.match(/<div[^>]*class="[^"]*u-rich-text-blog[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i)
+    || html.match(/<div[^>]*class="[^"]*w-richtext[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+
+  if (richTextMatch) {
+    content = richTextMatch[1]
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // If rich text extraction failed, try a broader approach
+  if (!content) {
+    // Get title from <h1> if not already found
+    if (!title) {
+      const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+      if (h1Match) title = h1Match[1].replace(/<[^>]+>/g, '').trim();
+    }
+
+    // Strip the whole page down to text as a last resort
+    content = html
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<nav[\s\S]*?<\/nav>/gi, '')
+      .replace(/<footer[\s\S]*?<\/footer>/gi, '')
+      .replace(/<header[\s\S]*?<\/header>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  return { title, author, publishedAt, content };
+}
+
+// Main blog fetching orchestrator.
+// For each blog source in the config, discovers new articles, deduplicates
+// against previously seen URLs, fetches full article content, and returns
+// the results for feed-blogs.json.
+async function fetchBlogContent(blogs, state, errors) {
+  const results = [];
+  const cutoff = new Date(Date.now() - BLOG_LOOKBACK_HOURS * 60 * 60 * 1000);
+
+  for (const blog of blogs) {
+    console.error(`  Processing blog: ${blog.name}...`);
+    let candidates = [];
+
+    try {
+      // Step 1: Discover articles from the blog index page
+      const indexRes = await fetch(blog.indexUrl, {
+        headers: { 'User-Agent': 'FollowBuilders/1.0 (feed aggregator)' }
+      });
+      if (!indexRes.ok) {
+        errors.push(`Blog: Failed to fetch index for ${blog.name}: HTTP ${indexRes.status}`);
+        continue;
+      }
+      const indexHtml = await indexRes.text();
+
+      // Use the right parser based on which blog this is
+      if (blog.indexUrl.includes('anthropic.com')) {
+        candidates = parseAnthropicEngineeringIndex(indexHtml);
+      } else if (blog.indexUrl.includes('claude.com')) {
+        candidates = parseClaudeBlogIndex(indexHtml);
+      }
+
+      // Step 2: Filter to unseen articles, cap at MAX_ARTICLES_PER_BLOG.
+      // Blog index pages list articles newest-first. We only consider the
+      // first few entries (MAX_INDEX_SCAN) to avoid crawling the entire
+      // backlog on first run. Articles with a known date must fall within
+      // the lookback window; articles without dates are accepted if they
+      // appear near the top of the listing (likely recent).
+      const MAX_INDEX_SCAN = MAX_ARTICLES_PER_BLOG; // only look at the N most recent entries
+      const newArticles = [];
+      for (const article of candidates.slice(0, MAX_INDEX_SCAN)) {
+        if (state.seenArticles[article.url]) continue; // already seen
+        // If we have a date, check it's within the lookback window
+        if (article.publishedAt && new Date(article.publishedAt) < cutoff) continue;
+        newArticles.push(article);
+        if (newArticles.length >= MAX_ARTICLES_PER_BLOG) break;
+      }
+
+      if (newArticles.length === 0) {
+        console.error(`    No new articles found`);
+        continue;
+      }
+
+      console.error(`    Found ${newArticles.length} new article(s), fetching content...`);
+
+      // Step 3: Fetch full article content for each new article
+      for (const article of newArticles) {
+        try {
+          // Fetch the full article page
+          const articleRes = await fetch(article.url, {
+            headers: { 'User-Agent': 'FollowBuilders/1.0 (feed aggregator)' }
+          });
+          if (!articleRes.ok) {
+            errors.push(`Blog: Failed to fetch article ${article.url}: HTTP ${articleRes.status}`);
+            continue;
+          }
+          const articleHtml = await articleRes.text();
+
+          // Use the right content extractor based on the blog
+          let extracted;
+          if (article.url.includes('anthropic.com/engineering')) {
+            extracted = extractAnthropicArticleContent(articleHtml);
+          } else if (article.url.includes('claude.com/blog')) {
+            extracted = extractClaudeBlogArticleContent(articleHtml);
+          }
+
+          if (!extracted || !extracted.content) {
+            errors.push(`Blog: No content extracted from ${article.url}`);
+            continue;
+          }
+
+          // Merge extracted data with what we already have from the index
+          results.push({
+            source: 'blog',
+            name: blog.name,
+            title: extracted.title || article.title || 'Untitled',
+            url: article.url,
+            publishedAt: extracted.publishedAt || article.publishedAt || null,
+            author: extracted.author || '',
+            description: article.description || '',
+            content: extracted.content
+          });
+
+          // Mark as seen
+          state.seenArticles[article.url] = Date.now();
+
+          // Small delay between article fetches to be polite
+          await new Promise(r => setTimeout(r, 500));
+        } catch (err) {
+          errors.push(`Blog: Error fetching article ${article.url}: ${err.message}`);
+        }
+      }
+    } catch (err) {
+      errors.push(`Blog: Error processing ${blog.name}: ${err.message}`);
+    }
+  }
+
+  return results;
+}
+
 // -- Main --------------------------------------------------------------------
 
 async function main() {
   const args = process.argv.slice(2);
   const tweetsOnly = args.includes('--tweets-only');
   const podcastsOnly = args.includes('--podcasts-only');
+  const blogsOnly = args.includes('--blogs-only');
+
+  // If a specific --*-only flag is set, only that feed type runs.
+  // If no flag is set, all three run.
+  const runTweets = tweetsOnly || (!podcastsOnly && !blogsOnly);
+  const runPodcasts = podcastsOnly || (!tweetsOnly && !blogsOnly);
+  const runBlogs = blogsOnly || (!tweetsOnly && !podcastsOnly);
 
   const xBearerToken = process.env.X_BEARER_TOKEN;
   const supadataKey = process.env.SUPADATA_API_KEY;
 
-  if (!tweetsOnly && !supadataKey) {
+  if (runPodcasts && !supadataKey) {
     console.error('SUPADATA_API_KEY not set');
     process.exit(1);
   }
-  if (!podcastsOnly && !xBearerToken) {
+  if (runTweets && !xBearerToken) {
     console.error('X_BEARER_TOKEN not set');
     process.exit(1);
   }
@@ -296,11 +619,10 @@ async function main() {
   const state = await loadState();
   const errors = [];
 
-  // Fetch tweets (unless --podcasts-only)
-  let xContent = [];
-  if (!podcastsOnly) {
+  // Fetch tweets
+  if (runTweets) {
     console.error('Fetching X/Twitter content...');
-    xContent = await fetchXContent(sources.x_accounts, xBearerToken, state, errors);
+    const xContent = await fetchXContent(sources.x_accounts, xBearerToken, state, errors);
     console.error(`  Found ${xContent.length} builders with new tweets`);
 
     const totalTweets = xContent.reduce((sum, a) => sum + a.tweets.length, 0);
@@ -316,11 +638,10 @@ async function main() {
     console.error(`  feed-x.json: ${xContent.length} builders, ${totalTweets} tweets`);
   }
 
-  // Fetch podcasts (unless --tweets-only)
-  let podcasts = [];
-  if (!tweetsOnly) {
+  // Fetch podcasts
+  if (runPodcasts) {
     console.error('Fetching YouTube content...');
-    podcasts = await fetchYouTubeContent(sources.podcasts, supadataKey, state, errors);
+    const podcasts = await fetchYouTubeContent(sources.podcasts, supadataKey, state, errors);
     console.error(`  Found ${podcasts.length} new episodes`);
 
     const podcastFeed = {
@@ -333,6 +654,24 @@ async function main() {
     };
     await writeFile(join(SCRIPT_DIR, '..', 'feed-podcasts.json'), JSON.stringify(podcastFeed, null, 2));
     console.error(`  feed-podcasts.json: ${podcasts.length} episodes`);
+  }
+
+  // Fetch blog posts
+  if (runBlogs && sources.blogs && sources.blogs.length > 0) {
+    console.error('Fetching blog content...');
+    const blogContent = await fetchBlogContent(sources.blogs, state, errors);
+    console.error(`  Found ${blogContent.length} new blog post(s)`);
+
+    const blogFeed = {
+      generatedAt: new Date().toISOString(),
+      lookbackHours: BLOG_LOOKBACK_HOURS,
+      blogs: blogContent,
+      stats: { blogPosts: blogContent.length },
+      errors: errors.filter(e => e.startsWith('Blog')).length > 0
+        ? errors.filter(e => e.startsWith('Blog')) : undefined
+    };
+    await writeFile(join(SCRIPT_DIR, '..', 'feed-blogs.json'), JSON.stringify(blogFeed, null, 2));
+    console.error(`  feed-blogs.json: ${blogContent.length} posts`);
   }
 
   // Save dedup state

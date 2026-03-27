@@ -2,7 +2,7 @@ name: Generate Feeds
 
 on:
   schedule:
-    # Both tweets and podcasts: once daily at 6am UTC
+    # All feeds (tweets, podcasts, blogs): once daily at 6am UTC
     - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
@@ -15,6 +15,7 @@ on:
           - all
           - tweets-only
           - podcasts-only
+          - blogs-only
 
 jobs:
   generate:
@@ -47,6 +48,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add feed-x.json feed-podcasts.json state-feed.json
+          git add feed-x.json feed-podcasts.json feed-blogs.json state-feed.json
           git diff --cached --quiet || git commit -m "chore: update feeds [skip ci]"
           git push

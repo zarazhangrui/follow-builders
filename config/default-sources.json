@@ -31,6 +31,22 @@
       "channelHandle": "DataDrivenNYC"
     }
   ],
+  "blogs": [
+    {
+      "name": "Anthropic Engineering",
+      "type": "scrape",
+      "indexUrl": "https://www.anthropic.com/engineering",
+      "articleBaseUrl": "https://www.anthropic.com/engineering/",
+      "fetchMethod": "http"
+    },
+    {
+      "name": "Claude Blog",
+      "type": "scrape",
+      "indexUrl": "https://claude.com/blog",
+      "articleBaseUrl": "https://claude.com/blog/",
+      "fetchMethod": "http"
+    }
+  ],
   "x_accounts": [
     { "name": "Andrej Karpathy", "handle": "karpathy" },
     { "name": "Swyx", "handle": "swyx" },

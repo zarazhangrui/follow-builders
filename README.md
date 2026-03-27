@@ -16,6 +16,7 @@ WhatsApp, etc.) with:
 
 - Summaries of new podcast episodes from top AI podcasts
 - Key posts and insights from 25 curated AI builders on X/Twitter
+- Full articles from official AI company blogs (Anthropic Engineering, Claude Blog)
 - Links to all original content
 - Available in English, Chinese, or bilingual
 
@@ -43,7 +44,7 @@ Your delivery preferences are configurable through conversation. Just tell your 
 - "Make the summaries shorter"
 - "Show me my current settings"
 
-The source list (builders and podcasts) lives in your local checkout.
+The source list (builders, podcasts, and blogs) lives in your local checkout.
 If you want changes, update your local repo or edit the config/source files yourself.
 
 ## Customizing the Summaries
@@ -59,6 +60,7 @@ insights," "Use a more casual tone." The agent updates the prompts for you.
 Edit the files in the `prompts/` folder:
 - `summarize-podcast.md` — how podcast episodes are summarized
 - `summarize-tweets.md` — how X/Twitter posts are summarized
+- `summarize-blogs.md` — how blog posts are summarized
 - `digest-intro.md` — the overall digest format and tone
 - `translate.md` — how English content is translated to Chinese
 
@@ -75,6 +77,10 @@ These are plain English instructions, not code. Changes take effect on the next 
 
 ### AI Builders on X (25)
 [Andrej Karpathy](https://x.com/karpathy), [Swyx](https://x.com/swyx), [Josh Woodward](https://x.com/joshwoodward), [Kevin Weil](https://x.com/kevinweil), [Peter Yang](https://x.com/petergyang), [Nan Yu](https://x.com/thenanyu), [Madhu Guru](https://x.com/realmadhuguru), [Amanda Askell](https://x.com/AmandaAskell), [Cat Wu](https://x.com/_catwu), [Thariq](https://x.com/trq212), [Google Labs](https://x.com/GoogleLabs), [Amjad Masad](https://x.com/amasad), [Guillermo Rauch](https://x.com/rauchg), [Alex Albert](https://x.com/alexalbert__), [Aaron Levie](https://x.com/levie), [Ryo Lu](https://x.com/ryolu_), [Garry Tan](https://x.com/garrytan), [Matt Turck](https://x.com/mattturck), [Zara Zhang](https://x.com/zarazhangrui), [Nikunj Kothari](https://x.com/nikunj), [Peter Steinberger](https://x.com/steipete), [Dan Shipper](https://x.com/danshipper), [Aditya Agarwal](https://x.com/adityaag), [Sam Altman](https://x.com/sama), [Claude](https://x.com/claudeai)
+
+### Official Blogs (2)
+- [Anthropic Engineering](https://www.anthropic.com/engineering) — technical deep-dives from the Anthropic team
+- [Claude Blog](https://claude.com/blog) — product announcements and updates from Claude
 
 ## Installation
 
@@ -105,7 +111,7 @@ runtime digest path auto-fetches prompts or feeds from GitHub.
 
 ## How It Works
 
-1. You keep local feed files in the repository (`feed-x.json` and `feed-podcasts.json`)
+1. You keep local feed files in the repository (`feed-x.json`, `feed-podcasts.json`, and `feed-blogs.json`)
 2. Your agent reads those local feed files and local prompt files from disk
 3. Your agent remixes the raw content into a digestible summary using your preferences
 4. The digest is delivered to your messaging app (or shown in-chat)
@@ -120,10 +126,9 @@ See [examples/sample-digest.md](examples/sample-digest.md) for what the output l
 - Prompts and prepared feed files are loaded locally from your checkout
 - If you use Telegram/email delivery, those keys are stored locally in `~/.follow-builders/.env`
 - If you run the local feed generator, it will talk directly to the configured upstream APIs
-- The skill only reads public content (public YouTube videos, public X posts)
+- The skill only reads public content (public blog posts, public YouTube videos, public X posts)
 - Your configuration, preferences, and reading history stay on your machine
 
 ## License
 
 MIT
-

@@ -1,6 +1,6 @@
 ---
 name: follow-builders
-description: AI builders digest — monitors top AI builders on X and YouTube podcasts, remixes their content into digestible summaries. Use when the user wants AI industry insights, builder updates, or invokes /ai. In this fork, prompts and prepared feed files are read locally from the repo; nothing is fetched from a central GitHub feed at runtime.
+description: AI builders digest — monitors top AI builders on X, YouTube podcasts, and official AI blogs, remixes their content into digestible summaries. Use when the user wants AI industry insights, builder updates, or invokes /ai. In this fork, prompts and prepared feed files are read locally from the repo; nothing is fetched from a central GitHub feed at runtime.
 ---
 
 # Follow Builders, Not Influencers
@@ -44,14 +44,14 @@ If NOT, run the onboarding flow:
 Tell the user:
 
 "I'm your AI Builders Digest. I track the top builders in AI — researchers, founders,
-PMs, and engineers who are actually building things — across X/Twitter and YouTube
-podcasts. Every day (or week), I'll deliver you a curated summary of what they're
+PMs, and engineers who are actually building things — across X/Twitter, YouTube
+podcasts, and official AI blogs. Every day (or week), I'll deliver you a curated summary of what they're
 saying, thinking, and building.
 
-I currently track [N] builders on X and [M] podcasts. In this fork, the source
-list comes from your local checkout, so nothing silently changes at runtime."
+I currently track [N] builders on X, [M] podcasts, and [B] official blogs. In this fork,
+the source list comes from your local checkout, so nothing silently changes at runtime."
 
-(Replace [N] and [M] with actual counts from default-sources.json)
+(Replace [N], [M], and [B] with actual counts from default-sources.json)
 
 ### Step 2: Delivery Preferences
 
@@ -148,7 +148,7 @@ explicitly choose to run the local feed generator against upstream APIs."
 
 ### Step 6: Show Sources
 
-Show the full list of default builders and podcasts being tracked.
+Show the full list of default builders, podcasts, and blogs being tracked.
 Read from `config/default-sources.json` and display as a clean list.
 
 Tell the user: "In this fork, the source list lives in your local checkout.
@@ -418,7 +418,7 @@ When the user says something that sounds like a settings change, handle it:
 The source list lives in the local checkout for this fork.
 If a user asks to add or remove sources, tell them: "In this fork, the source
 list is local. Update the local repo or edit the source files/config directly
-if you want to change the tracked builders or podcasts."
+if you want to change the tracked builders, podcasts, or blogs."
 
 ### Schedule Changes
 - "Switch to weekly/daily" → Update `frequency` in config.json

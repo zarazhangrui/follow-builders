@@ -12,6 +12,7 @@
 
 - 顶级 AI 播客新节目的精华摘要
 - 25 位精选 AI 建造者在 X/Twitter 上的关键观点和洞察
+- AI 公司官方博客的完整文章（Anthropic Engineering、Claude Blog）
 - 所有原始内容的链接
 - 支持英文、中文或双语版本
 
@@ -39,7 +40,7 @@ Agent 会询问你：
 - "把摘要写得更简短一些"
 - "显示我当前的设置"
 
-信息源列表（建造者和播客）保存在你的本地仓库里。
+信息源列表（建造者、播客和博客）保存在你的本地仓库里。
 如果你想更新它们，请更新本地仓库或自行编辑对应的配置/源文件。
 
 ## 自定义摘要风格
@@ -53,6 +54,7 @@ Skill 使用纯文本 prompt 文件来控制内容的摘要方式。你可以通
 编辑 `prompts/` 文件夹中的文件：
 - `summarize-podcast.md` — 播客节目的摘要方式
 - `summarize-tweets.md` — X/Twitter 帖子的摘要方式
+- `summarize-blogs.md` — 博客文章的摘要方式
 - `digest-intro.md` — 整体摘要的格式和语气
 - `translate.md` — 英文内容翻译为中文的方式
 
@@ -69,6 +71,10 @@ Skill 使用纯文本 prompt 文件来控制内容的摘要方式。你可以通
 
 ### X 上的 AI 建造者（25位）
 [Andrej Karpathy](https://x.com/karpathy), [Swyx](https://x.com/swyx), [Josh Woodward](https://x.com/joshwoodward), [Kevin Weil](https://x.com/kevinweil), [Peter Yang](https://x.com/petergyang), [Nan Yu](https://x.com/thenanyu), [Madhu Guru](https://x.com/realmadhuguru), [Amanda Askell](https://x.com/AmandaAskell), [Cat Wu](https://x.com/_catwu), [Thariq](https://x.com/trq212), [Google Labs](https://x.com/GoogleLabs), [Amjad Masad](https://x.com/amasad), [Guillermo Rauch](https://x.com/rauchg), [Alex Albert](https://x.com/alexalbert__), [Aaron Levie](https://x.com/levie), [Ryo Lu](https://x.com/ryolu_), [Garry Tan](https://x.com/garrytan), [Matt Turck](https://x.com/mattturck), [Zara Zhang](https://x.com/zarazhangrui), [Nikunj Kothari](https://x.com/nikunj), [Peter Steinberger](https://x.com/steipete), [Dan Shipper](https://x.com/danshipper), [Aditya Agarwal](https://x.com/adityaag), [Sam Altman](https://x.com/sama), [Claude](https://x.com/claudeai)
+
+### 官方博客（2个）
+- [Anthropic Engineering](https://www.anthropic.com/engineering) — Anthropic 团队的技术深度文章
+- [Claude Blog](https://claude.com/blog) — Claude 的产品公告与更新
 
 ## 安装
 
@@ -98,7 +104,7 @@ Prompt 和已准备好的 feed 文件都从本地仓库读取。运行时不会�
 
 ## 工作原理
 
-1. 你在仓库中维护本地 feed 文件（`feed-x.json` 和 `feed-podcasts.json`）
+1. 你在仓库中维护本地 feed 文件（`feed-x.json`、`feed-podcasts.json` 和 `feed-blogs.json`）
 2. 你的 agent 从磁盘读取这些本地 feed 文件和本地 prompt 文件
 3. 你的 agent 根据你的偏好将原始内容重新混编为易消化的摘要
 4. 摘要推送到你的通讯工具（或直接在聊天中显示）
@@ -113,7 +119,7 @@ Prompt 和已准备好的 feed 文件都从本地仓库读取。运行时不会�
 - Prompt 和已准备好的 feed 文件都从你的本地 checkout 读取
 - 如果你使用 Telegram/邮件推送，相关 key 仅存储在本地 `~/.follow-builders/.env`
 - 如果你运行本地 feed 生成器，它会直接访问配置好的上游 API
-- Skill 只读取公开内容（公开的 YouTube 视频和 X 帖子）
+- Skill 只读取公开内容（公开的博客文章、YouTube 视频和 X 帖子）
 - 你的配置、偏好和阅读记录都保留在你自己的设备上
 
 ## 许可证

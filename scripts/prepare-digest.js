@@ -4,7 +4,7 @@
 // Follow Builders — Prepare Digest
 // ============================================================================
 // Gathers everything the LLM needs to produce a digest:
-// - Reads local feed files (tweets + podcasts)
+// - Reads local feed files (tweets + podcasts + blogs)
 // - Loads local prompts (with optional user overrides)
 // - Reads the user's config (language, delivery method)
 // - Outputs a single JSON blob to stdout
@@ -18,7 +18,7 @@
 // Output: JSON to stdout
 // ============================================================================
 
-import { readFile, mkdir } from 'fs/promises';
+import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
@@ -31,10 +31,12 @@ const CONFIG_PATH = join(USER_DIR, 'config.json');
 const SCRIPT_DIR = decodeURIComponent(new URL('.', import.meta.url).pathname);
 const FEED_X_PATH = join(SCRIPT_DIR, '..', 'feed-x.json');
 const FEED_PODCASTS_PATH = join(SCRIPT_DIR, '..', 'feed-podcasts.json');
+const FEED_BLOGS_PATH = join(SCRIPT_DIR, '..', 'feed-blogs.json');
 
 const PROMPT_FILES = [
   'summarize-podcast.md',
   'summarize-tweets.md',
+  'summarize-blogs.md',
   'digest-intro.md',
   'translate.md'
 ];
@@ -65,14 +67,16 @@ async function main() {
     }
   }
 
-  // 2. Read both local feeds
-  const [feedX, feedPodcasts] = await Promise.all([
+  // 2. Read all three local feeds
+  const [feedX, feedPodcasts, feedBlogs] = await Promise.all([
     readJSONIfExists(FEED_X_PATH),
-    readJSONIfExists(FEED_PODCASTS_PATH)
+    readJSONIfExists(FEED_PODCASTS_PATH),
+    readJSONIfExists(FEED_BLOGS_PATH)
   ]);
 
   if (!feedX) errors.push(`Could not read local tweet feed: ${FEED_X_PATH}`);
   if (!feedPodcasts) errors.push(`Could not read local podcast feed: ${FEED_PODCASTS_PATH}`);
+  if (!feedBlogs) errors.push(`Could not read local blog feed: ${FEED_BLOGS_PATH}`);
 
   // 3. Load prompts with priority: user custom > local default
   //
@@ -116,13 +120,15 @@ async function main() {
     // Content to remix
     podcasts: feedPodcasts?.podcasts || [],
     x: feedX?.x || [],
+    blogs: feedBlogs?.blogs || [],
 
     // Stats for the LLM to reference
     stats: {
       podcastEpisodes: feedPodcasts?.podcasts?.length || 0,
       xBuilders: feedX?.x?.length || 0,
       totalTweets: (feedX?.x || []).reduce((sum, a) => sum + a.tweets.length, 0),
-      feedGeneratedAt: feedX?.generatedAt || feedPodcasts?.generatedAt || null
+      blogPosts: feedBlogs?.blogs?.length || 0,
+      feedGeneratedAt: feedX?.generatedAt || feedPodcasts?.generatedAt || feedBlogs?.generatedAt || null
     },
 
     // Prompts — the LLM reads these and follows the instructions
