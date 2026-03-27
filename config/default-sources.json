@@ -1,51 +1,14 @@
 {
   "podcasts": [
-    {
-      "name": "Latent Space",
-      "type": "youtube_channel",
-      "url": "https://www.youtube.com/@LatentSpacePod",
-      "channelHandle": "LatentSpacePod"
-    },
-    {
-      "name": "Training Data",
-      "type": "youtube_playlist",
-      "url": "https://www.youtube.com/playlist?list=PLOhHNjZItNnMm5tdW61JpnyxeYH5NDDx8",
-      "playlistId": "PLOhHNjZItNnMm5tdW61JpnyxeYH5NDDx8"
-    },
-    {
-      "name": "No Priors",
-      "type": "youtube_channel",
-      "url": "https://www.youtube.com/@NoPriorsPodcast",
-      "channelHandle": "NoPriorsPodcast"
-    },
-    {
-      "name": "Unsupervised Learning",
-      "type": "youtube_channel",
-      "url": "https://www.youtube.com/@RedpointAI",
-      "channelHandle": "RedpointAI"
-    },
-    {
-      "name": "Data Driven NYC",
-      "type": "youtube_channel",
-      "url": "https://www.youtube.com/@DataDrivenNYC/videos",
-      "channelHandle": "DataDrivenNYC"
-    }
+    { "name": "Latent Space", "type": "youtube_channel", "url": "https://www.youtube.com/@LatentSpacePod", "channelHandle": "LatentSpacePod" },
+    { "name": "Training Data", "type": "youtube_playlist", "url": "https://www.youtube.com/playlist?list=PLOhHNjZItNnMm5tdW61JpnyxeYH5NDDx8", "playlistId": "PLOhHNjZItNnMm5tdW61JpnyxeYH5NDDx8" },
+    { "name": "No Priors", "type": "youtube_channel", "url": "https://www.youtube.com/@NoPriorsPodcast", "channelHandle": "NoPriorsPodcast" },
+    { "name": "Unsupervised Learning", "type": "youtube_channel", "url": "https://www.youtube.com/@RedpointAI", "channelHandle": "RedpointAI" },
+    { "name": "Data Driven NYC", "type": "youtube_channel", "url": "https://www.youtube.com/@DataDrivenNYC/videos", "channelHandle": "DataDrivenNYC" }
   ],
   "blogs": [
-    {
-      "name": "Anthropic Engineering",
-      "type": "scrape",
-      "indexUrl": "https://www.anthropic.com/engineering",
-      "articleBaseUrl": "https://www.anthropic.com/engineering/",
-      "fetchMethod": "http"
-    },
-    {
-      "name": "Claude Blog",
-      "type": "scrape",
-      "indexUrl": "https://claude.com/blog",
-      "articleBaseUrl": "https://claude.com/blog/",
-      "fetchMethod": "http"
-    }
+    { "name": "Anthropic Engineering", "type": "scrape", "indexUrl": "https://www.anthropic.com/engineering", "articleBaseUrl": "https://www.anthropic.com/engineering/", "fetchMethod": "http" },
+    { "name": "Claude Blog", "type": "scrape", "indexUrl": "https://claude.com/blog", "articleBaseUrl": "https://claude.com/blog/", "fetchMethod": "http" }
   ],
   "x_accounts": [
     { "name": "Andrej Karpathy", "handle": "karpathy" },
@@ -72,6 +35,26 @@
     { "name": "Dan Shipper", "handle": "danshipper" },
     { "name": "Aditya Agarwal", "handle": "adityaag" },
     { "name": "Sam Altman", "handle": "sama" },
-    { "name": "Claude", "handle": "claudeai" }
+    { "name": "Claude", "handle": "claudeai" },
+    { "name": "Marc Andreessen", "handle": "pmarca" },
+    { "name": "Chris Dixon", "handle": "cdixon" },
+    { "name": "Elad Gil", "handle": "eladgil" },
+    { "name": "Sarah Guo", "handle": "sarahguo" },
+    { "name": "Andrew Chen", "handle": "andrewchen" },
+    { "name": "Tyler Wills", "handle": "tylerawills" },
+    { "name": "Bill Gurley", "handle": "bgurley" },
+    { "name": "Natasha Lomas", "handle": "nx_lomas" },
+    { "name": "Peter Lazaroff", "handle": "peterlazaroff" },
+    { "name": "Nic Carter", "handle": "nic__carter" },
+    { "name": "Vitalik Buterin", "handle": "VitalikButerin" },
+    { "name": "Sassal", "handle": "sassal0x" },
+    { "name": "DeFi Dad", "handle": "DeFi_Dad" },
+    { "name": "Dan Held", "handle": "danheld" },
+    { "name": "levels.io", "handle": "levelsio" },
+    { "name": "The Primeagen", "handle": "theprimeagen" },
+    { "name": "Paul B.", "handle": "ptaborit" },
+    { "name": "Michael", "handle": "mic3_dev" },
+    { "name": "Lenny Rachitsky", "handle": "lennysan" },
+    { "name": "Naval Ravikant", "handle": "naval" }
   ]
 }
