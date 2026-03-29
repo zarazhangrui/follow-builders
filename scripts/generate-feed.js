@@ -97,7 +97,14 @@ async function fetchYouTubeContent(podcasts, apiKey, state, errors) {
       }
 
       const videosData = await videosRes.json();
-      const videoIds = videosData.videoIds || videosData.video_ids || [];
+      // Supadata returns videos split into regular, shorts, and live categories.
+      // Podcasts often stream live first, so we must include liveIds too.
+      // We skip shortIds since podcast episodes aren't Shorts.
+      const regularIds = videosData.videoIds || videosData.video_ids || [];
+      const liveIds = videosData.liveIds || videosData.live_ids || [];
+      const videoIds = [...regularIds, ...liveIds];
+
+      console.error(`  ${podcast.name}: found ${regularIds.length} regular + ${liveIds.length} live video IDs`);
 
       // Check first 2 videos per channel, skip already-seen ones
       for (const videoId of videoIds.slice(0, 2)) {
@@ -131,9 +138,19 @@ async function fetchYouTubeContent(podcasts, apiKey, state, errors) {
   // Sort OLDEST first so videos are featured in chronological order —
   // if 3 videos were published in 72h, day 1 gets the oldest, day 2 the
   // next, day 3 the newest. Dedup ensures each is featured exactly once.
+  //
+  // If publishedAt is missing (API didn't return a date), we still include
+  // the video — it appeared near the top of the channel/playlist listing,
+  // so it's likely recent. Videos without dates sort to the end.
   const withinWindow = allCandidates
-    .filter(v => v.publishedAt && new Date(v.publishedAt) >= cutoff)
-    .sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt)); // oldest first
+    .filter(v => !v.publishedAt || new Date(v.publishedAt) >= cutoff)
+    .sort((a, b) => {
+      // Videos with dates first (oldest among them), then dateless ones
+      if (a.publishedAt && b.publishedAt) return new Date(a.publishedAt) - new Date(b.publishedAt);
+      if (a.publishedAt) return -1;
+      if (b.publishedAt) return 1;
+      return 0;
+    });
 
   const selected = withinWindow[0]; // oldest unseen video
   if (!selected) return [];

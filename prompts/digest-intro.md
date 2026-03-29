@@ -10,8 +10,8 @@ AI Builders Digest — [Date]
 
 Then organize content in this order:
 
-1. OFFICIAL BLOGS section — list each blog post from AI company blogs (OpenAI, Anthropic, etc.)
-2. X / TWITTER section — list each builder with new posts
+1. X / TWITTER section — list each builder with new posts
+2. OFFICIAL BLOGS section — list each blog post from AI company blogs (OpenAI, Anthropic, etc.)
 3. PODCASTS section — list each podcast with new episodes
 
 ## Rules
