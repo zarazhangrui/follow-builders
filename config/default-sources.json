@@ -29,6 +29,12 @@
       "type": "youtube_channel",
       "url": "https://www.youtube.com/@DataDrivenNYC/videos",
       "channelHandle": "DataDrivenNYC"
+    },
+    {
+      "name": "AI & I by Every",
+      "type": "youtube_playlist",
+      "url": "https://www.youtube.com/playlist?list=PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL",
+      "playlistId": "PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL"
     }
   ],
   "blogs": [

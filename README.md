@@ -48,6 +48,12 @@ Your delivery preferences are configurable through conversation. Just tell your 
 The source list (builders and podcasts) is curated centrally and updates
 automatically — you always get the latest sources without doing anything.
 
+## Obsidian Integration
+
+If you use Obsidian, Follow Builders can automatically archive a copy of your daily/weekly digest into your vault.
+During the setup process, simply provide the name of your Obsidian Vault. The skill will automatically locate the vault on your machine and append each digest to your Daily note (`Daily/YYYY-MM-DD.md`) under the `## AI Builders Digest` heading.
+No plugins required — it uses Obsidian's native URI capabilities.
+
 ## Customizing the Summaries
 
 The skill uses plain-English prompt files to control how content is summarized.
