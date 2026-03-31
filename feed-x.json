@@ -1,7 +1,108 @@
 {
-  "generatedAt": "2026-03-30T17:54:41.398Z",
+  "generatedAt": "2026-03-30T07:24:33.675Z",
   "lookbackHours": 24,
   "x": [
+    {
+      "source": "x",
+      "name": "Swyx",
+      "handle": "swyx",
+      "bio": "achieve ambition with intentionality, intensity, integrity & insanity.\n\naffiliations:\n- @dxtipshq \n- @cognition\n- @temporalio\n- @aidotengineer\n- @latentspacepod",
+      "tweets": [
+        {
+          "id": "2038509566800118021",
+          "text": "the most delightful AIs of our time\n\nshelved to do koding and enterprise saas https://t.co/OtrYwwp12k",
+          "createdAt": "2026-03-30T06:52:09.000Z",
+          "url": "https://x.com/swyx/status/2038509566800118021",
+          "likes": 8,
+          "retweets": 0,
+          "replies": 4,
+          "isQuote": true,
+          "quotedTweetId": "2038381295588540663"
+        },
+        {
+          "id": "2038431061575979027",
+          "text": "redpoint literally just published a ranked list of saas businesses to redo from scratch with ai. \n\nyou can flip the 54% and the number 46% of enterprise CIOs *open to new ainative startups* over incumbents is a stunning market opportunity. if you’d asked me prior to seeing this survey i’d have said like 20%. CIOs are more hungry than conservative right now (vs my priors) and that will not last.",
+          "createdAt": "2026-03-30T01:40:11.000Z",
+          "url": "https://x.com/swyx/status/2038431061575979027",
+          "likes": 231,
+          "retweets": 12,
+          "replies": 43,
+          "isQuote": true,
+          "quotedTweetId": "2037638091671035994"
+        },
+        {
+          "id": "2038289712029552641",
+          "text": "ok responsible disclosure i was misinformed about the fiber thing. it’s just 1/3 daily fiber.\n\ni recently started popping fiber pills as well - put them next to where you get your water, its super easy, barely an inconvenience https://t.co/RZAkCS1gzk",
+          "createdAt": "2026-03-29T16:18:31.000Z",
+          "url": "https://x.com/swyx/status/2038289712029552641",
+          "likes": 6,
+          "retweets": 0,
+          "replies": 3,
+          "isQuote": false,
+          "quotedTweetId": null
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Kevin Weil",
+      "handle": "kevinweil",
+      "bio": "VP Science @OpenAI, BoD @Cisco @nature_org, LTC @USArmyReserve\nEx: Pres @Planet, Head of Product @Instagram @Twitter\n❤️ @elizabeth ultramarathons kids cats math",
+      "tweets": [
+        {
+          "id": "2038352979158536256",
+          "text": "\"An open source workflow for producing a personalized mRNA cancer vaccine\" https://t.co/Ji6dlqsVHN",
+          "createdAt": "2026-03-29T20:29:55.000Z",
+          "url": "https://x.com/kevinweil/status/2038352979158536256",
+          "likes": 533,
+          "retweets": 49,
+          "replies": 7,
+          "isQuote": true,
+          "quotedTweetId": "2038346050130657344"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Peter Yang",
+      "handle": "petergyang",
+      "bio": "I share extremely practical AI tutorials and interviews | Join 140K+ readers at https://t.co/XYKTmGVH14 | Product at Roblox",
+      "tweets": [
+        {
+          "id": "2038461555713732620",
+          "text": "Can't tell if my plane WiFi sucks or if Claude's down again - at least X is working",
+          "createdAt": "2026-03-30T03:41:22.000Z",
+          "url": "https://x.com/petergyang/status/2038461555713732620",
+          "likes": 10,
+          "retweets": 0,
+          "replies": 10,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2038453706493243698",
+          "text": "If you enjoyed this, sign up for free to my newsletter to get my best AI and product guides.\n\nJoin 110,000+ subscribers here:\nhttps://t.co/yz9xcsfrhF",
+          "createdAt": "2026-03-30T03:10:10.000Z",
+          "url": "https://x.com/petergyang/status/2038453706493243698",
+          "likes": 1,
+          "retweets": 0,
+          "replies": 0,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2038420980494909637",
+          "text": "I am incredibly bullish on @meetgranola for a few reasons:\n\n1. Meeting notes are by far the most useful context in a company\n\n2. They know how to build for agents first with great APIs and MCPs\n\n3. @cjpedregal is a stand-up human\n\nLove how they started with a wedge in meeting notes and are expanding into much more.",
+          "createdAt": "2026-03-30T01:00:08.000Z",
+          "url": "https://x.com/petergyang/status/2038420980494909637",
+          "likes": 82,
+          "retweets": 1,
+          "replies": 8,
+          "isQuote": true,
+          "quotedTweetId": "2036807416461811794"
+        }
+      ]
+    },
     {
       "source": "x",
       "name": "Nan Yu",
@@ -9,43 +110,302 @@
       "bio": "head of product @linear",
       "tweets": [
         {
-          "id": "2038602288957202941",
-          "text": "You hate (love?) to see it\n\nhttps://t.co/73ytWuZOK2",
-          "createdAt": "2026-03-30T13:00:35.000Z",
-          "url": "https://x.com/thenanyu/status/2038602288957202941",
-          "likes": 12,
+          "id": "2038339285519085845",
+          "text": "Many such cases\n\nhttps://t.co/0GfbrSpmpK",
+          "createdAt": "2026-03-29T19:35:30.000Z",
+          "url": "https://x.com/thenanyu/status/2038339285519085845",
+          "likes": 2,
           "retweets": 0,
-          "replies": 2,
+          "replies": 1,
           "isQuote": true,
-          "quotedTweetId": "2038564720131629181"
+          "quotedTweetId": "2037986511426138143"
         },
         {
-          "id": "2038599289081872893",
-          "text": "Trillion dollars https://t.co/QH8qupv3ew",
-          "createdAt": "2026-03-30T12:48:40.000Z",
-          "url": "https://x.com/thenanyu/status/2038599289081872893",
-          "likes": 152,
-          "retweets": 1,
-          "replies": 6,
+          "id": "2038323524092207468",
+          "text": "Jevons paradox https://t.co/yIHD6f5WLa",
+          "createdAt": "2026-03-29T18:32:53.000Z",
+          "url": "https://x.com/thenanyu/status/2038323524092207468",
+          "likes": 29,
+          "retweets": 0,
+          "replies": 4,
           "isQuote": true,
-          "quotedTweetId": "2038368390314668222"
+          "quotedTweetId": "2038258954111705241"
         }
       ]
     },
     {
       "source": "x",
-      "name": "Claude",
-      "handle": "claudeai",
-      "bio": "Claude is an AI assistant built by @anthropicai to be safe, accurate, and secure. Talk to Claude on https://t.co/ZhTwG8d1e5 or download the app.",
+      "name": "Thariq",
+      "handle": "trq212",
+      "bio": "Claude Code @anthropicai.   prev YC W20, mit media lab. \n\ntowards machines of loving grace",
       "tweets": [
         {
-          "id": "2038663014098899416",
-          "text": "Computer use is now in Claude Code.\n\nClaude can open your apps, click through your UI, and test what it built, right from the CLI.\n\nNow in research preview on Pro and Max plans. https://t.co/s2FDQaDmr1",
-          "createdAt": "2026-03-30T17:01:53.000Z",
-          "url": "https://x.com/claudeai/status/2038663014098899416",
-          "likes": 11545,
-          "retweets": 878,
-          "replies": 869,
+          "id": "2038354323722351049",
+          "text": "these are the components it added that I might want to add to the mockup https://t.co/JW6Hiz6XGS",
+          "createdAt": "2026-03-29T20:35:16.000Z",
+          "url": "https://x.com/trq212/status/2038354323722351049",
+          "likes": 96,
+          "retweets": 1,
+          "replies": 7,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2038353920473608309",
+          "text": "my specific flow was:\n1. sketch in Figma\n2. prompt: \"In my figma file &lt;link&gt;, I've made a sketch of a new grocery list feature, can you turn that mock up into something that matches the style of this app, also add a bunch of extra components that I might want to add\"",
+          "createdAt": "2026-03-29T20:33:40.000Z",
+          "url": "https://x.com/trq212/status/2038353920473608309",
+          "likes": 98,
+          "retweets": 2,
+          "replies": 5,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2038352023633228183",
+          "text": "the more I've been digging into the new Figma MCP, the more excited I am about it\n\nsomething new I'm trying is starting with a very ugly sketch in Figma, and then having Claude Code flesh it out in Figma so I can tweak and edit before sending the final back to Claude Code https://t.co/6IylfCwhgb https://t.co/mQXbMaEGkt",
+          "createdAt": "2026-03-29T20:26:07.000Z",
+          "url": "https://x.com/trq212/status/2038352023633228183",
+          "likes": 1014,
+          "retweets": 38,
+          "replies": 96,
+          "isQuote": true,
+          "quotedTweetId": "2036442894777594248"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Amjad Masad",
+      "handle": "amasad",
+      "bio": "ceo @replit. civilizationist",
+      "tweets": [
+        {
+          "id": "2038374343953035514",
+          "text": "Wow — $8m ARR. \n\nJon (@cheneypiano), one of the earliest Replit vibecoding success stories, is on his way to making millions in recurring revenue.\n\nStarted the business in a week and $400 barely a year ago. https://t.co/R2tsULNJoy",
+          "createdAt": "2026-03-29T21:54:49.000Z",
+          "url": "https://x.com/amasad/status/2038374343953035514",
+          "likes": 673,
+          "retweets": 53,
+          "replies": 31,
+          "isQuote": true,
+          "quotedTweetId": "2038320999721242988"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Guillermo Rauch",
+      "handle": "rauchg",
+      "bio": "@vercel CEO",
+      "tweets": [
+        {
+          "id": "2038396313566605720",
+          "text": "Some people have been contemplating an idea for years, maybe decades. Obsessing, attempting, discarding, agonizing, retrying.\n\nSome of these ideas are unpopular, niche, impractical. Not obviously capitalizable. They live on in the inventor's mind.\n\nIn 2026, millions of these ideas will come to life thanks to superintelligent coding agents. \n\nAI doesn't get tired. It amplifies the individual, and for better and sometimes for worse, it always takes you seriously. \"Great idea. Splendid. Wow. You're absolutely right.\" \n\nA world of digital wonders awaits us. This world will disproportionally favor the boldest ideas. Software that once seemed impossible will be one hyperlink away. I can't wait to see it.",
+          "createdAt": "2026-03-29T23:22:07.000Z",
+          "url": "https://x.com/rauchg/status/2038396313566605720",
+          "likes": 825,
+          "retweets": 82,
+          "replies": 88,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2038274722988003489",
+          "text": "Hiring engineers with 5 years of experience in @𝚌𝚑𝚎𝚗𝚐𝚕𝚘𝚞/𝚙𝚛𝚎𝚝𝚎𝚡𝚝 to create the web rendering toolkit of the future",
+          "createdAt": "2026-03-29T15:18:57.000Z",
+          "url": "https://x.com/rauchg/status/2038274722988003489",
+          "likes": 2773,
+          "retweets": 76,
+          "replies": 140,
+          "isQuote": false,
+          "quotedTweetId": null
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Aaron Levie",
+      "handle": "levie",
+      "bio": "ceo @box - your business lives in content. unleash it with AI",
+      "tweets": [
+        {
+          "id": "2038468564500537416",
+          "text": "It’s wild to think about what types of infrastructure and services must change in a world where agents can process information a hundred or a thousand times faster than humans.\n\nEven the tools that were built for machine speed before, generally were still in service of end-users making a request somewhere in the system. Agents running 24/7 and in parallel modify these requirements meaningfully. Here are just a few examples:\n\n* Sandboxes. Agents need sandboxes to operate in that have to be insanely low latency because they can boot up these environments for coding at any moment.\n\n* Search (both publicly and within an enterprise). Agents can parallelize searches hundreds or thousands of times so they need to be able to work with fast indexes of information. \n\n* Payments. Agents can now pay in micro transactions, and aren’t bothered by the friction of paying $0.01 for a resource that a human would be. \n\n* File systems. Agents need to be able to work with files at a scale that humans never had to worry about. You’ll have all new complexity around version control, permissions, and having agents reading/writing from data at insane speeds.\n\nAnd there are tons more. We’re going from a word where software was built for people to a world where it’s built for agents. Lots of changes downstream as a result.",
+          "createdAt": "2026-03-30T04:09:13.000Z",
+          "url": "https://x.com/levie/status/2038468564500537416",
+          "likes": 132,
+          "retweets": 19,
+          "replies": 28,
+          "isQuote": true,
+          "quotedTweetId": "2038230613912887757"
+        },
+        {
+          "id": "2038263457125142742",
+          "text": "The thing that most people miss initially with agents is that the scope of what we will produce will go up commensurate with what the tools can now automate, which basically means we’ll working the same or even more.\n\nEveryone thinks that we will use AI to do what we already do but cheaper and faster, which would lead to fewer people or getting more time back. In fact it will just mean we’re doing more things.\n\nOnce we figured out that we can automate a particular task, you then expand the size of work to do many more of those or other tasks in a project. The result is that you’re actually combining many other previously hard to combine tasks into a single workflow, causing even more work. \n\nThe software project scope now multiplies because you know you can build far more. The customer insights project now balloons because you know you can reasonably aggregate far more data. The marketing campaign has even more creative production because it’s cheaper and easier. \n\nThis is going to happen in almost every field of work.",
+          "createdAt": "2026-03-29T14:34:11.000Z",
+          "url": "https://x.com/levie/status/2038263457125142742",
+          "likes": 330,
+          "retweets": 36,
+          "replies": 88,
+          "isQuote": true,
+          "quotedTweetId": "2037986511426138143"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Garry Tan",
+      "handle": "garrytan",
+      "bio": "President & CEO @ycombinator —Founder @garryslist—Creator of GStack—designer/engineer who helps founders—SF Dem accelerating the boom loop",
+      "tweets": [
+        {
+          "id": "2038505281504833579",
+          "text": "OK, I heard people are running into my \"You should apply to YC\" message dozens of times, so I decided to make them more interesting every time. https://t.co/zFuy2XYfor",
+          "createdAt": "2026-03-30T06:35:07.000Z",
+          "url": "https://x.com/garrytan/status/2038505281504833579",
+          "likes": 4,
+          "retweets": 1,
+          "replies": 2,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2038493235862253676",
+          "text": "This is the simplest optimization when you have a big boil-the-ocean PR but it's so useful. \n\nWhatever can be parallelized as agents, /plan-ceo-review will figure it out and make a plan that clearly states what you can do side-by-side and when to merge https://t.co/rB2Hji25fV",
+          "createdAt": "2026-03-30T05:47:15.000Z",
+          "url": "https://x.com/garrytan/status/2038493235862253676",
+          "likes": 5,
+          "retweets": 0,
+          "replies": 2,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2038490850507084252",
+          "text": "morluto was my first outside GStack contributor https://t.co/Z89uqLBWky https://t.co/N3ZO14Gacr",
+          "createdAt": "2026-03-30T05:37:46.000Z",
+          "url": "https://x.com/garrytan/status/2038490850507084252",
+          "likes": 24,
+          "retweets": 1,
+          "replies": 5,
+          "isQuote": true,
+          "quotedTweetId": "2038470212358664387"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Matt Turck",
+      "handle": "mattturck",
+      "bio": "VC at @FirstMarkCap.  Host: MAD Podcast; Organizer: Data Driven NYC, Author: MAD Landscape.",
+      "tweets": [
+        {
+          "id": "2038420259179213266",
+          "text": "Everybody says Spain, but, I mean… https://t.co/S95ePKpsb6",
+          "createdAt": "2026-03-30T00:57:16.000Z",
+          "url": "https://x.com/mattturck/status/2038420259179213266",
+          "likes": 13,
+          "retweets": 0,
+          "replies": 5,
+          "isQuote": false,
+          "quotedTweetId": null
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Nikunj Kothari",
+      "handle": "nikunj",
+      "bio": "partner @fpvventures - investing in seed/A. previous: early hire @meter, @opendoor, @atlassian & others. love @shimoleejhaveri + 👦👧",
+      "tweets": [
+        {
+          "id": "2038273722826854675",
+          "text": "X Chat app is seriously well done. Performant and buttery smooth. \n\nPlease ship the requests tab and that’s all I need to move all my communication over. \n\nMajor kudos to the team.",
+          "createdAt": "2026-03-29T15:14:59.000Z",
+          "url": "https://x.com/nikunj/status/2038273722826854675",
+          "likes": 26,
+          "retweets": 0,
+          "replies": 3,
+          "isQuote": false,
+          "quotedTweetId": null
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Peter Steinberger",
+      "handle": "steipete",
+      "bio": "Polyagentmorous ClawFather. Came back from retirement to mess with AI and help a lobster take over the world @openclaw🦞",
+      "tweets": [
+        {
+          "id": "2038403837493702918",
+          "text": "them: openclaw is dead\nme: *keeps scrolling* https://t.co/t52IGtWSCj\n\n今夜、東京で会いましょう!🇯🇵",
+          "createdAt": "2026-03-29T23:52:01.000Z",
+          "url": "https://x.com/steipete/status/2038403837493702918",
+          "likes": 651,
+          "retweets": 74,
+          "replies": 39,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2038389167793795302",
+          "text": "good call for everything in life https://t.co/r9y7SfI7XT",
+          "createdAt": "2026-03-29T22:53:43.000Z",
+          "url": "https://x.com/steipete/status/2038389167793795302",
+          "likes": 316,
+          "retweets": 24,
+          "replies": 20,
+          "isQuote": true,
+          "quotedTweetId": "2038385665553952805"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Dan Shipper",
+      "handle": "danshipper",
+      "bio": "ceo @every | the only subscription you need to stay at the edge of AI",
+      "tweets": [
+        {
+          "id": "2038328780154958315",
+          "text": "pirates, architects, hot people, grown ups https://t.co/XiP1dHYC4u",
+          "createdAt": "2026-03-29T18:53:46.000Z",
+          "url": "https://x.com/danshipper/status/2038328780154958315",
+          "likes": 227,
+          "retweets": 7,
+          "replies": 15,
+          "isQuote": true,
+          "quotedTweetId": "2038026663867330850"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Aditya Agarwal",
+      "handle": "adityaag",
+      "bio": "General Partner @SouthPkCommons, Co-Founder @Bevel_Health | Ex: Early Eng @facebook, CTO @Dropbox, Board @Flipkart | Optimist, Builder, Dad",
+      "tweets": [
+        {
+          "id": "2038381148972437900",
+          "text": "Ok San Francisco this weekend is popping in a way that I haven’t seen in like 7-8 years.\n\nObviously this means two things:\n1/ AI will create untold happiness\n\n2/ AI will be responsible for amazing weather.\n\nSign me up.",
+          "createdAt": "2026-03-29T22:21:51.000Z",
+          "url": "https://x.com/adityaag/status/2038381148972437900",
+          "likes": 101,
+          "retweets": 1,
+          "replies": 6,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2038330283523760613",
+          "text": "As a 40 year old, you go to 10x more kids birthday parties than your own friends birthday parties.",
+          "createdAt": "2026-03-29T18:59:44.000Z",
+          "url": "https://x.com/adityaag/status/2038330283523760613",
+          "likes": 192,
+          "retweets": 3,
+          "replies": 12,
           "isQuote": false,
           "quotedTweetId": null
         }
@@ -53,7 +413,7 @@
     }
   ],
   "stats": {
-    "xBuilders": 2,
-    "totalTweets": 3
+    "xBuilders": 14,
+    "totalTweets": 27
   }
 }
