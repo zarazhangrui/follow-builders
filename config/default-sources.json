@@ -2,39 +2,33 @@
   "podcasts": [
     {
       "name": "Latent Space",
-      "type": "youtube_channel",
-      "url": "https://www.youtube.com/@LatentSpacePod",
-      "channelHandle": "LatentSpacePod"
+      "rssUrl": "https://api.substack.com/feed/podcast/spotify/7b7a1a8a-d456-4883-8107-3b04d028beab/1084089.rss",
+      "url": "https://www.youtube.com/@LatentSpacePod"
     },
     {
       "name": "Training Data",
-      "type": "youtube_playlist",
-      "url": "https://www.youtube.com/playlist?list=PLOhHNjZItNnMm5tdW61JpnyxeYH5NDDx8",
-      "playlistId": "PLOhHNjZItNnMm5tdW61JpnyxeYH5NDDx8"
+      "rssUrl": "https://feeds.megaphone.fm/trainingdata",
+      "url": "https://www.youtube.com/playlist?list=PLOhHNjZItNnMm5tdW61JpnyxeYH5NDDx8"
     },
     {
       "name": "No Priors",
-      "type": "youtube_channel",
-      "url": "https://www.youtube.com/@NoPriorsPodcast",
-      "channelHandle": "NoPriorsPodcast"
+      "rssUrl": "https://feeds.megaphone.fm/nopriors",
+      "url": "https://www.youtube.com/@NoPriorsPodcast"
     },
     {
       "name": "Unsupervised Learning",
-      "type": "youtube_channel",
-      "url": "https://www.youtube.com/@RedpointAI",
-      "channelHandle": "RedpointAI"
+      "rssUrl": "https://feeds.simplecast.com/dOSE_bdP",
+      "url": "https://www.youtube.com/@RedpointAI"
     },
     {
       "name": "The MAD Podcast with Matt Turck",
-      "type": "youtube_channel",
-      "url": "https://www.youtube.com/@DataDrivenNYC/videos",
-      "channelHandle": "DataDrivenNYC"
+      "rssUrl": "https://anchor.fm/s/f2ee4948/podcast/rss",
+      "url": "https://www.youtube.com/@DataDrivenNYC/videos"
     },
     {
       "name": "AI & I by Every",
-      "type": "youtube_playlist",
-      "url": "https://www.youtube.com/playlist?list=PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL",
-      "playlistId": "PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL"
+      "rssUrl": "https://anchor.fm/s/ed1f5584/podcast/rss",
+      "url": "https://www.youtube.com/playlist?list=PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL"
     }
   ],
   "blogs": [
