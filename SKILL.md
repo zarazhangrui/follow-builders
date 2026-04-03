@@ -180,6 +180,8 @@ cat > ~/.follow-builders/config.json << 'CFGEOF'
     "chatId": "<telegram chat ID, only if telegram>",
     "email": "<email address, only if email>"
   },
+  "archiveDigests": true,
+  "archivePath": "~/.follow-builders/digests/",
   "onboardingComplete": true
 }
 CFGEOF
@@ -407,6 +409,22 @@ If delivery fails, show the digest in the terminal as fallback.
 **If "stdout" (default):**
 Just output the digest directly.
 
+### Step 7: Archive
+
+If `config.archiveDigests` is `true` (the default), save the remixed digest as a
+dated markdown file for future reference:
+
+```bash
+mkdir -p ~/.follow-builders/digests
+```
+
+Write the digest to `~/.follow-builders/digests/YYYY-MM-DD.md` (using today's date).
+If a file for today already exists, overwrite it (the user may have re-run the digest).
+
+The archive path can be customized via `config.archivePath`. The file should be clean
+markdown — the same content that was delivered to the user, suitable for searching
+and reading later.
+
 ---
 
 ## Configuration Handling
@@ -448,6 +466,13 @@ Then edit `~/.follow-builders/prompts/<filename>.md` with the user's requested c
 - "Focus more on [X]" → Edit the relevant prompt file
 - "Change the tone to [X]" → Edit the relevant prompt file
 - "Reset to default" → Delete the file from `~/.follow-builders/prompts/`
+
+### Archive Changes
+- "Save digests locally" / "Archive my digests" → Set `archiveDigests` to `true` in config.json
+- "Stop saving digests" → Set `archiveDigests` to `false` in config.json
+- "Change archive path" → Update `archivePath` in config.json
+- "Show past digests" / "What did builders say last week?" → Read from the archive directory
+  and summarize or display the relevant file(s)
 
 ### Info Requests
 - "Show my settings" → Read and display config.json in a friendly format
