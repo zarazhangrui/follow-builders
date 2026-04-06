@@ -1,6 +1,6 @@
 ---
 name: follow-builders
-description: AI builders digest — monitors top AI builders on X and YouTube podcasts, remixes their content into digestible summaries. Use when the user wants AI industry insights, builder updates, or invokes /ai. No API keys or dependencies required — all content is fetched from a central feed.
+description: AI builders digest — monitors top AI builders on X and YouTube podcasts, remixes their content into digestible summaries. Use when the user wants AI industry insights, builder updates, or invokes /ai. No API keys or delivery credentials are required for local stdout use; this fork reads bundled feed snapshots and prompts from the local skill copy.
 ---
 
 # Follow Builders, Not Influencers
@@ -11,9 +11,9 @@ digestible summaries of what they're saying.
 
 Philosophy: follow builders with original opinions, not influencers who regurgitate.
 
-**No API keys or environment variables are required from users.** All content
-(X/Twitter posts and YouTube transcripts) is fetched centrally and served via
-a public feed. Users only need API keys if they choose Telegram or email delivery.
+**No API keys or environment variables are required from users for local stdout use.**
+This fork reads bundled feed snapshots and prompts from the local skill copy.
+Users only need API keys if they choose Telegram or email delivery.
 
 ## Detecting Platform
 
@@ -47,8 +47,8 @@ PMs, and engineers who are actually building things — across X/Twitter and You
 podcasts. Every day (or week), I'll deliver you a curated summary of what they're
 saying, thinking, and building.
 
-I currently track [N] builders on X and [M] podcasts. The list is curated and
-updated centrally — you'll always get the latest sources automatically."
+I currently track [N] builders on X and [M] podcasts. The list is curated in this
+skill copy and can be updated through your own fork whenever you want."
 
 (Replace [N] and [M] with actual counts from default-sources.json)
 

@@ -4,8 +4,8 @@
 // Follow Builders — Prepare Digest
 // ============================================================================
 // Gathers everything the LLM needs to produce a digest:
-// - Fetches the central feeds (tweets + podcasts)
-// - Fetches the latest prompts from GitHub
+// - Loads the bundled feeds (tweets + podcasts + blogs)
+// - Loads local prompts shipped with the skill
 // - Reads the user's config (language, delivery method)
 // - Outputs a single JSON blob to stdout
 //
@@ -16,7 +16,7 @@
 // Output: JSON to stdout
 // ============================================================================
 
-import { readFile, mkdir } from 'fs/promises';
+import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
@@ -26,11 +26,6 @@ import { homedir } from 'os';
 const USER_DIR = join(homedir(), '.follow-builders');
 const CONFIG_PATH = join(USER_DIR, 'config.json');
 
-const FEED_X_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json';
-const FEED_PODCASTS_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json';
-const FEED_BLOGS_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json';
-
-const PROMPTS_BASE = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/prompts';
 const PROMPT_FILES = [
   'summarize-podcast.md',
   'summarize-tweets.md',
@@ -39,18 +34,14 @@ const PROMPT_FILES = [
   'translate.md'
 ];
 
-// -- Fetch helpers -----------------------------------------------------------
+// -- Local file helpers ------------------------------------------------------
 
-async function fetchJSON(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.json();
-}
-
-async function fetchText(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.text();
+async function readJSON(path) {
+  try {
+    return JSON.parse(await readFile(path, 'utf-8'));
+  } catch {
+    return null;
+  }
 }
 
 // -- Main --------------------------------------------------------------------
@@ -72,27 +63,28 @@ async function main() {
     }
   }
 
-  // 2. Fetch all three feeds
+  const scriptDir = decodeURIComponent(new URL('.', import.meta.url).pathname);
+  const skillDir = join(scriptDir, '..');
+  const localPromptsDir = join(skillDir, 'prompts');
+  const userPromptsDir = join(USER_DIR, 'prompts');
+
+  // 2. Load bundled feeds from the local skill copy only.
+  // This avoids remote prompt/feed updates changing behavior behind the user's back.
   const [feedX, feedPodcasts, feedBlogs] = await Promise.all([
-    fetchJSON(FEED_X_URL),
-    fetchJSON(FEED_PODCASTS_URL),
-    fetchJSON(FEED_BLOGS_URL)
+    readJSON(join(skillDir, 'feed-x.json')),
+    readJSON(join(skillDir, 'feed-podcasts.json')),
+    readJSON(join(skillDir, 'feed-blogs.json'))
   ]);
 
   if (!feedX) errors.push('Could not fetch tweet feed');
   if (!feedPodcasts) errors.push('Could not fetch podcast feed');
   if (!feedBlogs) errors.push('Could not fetch blog feed');
 
-  // 3. Load prompts with priority: user custom > remote (GitHub) > local default
+  // 3. Load prompts with priority: user custom > local default
   //
   // If the user has a custom prompt at ~/.follow-builders/prompts/<file>,
-  // use that (they personalized it — don't overwrite with remote updates).
-  // Otherwise, fetch the latest from GitHub so they get central improvements.
-  // If GitHub is unreachable, fall back to the local copy shipped with the skill.
+  // use that (they personalized it — don't overwrite with local defaults).
   const prompts = {};
-  const scriptDir = decodeURIComponent(new URL('.', import.meta.url).pathname);
-  const localPromptsDir = join(scriptDir, '..', 'prompts');
-  const userPromptsDir = join(USER_DIR, 'prompts');
 
   for (const filename of PROMPT_FILES) {
     const key = filename.replace('.md', '').replace(/-/g, '_');
@@ -105,14 +97,7 @@ async function main() {
       continue;
     }
 
-    // Priority 2: latest from GitHub (central updates)
-    const remote = await fetchText(`${PROMPTS_BASE}/${filename}`);
-    if (remote) {
-      prompts[key] = remote;
-      continue;
-    }
-
-    // Priority 3: local copy shipped with the skill
+    // Priority 2: local copy shipped with the skill
     if (existsSync(localPath)) {
       prompts[key] = await readFile(localPath, 'utf-8');
     } else {
