@@ -254,7 +254,7 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
       name: selected.podcast.name,
       title: selected.title,
       guid: selected.guid,
-      url: selected.podcast.url,
+      url: selected.link,
       publishedAt: selected.publishedAt,
       transcript: result.transcript
     }];
