@@ -129,3 +129,7 @@ See [examples/sample-digest.md](examples/sample-digest.md) for what the output l
 
 MIT
 
+
+## Download History
+
+[![Download History](https://skill-history.com/chart/zarazhangrui/follow-builders.svg)](https://skill-history.com/zarazhangrui/follow-builders)
