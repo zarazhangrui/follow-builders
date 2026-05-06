@@ -36,6 +36,7 @@ const PROMPT_FILES = [
   'summarize-tweets.md',
   'summarize-blogs.md',
   'digest-intro.md',
+  'generate-angles.md',
   'translate.md'
 ];
 
@@ -129,7 +130,8 @@ async function main() {
     config: {
       language: config.language || 'en',
       frequency: config.frequency || 'daily',
-      delivery: config.delivery || { method: 'stdout' }
+      delivery: config.delivery || { method: 'stdout' },
+      userProfile: config.userProfile || null
     },
 
     // Content to remix

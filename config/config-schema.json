@@ -60,6 +60,30 @@
       "type": "boolean",
       "default": false,
       "description": "Whether the user has completed initial setup"
+    },
+    "userProfile": {
+      "type": "object",
+      "description": "User profiling collected during onboarding for personalized digest angles",
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": ["product", "content", "operations", "pm", "transition", "investment"],
+          "description": "User's primary focus role (collected in Step 2)"
+        },
+        "focusAreas": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["building", "efficiency", "content", "career", "trends", "business"]
+          },
+          "description": "1-3 AI focus areas the user cares most about"
+        },
+        "digestionMode": {
+          "type": "string",
+          "enum": ["angles", "business", "takeaways", "trends"],
+          "description": "Preferred way to digest information: angles (headline ideas), business (business logic), takeaways (ready-to-use), trends (trend spotting)"
+        }
+      }
     }
   }
 }
