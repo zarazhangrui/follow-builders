@@ -22,7 +22,7 @@ WhatsApp, etc.) with:
 
 ## Quick Start
 
-1. Install the skill in your agent (OpenClaw or Claude Code)
+1. Install the skill in your agent (OpenClaw, Codex, or Claude Code)
 2. Say "set up follow builders" or invoke `/follow-builders`
 3. The agent walks you through setup conversationally — no config files to edit
 
@@ -91,18 +91,21 @@ clawhub install follow-builders
 
 # Or manually
 git clone https://github.com/zarazhangrui/follow-builders.git ~/skills/follow-builders
-cd ~/skills/follow-builders/scripts && npm install
 ```
 
 ### Claude Code
 ```bash
 git clone https://github.com/zarazhangrui/follow-builders.git ~/.claude/skills/follow-builders
-cd ~/.claude/skills/follow-builders/scripts && npm install
+```
+
+### Codex
+```bash
+git clone https://github.com/zarazhangrui/follow-builders.git ~/.codex/skills/follow-builders
 ```
 
 ## Requirements
 
-- An AI agent (OpenClaw, Claude Code, or similar)
+- An AI agent (OpenClaw, Codex, Claude Code, or similar)
 - Internet connection (to fetch the central feed)
 
 That's it. No API keys needed. All content (blog articles + YouTube transcripts + X/Twitter posts)
@@ -128,4 +131,3 @@ See [examples/sample-digest.md](examples/sample-digest.md) for what the output l
 ## License
 
 MIT
-
