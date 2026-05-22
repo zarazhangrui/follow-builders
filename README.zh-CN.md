@@ -109,6 +109,20 @@ cd ~/.claude/skills/follow-builders/scripts && npm install
 
 查看 [examples/sample-digest.md](examples/sample-digest.md) 了解输出示例。
 
+## 可选：自定义 X/Twitter 工作流
+
+Follow Builders 适合获取精选 AI 建造者摘要。如果你的 OpenClaw agent 还需要自定义 X/Twitter 自动化，可以在本 Skill 旁边安装 [TweetClaw](https://clawhub.ai/xquik/plugins/tweetclaw)。它支持搜索帖子和回复、导出关注者、查询用户、监控帖子、发送私信、管理媒体、运行 webhooks，以及通过 Xquik 审核发帖或回复操作。
+
+```bash
+openclaw plugins install clawhub:@xquik/tweetclaw
+openclaw config set plugins.entries.tweetclaw.config.apiKey "$XQUIK_API_KEY"
+openclaw config set tools.alsoAllow '["explore", "tweetclaw"]'
+```
+
+TweetClaw 需要 Xquik API key。请仅将其保存在本地环境中。
+
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
+
 ## 隐私
 
 - 不发送任何 API key——所有内容由中心化服务获取
