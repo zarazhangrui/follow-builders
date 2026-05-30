@@ -26,12 +26,17 @@ which openclaw 2>/dev/null && echo "PLATFORM=openclaw" || echo "PLATFORM=other"
   Delivery is automatic via OpenClaw's channel system. No need to ask about delivery method.
   Cron uses `openclaw cron add`.
 
-- **Other** (Claude Code, Cursor, etc.): Non-persistent agent. Terminal closes = agent stops.
+- **Other** (Codex, Claude Code, Cursor, etc.): Non-persistent agent. Terminal closes = agent stops.
   For automatic delivery, users MUST set up Telegram or Email. Without it, digests
   are on-demand only (user types `/ai` to get one).
   Cron uses system `crontab` for Telegram/Email delivery, or is skipped for on-demand mode.
 
 Save the detected platform in config.json as `"platform": "openclaw"` or `"platform": "other"`.
+When running in Codex, treat the platform as `"other"` and use this skill directory
+fallback for script commands:
+```bash
+SKILL_DIR="${SKILL_DIR:-$HOME/.codex/skills/follow-builders}"
+```
 
 ## First Run — Onboarding
 
@@ -69,7 +74,7 @@ For weekly, also ask which day.
 user's Telegram/Discord/WhatsApp/etc. Set `delivery.method` to `"stdout"` in config
 and move on.
 
-**If non-persistent agent (Claude Code, Cursor, etc.):**
+**If non-persistent agent (Codex, Claude Code, Cursor, etc.):**
 
 Tell the user:
 
@@ -318,7 +323,8 @@ This script handles ALL data fetching deterministically — feeds, prompts, conf
 You do NOT fetch anything yourself.
 
 ```bash
-cd ${CLAUDE_SKILL_DIR}/scripts && node prepare-digest.js 2>/dev/null
+SKILL_DIR="${SKILL_DIR:-$HOME/.codex/skills/follow-builders}"
+cd "$SKILL_DIR/scripts" && node prepare-digest.js 2>/dev/null
 ```
 
 The script outputs a single JSON blob with everything you need:
@@ -400,7 +406,8 @@ Read `config.delivery.method` from the JSON:
 **If "telegram" or "email":**
 ```bash
 echo '<your digest text>' > /tmp/fb-digest.txt
-cd ${CLAUDE_SKILL_DIR}/scripts && node deliver.js --file /tmp/fb-digest.txt 2>/dev/null
+SKILL_DIR="${SKILL_DIR:-$HOME/.codex/skills/follow-builders}"
+cd "$SKILL_DIR/scripts" && node deliver.js --file /tmp/fb-digest.txt 2>/dev/null
 ```
 If delivery fails, show the digest in the terminal as fallback.
 
@@ -439,7 +446,8 @@ customization persists and won't be overwritten by central updates.
 
 ```bash
 mkdir -p ~/.follow-builders/prompts
-cp ${CLAUDE_SKILL_DIR}/prompts/<filename>.md ~/.follow-builders/prompts/<filename>.md
+SKILL_DIR="${SKILL_DIR:-$HOME/.codex/skills/follow-builders}"
+cp "$SKILL_DIR/prompts/<filename>.md" ~/.follow-builders/prompts/<filename>.md
 ```
 
 Then edit `~/.follow-builders/prompts/<filename>.md` with the user's requested changes.

@@ -24,13 +24,95 @@ import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
-import { config as loadEnv } from 'dotenv';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 
 // -- Constants ---------------------------------------------------------------
 
 const USER_DIR = join(homedir(), '.follow-builders');
 const CONFIG_PATH = join(USER_DIR, 'config.json');
 const ENV_PATH = join(USER_DIR, '.env');
+const execFileAsync = promisify(execFile);
+
+// -- Environment loading -----------------------------------------------------
+
+async function loadEnvFile(path) {
+  if (!existsSync(path)) return;
+
+  const body = await readFile(path, 'utf-8');
+  for (const rawLine of body.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+
+    const match = line.match(/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+    if (!match) continue;
+
+    const [, key, rawValue] = match;
+    let value = rawValue.trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (process.env[key] === undefined) process.env[key] = value;
+  }
+}
+
+// -- HTTP helpers ------------------------------------------------------------
+
+function responseFromBody(status, body) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    async json() {
+      return body ? JSON.parse(body) : {};
+    },
+    async text() {
+      return body;
+    }
+  };
+}
+
+async function postJSON(url, payload, headers = {}) {
+  const args = [
+    '-sS',
+    '--max-time',
+    '30',
+    '-X',
+    'POST',
+    url,
+    '-H',
+    'Content-Type: application/json'
+  ];
+
+  for (const [key, value] of Object.entries(headers)) {
+    args.push('-H', `${key}: ${value}`);
+  }
+
+  args.push('--data-binary', JSON.stringify(payload), '-w', '\n%{http_code}');
+
+  try {
+    const { stdout } = await execFileAsync('curl', args, {
+      maxBuffer: 10 * 1024 * 1024
+    });
+    const splitAt = stdout.lastIndexOf('\n');
+    const body = splitAt === -1 ? '' : stdout.slice(0, splitAt);
+    const status = Number(splitAt === -1 ? stdout : stdout.slice(splitAt + 1));
+    return responseFromBody(status, body);
+  } catch {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(30000)
+    });
+    return responseFromBody(res.status, await res.text());
+  }
+}
 
 // -- Read input --------------------------------------------------------------
 
@@ -82,17 +164,13 @@ async function sendTelegram(text, botToken, chatId) {
   }
 
   for (const chunk of chunks) {
-    const res = await fetch(
+    const res = await postJSON(
       `https://api.telegram.org/bot${botToken}/sendMessage`,
       {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: chunk,
-          parse_mode: 'Markdown',
-          disable_web_page_preview: true
-        })
+        chat_id: chatId,
+        text: chunk,
+        parse_mode: 'Markdown',
+        disable_web_page_preview: true
       }
     );
 
@@ -100,16 +178,12 @@ async function sendTelegram(text, botToken, chatId) {
       const err = await res.json();
       // If Markdown parsing fails, retry without parse_mode
       if (err.description && err.description.includes("can't parse")) {
-        await fetch(
+        await postJSON(
           `https://api.telegram.org/bot${botToken}/sendMessage`,
           {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: chatId,
-              text: chunk,
-              disable_web_page_preview: true
-            })
+            chat_id: chatId,
+            text: chunk,
+            disable_web_page_preview: true
           }
         );
       } else {
@@ -127,21 +201,20 @@ async function sendTelegram(text, botToken, chatId) {
 // Sends the digest via Resend's email API.
 // The user provides their own Resend API key and email address.
 async function sendEmail(text, apiKey, toEmail) {
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
+  const res = await postJSON(
+    'https://api.resend.com/emails',
+    {
       from: 'AI Builders Digest <digest@resend.dev>',
       to: [toEmail],
       subject: `AI Builders Digest — ${new Date().toLocaleDateString('en-US', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       })}`,
       text: text
-    })
-  });
+    },
+    {
+      Authorization: `Bearer ${apiKey}`
+    }
+  );
 
   if (!res.ok) {
     const err = await res.json();
@@ -153,7 +226,7 @@ async function sendEmail(text, apiKey, toEmail) {
 
 async function main() {
   // Load env and config
-  loadEnv({ path: ENV_PATH });
+  await loadEnvFile(ENV_PATH);
 
   let config = {};
   if (existsSync(CONFIG_PATH)) {

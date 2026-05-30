@@ -16,10 +16,12 @@
 // Output: JSON to stdout
 // ============================================================================
 
-import { readFile, mkdir } from 'fs/promises';
+import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 
 // -- Constants ---------------------------------------------------------------
 
@@ -38,19 +40,39 @@ const PROMPT_FILES = [
   'digest-intro.md',
   'translate.md'
 ];
+const execFileAsync = promisify(execFile);
 
 // -- Fetch helpers -----------------------------------------------------------
 
-async function fetchJSON(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.json();
+async function fetchText(url) {
+  // Some agent environments rely on HTTP(S)_PROXY. Node's built-in fetch does
+  // not consistently honor those proxy variables, while curl usually does.
+  try {
+    const { stdout } = await execFileAsync(
+      'curl',
+      ['-fsSL', '--max-time', '30', url],
+      { maxBuffer: 50 * 1024 * 1024 }
+    );
+    return stdout;
+  } catch {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
+      if (!res.ok) return null;
+      return res.text();
+    } catch {
+      return null;
+    }
+  }
 }
 
-async function fetchText(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.text();
+async function fetchJSON(url) {
+  const text = await fetchText(url);
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
 }
 
 // -- Main --------------------------------------------------------------------

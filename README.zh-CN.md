@@ -18,7 +18,7 @@
 
 ## 快速开始
 
-1. 在你的 AI agent 中安装此 skill（OpenClaw 或 Claude Code）
+1. 在你的 AI agent 中安装此 skill（OpenClaw、Codex 或 Claude Code）
 2. 输入 "set up follow builders" 或执行 `/follow-builders`
 3. Agent 会以对话方式引导你完成设置——不需要手动编辑任何配置文件
 
@@ -84,18 +84,21 @@ clawhub install follow-builders
 
 # 或手动安装
 git clone https://github.com/zarazhangrui/follow-builders.git ~/skills/follow-builders
-cd ~/skills/follow-builders/scripts && npm install
 ```
 
 ### Claude Code
 ```bash
 git clone https://github.com/zarazhangrui/follow-builders.git ~/.claude/skills/follow-builders
-cd ~/.claude/skills/follow-builders/scripts && npm install
+```
+
+### Codex
+```bash
+git clone https://github.com/zarazhangrui/follow-builders.git ~/.codex/skills/follow-builders
 ```
 
 ## 系统要求
 
-- 一个 AI agent（OpenClaw、Claude Code 或类似工具）
+- 一个 AI agent（OpenClaw、Codex、Claude Code 或类似工具）
 - 网络连接（用于获取中心化 feed）
 
 仅此而已。不需要任何 API key。所有内容（博客文章 + YouTube 字幕 + X/Twitter 帖子）由中心化服务每日抓取更新。
