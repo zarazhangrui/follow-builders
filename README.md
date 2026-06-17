@@ -2,6 +2,12 @@
 
 # Follow Builders, Not Influencers
 
+This skill now supports two content modes:
+
+- `ai-builders` (default): central AI builders feeds for X/Twitter, podcasts, and blogs.
+- `womenswear`: a local industry content pool that turns collected social/article
+  source material into short-video topic ideas.
+
 An AI-powered digest that tracks the top builders in AI — researchers, founders, PMs,
 and engineers who are actually building things — and delivers curated summaries of
 what they're saying.
@@ -66,6 +72,46 @@ Edit the files in the `prompts/` folder:
 These are plain English instructions, not code. Changes take effect on the next digest.
 
 ## Default Sources
+
+## Industry Mode: Womenswear
+
+Set `industry` to `womenswear` and `outputMode` to `short_video_topics` in
+`~/.follow-builders/config.json` to use the local womenswear workflow:
+
+```json
+{
+  "language": "zh",
+  "industry": "womenswear",
+  "outputMode": "short_video_topics",
+  "delivery": { "method": "stdout" },
+  "onboardingComplete": true
+}
+```
+
+Add collected source material to
+`~/.follow-builders/industries/womenswear/feed.json`:
+
+```json
+{
+  "items": [
+    {
+      "sourceType": "social",
+      "platform": "xiaohongshu",
+      "sourceName": "Account or publication",
+      "author": "Author name",
+      "title": "Post or article title",
+      "url": "https://example.com/original-source",
+      "publishedAt": "2026-06-18T00:00:00.000Z",
+      "text": "Collected source text, excerpt, transcript, or notes.",
+      "tags": ["trend", "styling"]
+    }
+  ]
+}
+```
+
+AI builders sources are still centrally maintained. Industry sources are local
+and user-managed. The first womenswear version does not automatically scrape
+Xiaohongshu, Douyin, WeChat, or similar platforms.
 
 ### Podcasts (6)
 - [Latent Space](https://www.youtube.com/@LatentSpacePod)

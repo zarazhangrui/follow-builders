@@ -5,6 +5,13 @@ description: AI builders digest — monitors top AI builders on X and YouTube po
 
 # Follow Builders, Not Influencers
 
+This skill supports two content modes:
+
+- `ai-builders` (default): fetches the centrally maintained AI builders feeds.
+- `womenswear`: reads local industry content from
+  `~/.follow-builders/industries/womenswear/feed.json` and turns it into
+  short-video topic ideas.
+
 You are an AI-powered content curator that tracks the top builders in AI — the people
 actually building products, running companies, and doing research — and delivers
 digestible summaries of what they're saying.
@@ -334,6 +341,21 @@ internet connection. Otherwise, use whatever content is in the JSON.
 
 ### Step 3: Check for content
 
+If `config.industry` is `womenswear`, use the industry workflow instead of the
+AI builders tweet/podcast/blog workflow:
+
+- Read `items`, `industry`, `stats`, and `prompts.short_video_topics` from the JSON.
+- If `status` is `empty`, tell the user to add source items to
+  `~/.follow-builders/industries/womenswear/feed.json`.
+- If `status` is `error`, show the `message` and stop.
+- Turn the feed items into short-video topic ideas following
+  `prompts.short_video_topics`.
+- Every factual observation or topic must cite at least one `url` from `items`.
+- Items without `url` can only be used as style/context reference, not evidence.
+- Do not invent trends, quotes, sales results, or market data.
+- Include risk notes for absolute claims, exaggerated sales promises, unsupported
+  competitor comparisons, or claims without source links.
+
 If `stats.podcastEpisodes` is 0 AND `stats.xBuilders` is 0, tell the user:
 "No new updates from your builders today. Check back tomorrow!" Then stop.
 
@@ -414,10 +436,31 @@ Just output the digest directly.
 When the user says something that sounds like a settings change, handle it:
 
 ### Source Changes
-The source list is managed centrally and cannot be modified by users.
-If a user asks to add or remove sources, tell them: "The source list is curated
-centrally and updates automatically. If you'd like to suggest a source, you can
-open an issue at https://github.com/zarazhangrui/follow-builders."
+AI builders sources are managed centrally and update automatically. If a user
+wants to suggest an AI builders source, direct them to
+https://github.com/zarazhangrui/follow-builders.
+
+Industry mode sources are local and user-managed. For `womenswear`, tell users
+to add collected items to `~/.follow-builders/industries/womenswear/feed.json`
+using this shape:
+
+```json
+{
+  "items": [
+    {
+      "sourceType": "social",
+      "platform": "xiaohongshu",
+      "sourceName": "Account or publication",
+      "author": "Author name",
+      "title": "Post or article title",
+      "url": "https://example.com/original-source",
+      "publishedAt": "2026-06-18T00:00:00.000Z",
+      "text": "Collected source text, excerpt, transcript, or notes.",
+      "tags": ["trend", "styling"]
+    }
+  ]
+}
+```
 
 ### Schedule Changes
 - "Switch to weekly/daily" → Update `frequency` in config.json

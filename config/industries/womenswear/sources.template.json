@@ -1,0 +1,49 @@
+{
+  "industry": "womenswear",
+  "notes": "Fill this template with the sources you want to track. The first version does not scrape these platforms automatically; add collected content to ~/.follow-builders/industries/womenswear/feed.json.",
+  "sources": [
+    {
+      "sourceType": "social",
+      "platform": "xiaohongshu",
+      "sourceName": "",
+      "author": "",
+      "url": "",
+      "tags": ["trend", "styling", "retail"]
+    },
+    {
+      "sourceType": "social",
+      "platform": "douyin",
+      "sourceName": "",
+      "author": "",
+      "url": "",
+      "tags": ["short-video", "sales", "styling"]
+    },
+    {
+      "sourceType": "article",
+      "platform": "wechat",
+      "sourceName": "",
+      "author": "",
+      "url": "",
+      "tags": ["industry", "retail", "sourcing"]
+    },
+    {
+      "sourceType": "article",
+      "platform": "website",
+      "sourceName": "",
+      "author": "",
+      "url": "",
+      "tags": ["trend", "market"]
+    }
+  ],
+  "feedItemShape": {
+    "sourceType": "social | article",
+    "platform": "xiaohongshu | douyin | weibo | wechat | website | other",
+    "sourceName": "Account, publication, or site name",
+    "author": "Author or account owner",
+    "title": "Post or article title",
+    "url": "Original source URL",
+    "publishedAt": "ISO date string when known",
+    "text": "Collected text, excerpt, transcript, or notes",
+    "tags": ["trend", "sourcing", "styling"]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "womenswear",
+  "name": "Womenswear",
+  "description": "A practical industry feed for womenswear retail, sourcing, styling, ecommerce, and short-video topic development.",
+  "audience": [
+    "womenswear store owners",
+    "womenswear ecommerce sellers",
+    "buyers and merchandisers",
+    "fashion content creators",
+    "consumers who want to avoid poor clothing purchases"
+  ],
+  "outputMode": "short_video_topics",
+  "contentGoals": [
+    "spot useful womenswear market observations",
+    "turn source material into shootable short-video topics",
+    "surface hooks, angles, and practical talking points",
+    "preserve source links for every factual claim"
+  ],
+  "contentBoundaries": [
+    "Do not promise guaranteed sales, viral reach, or profit.",
+    "Avoid absolute claims such as must-buy, guaranteed hit, or risk-free.",
+    "Do not criticize named competitors without source-backed evidence.",
+    "Treat unlinked material as style reference only, not factual evidence."
+  ]
+}

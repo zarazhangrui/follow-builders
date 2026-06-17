@@ -16,7 +16,7 @@
 // Output: JSON to stdout
 // ============================================================================
 
-import { readFile, mkdir } from 'fs/promises';
+import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
@@ -25,6 +25,7 @@ import { homedir } from 'os';
 
 const USER_DIR = join(homedir(), '.follow-builders');
 const CONFIG_PATH = join(USER_DIR, 'config.json');
+const SUPPORTED_INDUSTRIES = new Set(['womenswear']);
 
 const FEED_X_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json';
 const FEED_PODCASTS_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json';
@@ -36,6 +37,11 @@ const PROMPT_FILES = [
   'summarize-tweets.md',
   'summarize-blogs.md',
   'digest-intro.md',
+  'translate.md'
+];
+
+const INDUSTRY_PROMPT_FILES = [
+  'short-video-topics.md',
   'translate.md'
 ];
 
@@ -53,23 +59,178 @@ async function fetchText(url) {
   return res.text();
 }
 
+async function readJSON(path) {
+  return JSON.parse((await readFile(path, 'utf-8')).replace(/^\uFEFF/, ''));
+}
+
+async function loadPromptFile({ filename, localDir, userDir, errors }) {
+  const userPath = join(userDir, filename);
+  const localPath = join(localDir, filename);
+
+  if (existsSync(userPath)) {
+    return readFile(userPath, 'utf-8');
+  }
+
+  if (existsSync(localPath)) {
+    return readFile(localPath, 'utf-8');
+  }
+
+  errors.push(`Could not load prompt: ${filename}`);
+  return '';
+}
+
+function normalizeIndustry(industry) {
+  if (!industry || industry === 'ai-builders') return 'ai-builders';
+  return industry;
+}
+
+async function prepareIndustryDigest({ config, scriptDir, errors }) {
+  const industry = normalizeIndustry(config.industry);
+
+  if (!SUPPORTED_INDUSTRIES.has(industry)) {
+    return {
+      status: 'error',
+      message: `Unsupported industry: ${industry}`,
+      supportedIndustries: [...SUPPORTED_INDUSTRIES]
+    };
+  }
+
+  const localIndustryDir = join(scriptDir, '..', 'config', 'industries', industry);
+  const localPromptsDir = join(scriptDir, '..', 'prompts', 'industries', industry);
+  const userIndustryDir = join(USER_DIR, 'industries', industry);
+  const userPromptsDir = join(userIndustryDir, 'prompts');
+  const feedPath = join(userIndustryDir, 'feed.json');
+  const profilePath = join(localIndustryDir, 'profile.json');
+
+  let profile = {};
+  if (existsSync(profilePath)) {
+    try {
+      profile = await readJSON(profilePath);
+    } catch (err) {
+      errors.push(`Could not read industry profile: ${err.message}`);
+    }
+  } else {
+    errors.push(`Could not find industry profile: ${industry}`);
+  }
+
+  const prompts = {};
+  for (const filename of INDUSTRY_PROMPT_FILES) {
+    const key = filename.replace('.md', '').replace(/-/g, '_');
+    prompts[key] = await loadPromptFile({
+      filename,
+      localDir: localPromptsDir,
+      userDir: userPromptsDir,
+      errors
+    });
+  }
+
+  let items = [];
+  if (!existsSync(feedPath)) {
+    return {
+      status: 'empty',
+      message: `No local content feed found for industry "${industry}". Add items to ${feedPath}.`,
+      generatedAt: new Date().toISOString(),
+      config: {
+        language: config.language || 'en',
+        frequency: config.frequency || 'daily',
+        delivery: config.delivery || { method: 'stdout' },
+        industry,
+        outputMode: config.outputMode || 'short_video_topics'
+      },
+      industry: profile,
+      items,
+      prompts,
+      stats: { items: 0, linkedItems: 0, sourceTypes: {} },
+      errors: errors.length > 0 ? errors : undefined
+    };
+  }
+
+  try {
+    const feed = await readJSON(feedPath);
+    items = Array.isArray(feed) ? feed : feed.items || [];
+  } catch (err) {
+    return {
+      status: 'error',
+      message: `Could not parse local content feed for industry "${industry}": ${err.message}`,
+      feedPath
+    };
+  }
+
+  const sourceTypes = {};
+  for (const item of items) {
+    const type = item.sourceType || 'unknown';
+    sourceTypes[type] = (sourceTypes[type] || 0) + 1;
+  }
+
+  if (items.length === 0) {
+    return {
+      status: 'empty',
+      message: `No local content items found for industry "${industry}". Add items to ${feedPath}.`,
+      generatedAt: new Date().toISOString(),
+      config: {
+        language: config.language || 'en',
+        frequency: config.frequency || 'daily',
+        delivery: config.delivery || { method: 'stdout' },
+        industry,
+        outputMode: config.outputMode || 'short_video_topics'
+      },
+      industry: profile,
+      items,
+      prompts,
+      stats: { items: 0, linkedItems: 0, sourceTypes },
+      errors: errors.length > 0 ? errors : undefined
+    };
+  }
+
+  return {
+    status: 'ok',
+    generatedAt: new Date().toISOString(),
+    config: {
+      language: config.language || 'en',
+      frequency: config.frequency || 'daily',
+      delivery: config.delivery || { method: 'stdout' },
+      industry,
+      outputMode: config.outputMode || 'short_video_topics'
+    },
+    industry: profile,
+    items,
+    stats: {
+      items: items.length,
+      linkedItems: items.filter((item) => Boolean(item.url)).length,
+      sourceTypes
+    },
+    prompts,
+    errors: errors.length > 0 ? errors : undefined
+  };
+}
+
 // -- Main --------------------------------------------------------------------
 
 async function main() {
   const errors = [];
+  const scriptDir = decodeURIComponent(new URL('.', import.meta.url).pathname);
 
   // 1. Read user config
   let config = {
     language: 'en',
     frequency: 'daily',
-    delivery: { method: 'stdout' }
+    delivery: { method: 'stdout' },
+    industry: 'ai-builders',
+    outputMode: 'digest'
   };
   if (existsSync(CONFIG_PATH)) {
     try {
-      config = JSON.parse(await readFile(CONFIG_PATH, 'utf-8'));
+      config = await readJSON(CONFIG_PATH);
     } catch (err) {
       errors.push(`Could not read config: ${err.message}`);
     }
+  }
+
+  const industry = normalizeIndustry(config.industry);
+  if (industry !== 'ai-builders') {
+    const output = await prepareIndustryDigest({ config, scriptDir, errors });
+    console.log(JSON.stringify(output, null, 2));
+    return;
   }
 
   // 2. Fetch all three feeds
@@ -105,7 +266,6 @@ async function main() {
   // Otherwise, fetch the latest from GitHub so they get central improvements.
   // If GitHub is unreachable, fall back to the local copy shipped with the skill.
   const prompts = {};
-  const scriptDir = decodeURIComponent(new URL('.', import.meta.url).pathname);
   const localPromptsDir = join(scriptDir, '..', 'prompts');
   const userPromptsDir = join(USER_DIR, 'prompts');
 
@@ -144,7 +304,9 @@ async function main() {
     config: {
       language: config.language || 'en',
       frequency: config.frequency || 'daily',
-      delivery: config.delivery || { method: 'stdout' }
+      delivery: config.delivery || { method: 'stdout' },
+      industry: 'ai-builders',
+      outputMode: config.outputMode || 'digest'
     },
 
     // Content to remix

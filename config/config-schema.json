@@ -14,6 +14,18 @@
       "default": "en",
       "description": "Digest language: en (English), zh (Chinese), bilingual (both)"
     },
+    "industry": {
+      "type": "string",
+      "enum": ["ai-builders", "womenswear"],
+      "default": "ai-builders",
+      "description": "Content domain. ai-builders uses the central feed; womenswear uses a local industry feed."
+    },
+    "outputMode": {
+      "type": "string",
+      "enum": ["digest", "short_video_topics"],
+      "default": "digest",
+      "description": "Output format. Use short_video_topics for industry content intended for short-video ideation."
+    },
     "timezone": {
       "type": "string",
       "default": "America/Los_Angeles",
