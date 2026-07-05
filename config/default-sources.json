@@ -73,6 +73,13 @@
     { "name": "Dan Shipper", "handle": "danshipper" },
     { "name": "Aditya Agarwal", "handle": "adityaag" },
     { "name": "Sam Altman", "handle": "sama" },
-    { "name": "Claude", "handle": "claudeai" }
+    { "name": "Claude", "handle": "claudeai" },
+    { "name": "Anthropic", "handle": "AnthropicAI" },
+    { "name": "OpenAI", "handle": "OpenAI" },
+    { "name": "Google DeepMind", "handle": "GoogleDeepMind" },
+    { "name": "AI at Meta", "handle": "AIatMeta" },
+    { "name": "Mistral AI", "handle": "MistralAI" },
+    { "name": "Hugging Face", "handle": "huggingface" },
+    { "name": "xAI", "handle": "xai" }
   ]
 }
