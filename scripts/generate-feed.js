@@ -883,6 +883,150 @@ function extractClaudeBlogArticleContent(html) {
   return { title, author, publishedAt, content };
 }
 
+// -- Generic blog helpers (RSS-discovered + basic HTML scrape) ----------------
+
+// Strip a chunk of HTML down to readable plain text. Shared by the generic
+// extractor and the Meta scraper so their output matches the per-site ones.
+function stripHtmlToText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Reads a <meta property|name="<key>" content="..."> value in either attribute
+// order. Used for og:title / og:description fallbacks.
+function readMetaTag(html, key) {
+  const k = key.replace(/[:]/g, "\\:");
+  const m =
+    html.match(
+      new RegExp(
+        `<meta[^>]+(?:property|name)=["']${k}["'][^>]+content=["']([^"']*)["']`,
+        "i",
+      ),
+    ) ||
+    html.match(
+      new RegExp(
+        `<meta[^>]+content=["']([^"']*)["'][^>]+(?:property|name)=["']${k}["']`,
+        "i",
+      ),
+    );
+  return m ? m[1].trim() : "";
+}
+
+// Maps an RSS/Atom blog feed to the article-candidate shape the pipeline expects.
+// Like parseRssFeed (used by podcasts) but keyed on <link> rather than <guid>,
+// and it also keeps the item's <description>/<summary>, which several lab feeds
+// (e.g. OpenAI) populate with a real article summary - the reliable content
+// source when the article page itself is client-rendered or blocks fetches.
+function parseRssBlogFeed(xml) {
+  const items = [];
+  const itemRegex = /<(item|entry)\b[\s\S]*?<\/\1>/gi;
+  let match;
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const block = match[0];
+    const pick = (tag) => {
+      const m =
+        block.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${tag}>`, "i")) ||
+        block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i"));
+      return m ? m[1].trim() : "";
+    };
+    // Atom <link href="..."/> vs RSS <link>...</link>.
+    const link =
+      pick("link") ||
+      (block.match(/<link[^>]*href=["']([^"']+)["']/i) || [])[1] ||
+      "";
+    if (!link) continue;
+    const dateRaw = pick("pubDate") || pick("published") || pick("updated");
+    const date = dateRaw ? new Date(dateRaw) : null;
+    items.push({
+      title: pick("title"),
+      url: link.trim(),
+      publishedAt: date && !isNaN(date) ? date.toISOString() : null,
+      description: stripHtmlToText(pick("description") || pick("summary")),
+    });
+  }
+  return items;
+}
+
+// Generic article content extractor for blogs without a bespoke parser.
+// Metadata comes from JSON-LD then og: tags; body text prefers <article>, then
+// falls back to the page's <p> runs. Returns content: "" when a page is fully
+// client-rendered (e.g. OpenAI) so the caller can still emit a headline-only item.
+function extractGenericArticleContent(html) {
+  let title = "";
+  let author = "";
+  let publishedAt = null;
+
+  const jsonLdRegex =
+    /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi;
+  let ldMatch;
+  while ((ldMatch = jsonLdRegex.exec(html)) !== null) {
+    try {
+      let ld = JSON.parse(ldMatch[1]);
+      if (Array.isArray(ld))
+        ld = ld.find((x) => /Article|BlogPosting|NewsArticle/.test(x?.["@type"]));
+      if (ld && /Article|BlogPosting|NewsArticle/.test(ld["@type"] || "")) {
+        title = ld.headline || ld.name || "";
+        author =
+          ld.author?.name ||
+          (Array.isArray(ld.author) ? ld.author[0]?.name : "") ||
+          "";
+        publishedAt = ld.datePublished || null;
+        break;
+      }
+    } catch {
+      // not valid JSON-LD, keep scanning
+    }
+  }
+
+  const description = readMetaTag(html, "og:description") || readMetaTag(html, "description");
+  if (!title) {
+    title = readMetaTag(html, "og:title");
+    if (!title) {
+      const h1 = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+      if (h1) title = stripHtmlToText(h1[1]);
+    }
+  }
+
+  // Strip page chrome first so the body doesn't absorb nav menus / footers.
+  const cleaned = html
+    .replace(/<nav[\s\S]*?<\/nav>/gi, "")
+    .replace(/<header[\s\S]*?<\/header>/gi, "")
+    .replace(/<footer[\s\S]*?<\/footer>/gi, "")
+    .replace(/<aside[\s\S]*?<\/aside>/gi, "");
+
+  // Body: paragraph runs are the most reliable signal across sites; the long-
+  // paragraph filter drops stray menu/link text. Fall back to <article> only if
+  // the page has almost no <p> content.
+  const paras = [...cleaned.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)]
+    .map((p) => stripHtmlToText(p[1]))
+    .filter((t) => t.length > 60);
+  let body = paras.join("\n\n");
+  if (body.length < 200) {
+    const articleMatch = cleaned.match(/<article[^>]*>([\s\S]*?)<\/article>/i);
+    if (articleMatch) body = stripHtmlToText(articleMatch[1]);
+  }
+
+  // Lead with the publisher's own summary, then the body (without duplicating it).
+  // A client-rendered page yields neither, leaving content "" for headline-only.
+  const parts = [];
+  if (description) parts.push(description);
+  if (body && !(description && body.startsWith(description.slice(0, 60))))
+    parts.push(body);
+  const content = parts.join("\n\n");
+
+  return { title, author, publishedAt, content, description };
+}
+
 // Main blog fetching orchestrator.
 // For each blog source in the config, discovers new articles, deduplicates
 // against previously seen URLs, fetches full article content, and returns
@@ -896,8 +1040,10 @@ async function fetchBlogContent(blogs, state, errors) {
     let candidates = [];
 
     try {
-      // Step 1: Discover articles from the blog index page
-      const indexRes = await fetch(blog.indexUrl, {
+      // Step 1: Discover articles. RSS blogs use their feed (robust, structured);
+      // scrape blogs parse the index HTML with a per-site parser.
+      const discoveryUrl = blog.type === "rss" ? blog.rssUrl : blog.indexUrl;
+      const indexRes = await fetch(discoveryUrl, {
         headers: { "User-Agent": "FollowBuilders/1.0 (feed aggregator)" },
       });
       if (!indexRes.ok) {
@@ -909,7 +1055,9 @@ async function fetchBlogContent(blogs, state, errors) {
       const indexHtml = await indexRes.text();
 
       // Use the right parser based on which blog this is
-      if (blog.indexUrl.includes("anthropic.com")) {
+      if (blog.type === "rss") {
+        candidates = parseRssBlogFeed(indexHtml);
+      } else if (blog.indexUrl.includes("anthropic.com")) {
         candidates = parseAnthropicEngineeringIndex(indexHtml);
       } else if (blog.indexUrl.includes("claude.com")) {
         candidates = parseClaudeBlogIndex(indexHtml);
@@ -944,28 +1092,66 @@ async function fetchBlogContent(blogs, state, errors) {
       // Step 3: Fetch full article content for each new article
       for (const article of newArticles) {
         try {
-          // Fetch the full article page
+          // Fast path: when an RSS item already carries a substantial summary,
+          // use it directly and skip the article fetch. This is what makes
+          // OpenAI work (its article pages 403 datacenter fetches) and spares a
+          // needless request whenever the feed's own summary is enough.
+          if (blog.type === "rss" && article.description.length >= 120) {
+            results.push({
+              source: "blog",
+              name: blog.name,
+              title: article.title || "Untitled",
+              url: article.url,
+              publishedAt: article.publishedAt || null,
+              author: "",
+              description: article.description,
+              content: article.description,
+            });
+            state.seenArticles[article.url] = Date.now();
+            continue;
+          }
+
+          // Otherwise fetch the article page. RSS blogs tolerate a failed fetch
+          // (they fall back to the feed's description below); scrape blogs need it.
+          let articleHtml = "";
           const articleRes = await fetch(article.url, {
             headers: { "User-Agent": "FollowBuilders/1.0 (feed aggregator)" },
           });
-          if (!articleRes.ok) {
+          if (articleRes.ok) {
+            articleHtml = await articleRes.text();
+          } else if (blog.type !== "rss") {
             errors.push(
               `Blog: Failed to fetch article ${article.url}: HTTP ${articleRes.status}`,
             );
             continue;
           }
-          const articleHtml = await articleRes.text();
 
-          // Use the right content extractor based on the blog
+          // Use the right content extractor based on the blog. Bespoke parsers
+          // for the two original blogs; everything else uses the generic one.
           let extracted;
           if (article.url.includes("anthropic.com/engineering")) {
             extracted = extractAnthropicArticleContent(articleHtml);
           } else if (article.url.includes("claude.com/blog")) {
             extracted = extractClaudeBlogArticleContent(articleHtml);
+          } else {
+            extracted = extractGenericArticleContent(articleHtml);
           }
 
-          if (!extracted || !extracted.content) {
+          // For RSS blogs, the feed's <description> is the reliable fallback when
+          // the page yielded nothing (client-rendered or blocked).
+          if (blog.type === "rss" && !extracted.content && article.description) {
+            extracted.content = article.description;
+            if (!extracted.description) extracted.description = article.description;
+          }
+
+          // Scrape blogs require real body text (empty means the parser broke).
+          const title = extracted.title || article.title || "Untitled";
+          if (!extracted.content && blog.type !== "rss") {
             errors.push(`Blog: No content extracted from ${article.url}`);
+            continue;
+          }
+          if (!extracted.content && !article.title && !extracted.title) {
+            errors.push(`Blog: No content or title for ${article.url}`);
             continue;
           }
 
@@ -973,12 +1159,12 @@ async function fetchBlogContent(blogs, state, errors) {
           results.push({
             source: "blog",
             name: blog.name,
-            title: extracted.title || article.title || "Untitled",
+            title,
             url: article.url,
             publishedAt: extracted.publishedAt || article.publishedAt || null,
             author: extracted.author || "",
-            description: article.description || "",
-            content: extracted.content,
+            description: extracted.description || article.description || "",
+            content: extracted.content || "",
           });
 
           // Mark as seen

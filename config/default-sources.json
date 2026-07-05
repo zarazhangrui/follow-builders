@@ -45,6 +45,18 @@
       "indexUrl": "https://claude.com/blog",
       "articleBaseUrl": "https://claude.com/blog/",
       "fetchMethod": "http"
+    },
+    {
+      "name": "Google DeepMind",
+      "type": "rss",
+      "rssUrl": "https://deepmind.google/blog/rss.xml",
+      "url": "https://deepmind.google/blog/"
+    },
+    {
+      "name": "OpenAI",
+      "type": "rss",
+      "rssUrl": "https://openai.com/news/rss.xml",
+      "url": "https://openai.com/news/"
     }
   ],
   "x_accounts": [
