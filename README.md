@@ -15,7 +15,7 @@ A daily or weekly digest delivered to your preferred messaging app (Telegram, Di
 WhatsApp, etc.) with:
 
 - Summaries of new podcast episodes from top AI podcasts
-- Key posts and insights from 26 curated AI builders on X/Twitter
+- Key posts and insights from 36 curated AI builders on X/Twitter
 - Full articles from official AI company blogs (Anthropic Engineering, Claude Blog)
 - Links to all original content
 - Available in English, Chinese, or bilingual
@@ -61,7 +61,17 @@ Edit the files in the `prompts/` folder:
 - `summarize-tweets.md` — how X/Twitter posts are summarized
 - `summarize-blogs.md` — how blog posts are summarized
 - `digest-intro.md` — the overall digest format and tone
+- `digest-intro-expanded.md` — expanded digest rules that retain medium-density items
 - `translate.md` — how English content is translated to Chinese
+
+To generate the expanded edition explicitly:
+
+```bash
+node scripts/prepare-digest.js --expanded
+node scripts/deliver.js --file /tmp/fb-digest-expanded.md --expanded
+```
+
+The expanded edition is exported as `data/YYYY-MM-DD/digest-expanded.md` by default.
 
 These are plain English instructions, not code. Changes take effect on the next digest.
 
@@ -75,8 +85,8 @@ These are plain English instructions, not code. Changes take effect on the next 
 - [The MAD Podcast with Matt Turck](https://www.youtube.com/@DataDrivenNYC)
 - [AI & I by Every](https://www.youtube.com/playlist?list=PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL)
 
-### AI Builders on X (26)
-[Andrej Karpathy](https://x.com/karpathy), [Swyx](https://x.com/swyx), [Josh Woodward](https://x.com/joshwoodward), [Boris Cherny](https://x.com/bcherny), [Thibault Sottiaux](https://x.com/thsottiaux), [Peter Yang](https://x.com/petergyang), [Nan Yu](https://x.com/thenanyu), [Madhu Guru](https://x.com/realmadhuguru), [Amanda Askell](https://x.com/AmandaAskell), [Cat Wu](https://x.com/_catwu), [Thariq](https://x.com/trq212), [Google Labs](https://x.com/GoogleLabs), [Amjad Masad](https://x.com/amasad), [Guillermo Rauch](https://x.com/rauchg), [Alex Albert](https://x.com/alexalbert__), [Aaron Levie](https://x.com/levie), [Ryo Lu](https://x.com/ryolu_), [Garry Tan](https://x.com/garrytan), [Matt Turck](https://x.com/mattturck), [Zara Zhang](https://x.com/zarazhangrui), [Nikunj Kothari](https://x.com/nikunj), [Peter Steinberger](https://x.com/steipete), [Dan Shipper](https://x.com/danshipper), [Aditya Agarwal](https://x.com/adityaag), [Sam Altman](https://x.com/sama), [Claude](https://x.com/claudeai)
+### AI Builders on X (36)
+[Andrej Karpathy](https://x.com/karpathy), [Swyx](https://x.com/swyx), [Josh Woodward](https://x.com/joshwoodward), [Boris Cherny](https://x.com/bcherny), [Thibault Sottiaux](https://x.com/thsottiaux), [Kevin Weil](https://x.com/kevinweil), [OpenAI Developers](https://x.com/OpenAIDevs), [Anthropic](https://x.com/AnthropicAI), [Peter Yang](https://x.com/petergyang), [Nan Yu](https://x.com/thenanyu), [Madhu Guru](https://x.com/realmadhuguru), [Amanda Askell](https://x.com/AmandaAskell), [Cat Wu](https://x.com/_catwu), [Thariq](https://x.com/trq212), [Google Labs](https://x.com/GoogleLabs), [Amjad Masad](https://x.com/amasad), [Guillermo Rauch](https://x.com/rauchg), [Alex Albert](https://x.com/alexalbert__), [Aaron Levie](https://x.com/levie), [Ryo Lu](https://x.com/ryolu_), [Garry Tan](https://x.com/garrytan), [Matt Turck](https://x.com/mattturck), [Zara Zhang](https://x.com/zarazhangrui), [Nikunj Kothari](https://x.com/nikunj), [Peter Steinberger](https://x.com/steipete), [Dan Shipper](https://x.com/danshipper), [Aditya Agarwal](https://x.com/adityaag), [Sam Altman](https://x.com/sama), [Claude](https://x.com/claudeai), [Matt Van Horn](https://x.com/mvanhorn), [Simon Willison](https://x.com/simonw), [Harrison Chase](https://x.com/hwchase17), [Cognition](https://x.com/cognition_labs), [Cursor](https://x.com/cursor_ai), [LangChain](https://x.com/LangChainAI), [LlamaIndex](https://x.com/llama_index)
 
 ### Official Blogs (2)
 - [Anthropic Engineering](https://www.anthropic.com/engineering) — technical deep-dives from the Anthropic team
@@ -114,7 +124,19 @@ is fetched centrally and updated daily.
    (blog articles via web scraping, YouTube transcripts via Supadata, X/Twitter via official API)
 2. Your agent fetches the feed — one HTTP request, no API keys
 3. Your agent remixes the raw content into a digestible summary using your preferences
-4. The digest is delivered to your messaging app (or shown in-chat)
+4. The digest is saved as Markdown and delivered to your messaging app (or shown in-chat)
+
+Each delivered digest is exported by default to:
+
+```text
+data/YYYY-MM-DD/digest.md
+```
+
+Power users can override the export destination when calling the delivery script:
+
+```bash
+node scripts/deliver.js --file /tmp/fb-digest.md --output data/2026-05-12
+```
 
 See [examples/sample-digest.md](examples/sample-digest.md) for what the output looks like.
 
