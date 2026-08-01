@@ -65,6 +65,16 @@ async function fetchText(url, fetchImpl) {
   }
 }
 
+function validateFeedResult(result, contentField) {
+  if (result.data && !Array.isArray(result.data[contentField])) {
+    return {
+      data: null,
+      error: `Invalid feed payload: missing ${contentField} array`
+    };
+  }
+  return result;
+}
+
 // -- Main --------------------------------------------------------------------
 
 export async function prepareDigest({
@@ -90,11 +100,14 @@ export async function prepareDigest({
   }
 
   // 2. Fetch all three feeds
-  const [xResult, podcastResult, blogResult] = await Promise.all([
+  const [rawXResult, rawPodcastResult, rawBlogResult] = await Promise.all([
     fetchJSON(FEED_X_URL, fetchImpl),
     fetchJSON(FEED_PODCASTS_URL, fetchImpl),
     fetchJSON(FEED_BLOGS_URL, fetchImpl)
   ]);
+  const xResult = validateFeedResult(rawXResult, 'x');
+  const podcastResult = validateFeedResult(rawPodcastResult, 'podcasts');
+  const blogResult = validateFeedResult(rawBlogResult, 'blogs');
 
   const feedX = xResult.data;
   const feedPodcasts = podcastResult.data;
@@ -111,19 +124,22 @@ export async function prepareDigest({
   }
 
   let hasUpstreamFeedErrors = false;
-  if (feedX?.errors?.length) {
+  if (Array.isArray(feedX?.errors) && feedX.errors.length) {
     hasUpstreamFeedErrors = true;
     errors.push(
       ...feedX.errors.map((error) => `Tweet feed problem: ${error}`)
     );
   }
-  if (feedPodcasts?.errors?.length) {
+  if (
+    Array.isArray(feedPodcasts?.errors) &&
+    feedPodcasts.errors.length
+  ) {
     hasUpstreamFeedErrors = true;
     errors.push(
       ...feedPodcasts.errors.map((error) => `Podcast feed problem: ${error}`)
     );
   }
-  if (feedBlogs?.errors?.length) {
+  if (Array.isArray(feedBlogs?.errors) && feedBlogs.errors.length) {
     hasUpstreamFeedErrors = true;
     errors.push(
       ...feedBlogs.errors.map((error) => `Blog feed problem: ${error}`)

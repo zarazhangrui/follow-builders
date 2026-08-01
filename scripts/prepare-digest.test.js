@@ -159,3 +159,26 @@ test('reports partial when a loaded feed contains upstream errors', async (t) =>
     )
   );
 });
+
+test('reports partial when a feed payload is missing its content array', async (t) => {
+  const output = await prepareDigest({
+    fetchImpl: createFetch({
+      'feed-podcasts.json': jsonResponse({
+        generatedAt: '2026-08-01T00:05:00.000Z'
+      })
+    }),
+    userDir: await createUserDirectory(t)
+  });
+
+  assert.equal(output.status, 'partial');
+  assert.equal(output.feedStatus.podcasts.status, 'error');
+  assert.match(
+    output.feedStatus.podcasts.error,
+    /missing podcasts array/
+  );
+  assert.ok(
+    output.errors.some((error) =>
+      /Podcast feed problem:.*missing podcasts array/.test(error)
+    )
+  );
+});
