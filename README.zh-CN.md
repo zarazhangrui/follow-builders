@@ -43,11 +43,10 @@ Follow Builders 被封装为一个 skills-only ChatGPT Plugin，同时支持 **W
 
 ### 测试本地 Plugin
 
-1. 克隆仓库并安装投递脚本依赖：
+1. 克隆仓库：
 
    ```bash
    git clone https://github.com/zarazhangrui/follow-builders.git
-   cd follow-builders/scripts && npm install
    ```
 
 2. 在 ChatGPT Work 中使用 `@plugin-creator`，或在 Codex 中使用
@@ -147,6 +146,8 @@ cd ~/.claude/skills/follow-builders/scripts && npm install
 
 仅此而已。信息源不需要 API key。所有内容（博客文章 + YouTube 字幕 +
 X/Twitter 帖子）由中心化服务每日抓取更新。
+已安装 Plugin 的简报与投递脚本不依赖 `node_modules`；只有 feed 生成等仓库维护者
+工作流需要执行 `npm install`。
 
 ## 工作原理
 

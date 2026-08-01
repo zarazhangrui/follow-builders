@@ -54,11 +54,10 @@ published to the public Plugins Directory.
 
 ### Test the local Plugin
 
-1. Clone the repository and install the delivery script dependency:
+1. Clone the repository:
 
    ```bash
    git clone https://github.com/zarazhangrui/follow-builders.git
-   cd follow-builders/scripts && npm install
    ```
 
 2. In ChatGPT Work, use `@plugin-creator`, or in Codex use
@@ -165,6 +164,9 @@ cd ~/.claude/skills/follow-builders/scripts && npm install
 
 That's it. No source API keys are needed. All content (blog articles + YouTube
 transcripts + X/Twitter posts) is fetched centrally and updated daily.
+The installed Plugin's digest and delivery scripts do not require
+`node_modules`; `npm install` is only needed for repository-maintainer workflows
+such as feed generation.
 
 ## How It Works
 
