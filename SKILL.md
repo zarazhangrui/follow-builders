@@ -103,6 +103,15 @@ It prints one JSON object containing:
   shortest relevant retry (for example, check network access and run again).
   Do not call this “no updates.”
 
+Every response from this workflow begins with a visible, localized status line
+before any summary content: `Data status: ok`, `Data status: partial`, or
+`Data status: error`. For `partial`, name the affected sources on that line.
+
+Describe timing separately for each source. A `feedStatus.*.generatedAt` value is
+the time that feed was collected, not the publication time of every item. Do not
+infer one shared lookback window across X posts, podcasts, and blogs; use each
+item's own timestamp when describing its recency.
+
 Only say “No new updates from your builders” when `status` is `ok` and
 `podcastEpisodes`, `xBuilders`, and `blogPosts` are all zero.
 
