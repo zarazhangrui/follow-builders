@@ -103,9 +103,16 @@ It prints one JSON object containing:
   shortest relevant retry (for example, check network access and run again).
   Do not call this “no updates.”
 
-Every response from this workflow begins with a visible, localized status line
-before any summary content: `Data status: ok`, `Data status: partial`, or
-`Data status: error`. For `partial`, name the affected sources on that line.
+Begin every response with this two-line header before any other prose:
+
+```text
+# <localized digest title and date>
+<status label>: <ok|partial|error>
+```
+
+Use `数据状态` as the status label for Chinese output and `Data status` for
+English or bilingual output. Keep the enum value in English. For `partial`, add
+the affected source names on the same second line.
 
 Describe timing separately for each source. A `feedStatus.*.generatedAt` value is
 the time that feed was collected, not the publication time of every item. Do not
