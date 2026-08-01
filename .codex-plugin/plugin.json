@@ -1,0 +1,37 @@
+{
+  "name": "follow-builders",
+  "version": "1.0.0",
+  "description": "Curated AI builder updates from public X posts, podcasts, and official blogs.",
+  "author": {
+    "name": "Zara Zhang",
+    "url": "https://github.com/zarazhangrui"
+  },
+  "homepage": "https://github.com/zarazhangrui/follow-builders",
+  "repository": "https://github.com/zarazhangrui/follow-builders",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "builders",
+    "digest",
+    "podcasts",
+    "research"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Follow Builders",
+    "shortDescription": "Curated updates from people building AI products and research.",
+    "longDescription": "Generate on-demand or scheduled AI builder digests from centrally maintained public feeds in English, Chinese, or bilingual form.",
+    "developerName": "Zara Zhang",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/zarazhangrui/follow-builders",
+    "defaultPrompt": [
+      "Generate today's AI builders digest.",
+      "What are AI builders discussing recently?",
+      "生成今天的中文 AI Builders 简报。"
+    ]
+  }
+}
