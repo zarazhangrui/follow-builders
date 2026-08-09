@@ -12,6 +12,8 @@
 
 - 顶级 AI 播客新节目的精华摘要
 - 25 位精选 AI 建造者在 X/Twitter 上的关键观点和洞察
+- 本机 `twitter` CLI 补充的 X 新鲜信号（与中心 feed 按 tweet ID 去重融合）
+- AI Agent / 编码工具链的 GitHub watch、OSSInsight 趋势、Hacker News 社区讨论
 - AI 公司官方博客的完整文章（Anthropic Engineering、Claude Blog）
 - 所有原始内容的链接
 - 支持英文、中文或双语版本
@@ -27,7 +29,7 @@ Agent 会询问你：
 - 语言偏好
 - 推送方式（Telegram、邮件或直接在聊天中显示）
 
-不需要任何 API key——所有内容由中心化服务统一抓取。
+核心 feed 不需要新增内容 API key。可选 Horizon 渠道复用本机 `gh` 等工具；AnySearch 支持匿名访问。
 设置完成后，你的第一期摘要会立即推送。
 
 ## 修改设置
@@ -75,6 +77,17 @@ Skill 使用纯文本 prompt 文件来控制内容的摘要方式。你可以通
 - [Anthropic Engineering](https://www.anthropic.com/engineering) — Anthropic 团队的技术深度文章
 - [Claude Blog](https://claude.com/blog) — Claude 的产品公告与更新
 
+### Agent 工具链默认信号（非 RSS）
+
+这些默认源来自 `config/horizon-defaults.json`，用于补充“大家正在用什么 / star 什么 / 讨论什么”：
+
+- **本机 X 补鲜**：优先抓取 Karpathy、Swyx、Peter Yang、Guillermo Rauch、Alex Albert、Dan Shipper 等高信号账号，每账号 1 条，串行执行，避免触发限流。
+- **GitHub 24 小时动量**：合并固定观察池、按主题运行的 `gh search repos` 和 OSSInsight 候选，再用 GitHub 官方 GraphQL stargazer 时间戳计算 `stars24h` 与按项目年龄校正的 `starVelocity`；不会把累计 stars 冒充日增量。
+- **OSSInsight 候选发现**：先读取 `past_24_hours`，同时记录过滤前后行数。如果阈值把结果全部清空，可降级到 `past_week`，并在输出中保留真实窗口。
+- **Hacker News**：合并官方 new/top/best 列表与 Algolia 关键词检索，只保留 24 小时内的新帖，按 item ID 去重；已输出条目只有动量显著增长才会再次出现。
+- **Reddit 软源**：AnySearch 发现公开帖子元数据，Arctic Shift 复核发布时间，并承担搜索 fallback。两者都不是 Reddit 官方 API；帖子正文和评论会在进入 digest 准备态之前被丢弃。
+- **持久 Source Health**：`~/.follow-builders/trend-state.json` 保留 48 小时滚动基线。各渠道明确输出 `baseline_only`、`ok_new`、`ok_no_new`、`degraded`、`failed` 或 `blocked_auth`，不再把所有空数组都解释为成功。
+
 ## 安装
 
 ### OpenClaw
@@ -97,24 +110,28 @@ cd ~/.claude/skills/follow-builders/scripts && npm install
 
 - 一个 AI agent（OpenClaw、Claude Code 或类似工具）
 - 网络连接（用于获取中心化 feed）
+- 已登录的 GitHub CLI（`gh`），用于精确计算 GitHub 24 小时涨星；该源不可用时其余 digest 仍可继续
 
-仅此而已。不需要任何 API key。所有内容（博客文章 + YouTube 字幕 + X/Twitter 帖子）由中心化服务每日抓取更新。
+默认 Reddit 软源不需要 Reddit 账号或 Reddit API 凭据。AnySearch 可匿名运行（额度较低），也可读取本机已有的可选 key。中心化博客、播客和 X 内容不依赖这些 Horizon 渠道。
+
+AnySearch CLI 依次从 `config/horizon-defaults.json` 的 `reddit.anySearchCli`、`FOLLOW_BUILDERS_ANYSEARCH_CLI`（或 `ANYSEARCH_CLI`）、当前用户目录下常见的 agent skill 路径、以及 `PATH` 中的 `anysearch` 命令解析。
 
 ## 工作原理
 
-1. 中心化 feed 每日更新，抓取所有信息源的最新内容（博客文章通过网页抓取，YouTube 字幕通过 Supadata，X/Twitter 通过官方 API）
-2. 你的 agent 获取 feed——一次 HTTP 请求，不需要 API key
-3. 你的 agent 根据你的偏好将原始内容重新混编为易消化的摘要
-4. 摘要推送到你的通讯工具（或直接在聊天中显示）
+1. 中心化 feed 每日更新博客、播客和 X 内容（博客文章通过网页抓取，YouTube 字幕通过 Supadata，X/Twitter 通过官方 API）
+2. 你的 agent 获取该 feed，并独立准备 GitHub、HN、Reddit 的公开趋势元数据
+3. 本机 48 小时状态把新信号、重复条目、正常空结果和采集失败区分开
+4. Agent 根据你的偏好把准备态 JSON 混编为易消化的摘要
+5. 摘要推送到你的通讯工具（或直接在聊天中显示）
 
 查看 [examples/sample-digest.md](examples/sample-digest.md) 了解输出示例。
 
 ## 隐私
 
-- 不发送任何 API key——所有内容由中心化服务获取
-- 如果你使用 Telegram/邮件推送，相关 key 仅存储在本地 `~/.follow-builders/.env`
-- Skill 只读取公开内容（公开的博客文章、YouTube 视频和 X 帖子）
-- 你的配置、偏好和阅读记录都保留在你自己的设备上
+- Telegram/邮件推送凭据仅存储在本机 `~/.follow-builders/.env`，不会进入准备态输出
+- GitHub/HN/Reddit 只读取公开元数据；固定且不敏感的 Reddit 搜索词会发送给 AnySearch，帖子正文和评论会被丢弃
+- 48 小时滚动状态只在 `~/.follow-builders/trend-state.json` 保存 ID、时间戳和数值指标
+- 你的配置、偏好、交付凭据和趋势状态都保留在自己的设备上
 
 ## 许可证
 

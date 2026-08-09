@@ -16,6 +16,8 @@ WhatsApp, etc.) with:
 
 - Summaries of new podcast episodes from top AI podcasts
 - Key posts and insights from 25 curated AI builders on X/Twitter
+- Fresh local X signals from the installed `twitter` CLI, deduped with the central feed by tweet ID
+- GitHub watch, OSSInsight trending repos, and Hacker News discussion for AI agent and coding-tool infrastructure
 - Full articles from official AI company blogs (Anthropic Engineering, Claude Blog)
 - Links to all original content
 - Available in English, Chinese, or bilingual
@@ -31,7 +33,7 @@ The agent will ask you:
 - What language you prefer
 - How you want it delivered (Telegram, email, or in-chat)
 
-No API keys needed — all content is fetched centrally.
+No new content API key is required for the core feed. Optional Horizon sources reuse local tools such as `gh`; AnySearch supports anonymous access.
 Your first digest arrives immediately after setup.
 
 ## Changing Settings
@@ -82,6 +84,17 @@ These are plain English instructions, not code. Changes take effect on the next 
 - [Anthropic Engineering](https://www.anthropic.com/engineering) — technical deep-dives from the Anthropic team
 - [Claude Blog](https://claude.com/blog) — product announcements and updates from Claude
 
+### Agent Toolchain Signals (Non-RSS)
+
+These defaults live in `config/horizon-defaults.json` and add signals for what builders are using, starring, and debating:
+
+- **Local X freshness**: fetches one recent post each from high-signal accounts such as Karpathy, Swyx, Peter Yang, Guillermo Rauch, Alex Albert, and Dan Shipper. Runs serially to avoid rate limits.
+- **GitHub 24-hour momentum**: merges the fixed watchlist, topic-based `gh search repos` discovery, and OSSInsight candidates. Official GitHub GraphQL stargazer timestamps produce `stars24h` and an age-adjusted `starVelocity`; cumulative stars are not presented as daily growth.
+- **OSSInsight discovery**: starts with `past_24_hours` and records rows before and after filtering. If the configured threshold removes every result, it may fall back to `past_week`, and the wider window stays visible in the output.
+- **Hacker News**: merges the official new/top/best story lists with Algolia keyword search, keeps only 24-hour-old stories, deduplicates by item ID, and suppresses repeat appearances until momentum grows materially.
+- **Reddit soft source**: AnySearch discovers public post metadata, Arctic Shift verifies post time, and Arctic Shift search is the fallback. Both are non-official sources; post bodies and comments are discarded before digest preparation.
+- **Persistent source health**: `~/.follow-builders/trend-state.json` keeps a 48-hour rolling baseline. Each channel reports `baseline_only`, `ok_new`, `ok_no_new`, `degraded`, `failed`, or `blocked_auth` instead of treating every empty array as success.
+
 ## Installation
 
 ### OpenClaw
@@ -104,28 +117,30 @@ cd ~/.claude/skills/follow-builders/scripts && npm install
 
 - An AI agent (OpenClaw, Claude Code, or similar)
 - Internet connection (to fetch the central feed)
+- An authenticated GitHub CLI (`gh`) for exact GitHub 24-hour star counts; the rest of the digest still runs if this source is unavailable
 
-That's it. No API keys needed. All content (blog articles + YouTube transcripts + X/Twitter posts)
-is fetched centrally and updated daily.
+No Reddit account or Reddit API credentials are required for the default soft-source path. AnySearch can use anonymous access with lower limits or an optional locally configured key. Central blog, podcast, and X content remains available independently of these Horizon sources.
+
+The AnySearch CLI is resolved from `reddit.anySearchCli` in `config/horizon-defaults.json`, then `FOLLOW_BUILDERS_ANYSEARCH_CLI` (or `ANYSEARCH_CLI`), common agent skill directories under the current home directory, and finally the `anysearch` command on `PATH`.
 
 ## How It Works
 
-1. A central feed is updated daily with the latest content from all sources
+1. A central feed is updated daily with blogs, podcasts, and X content
    (blog articles via web scraping, YouTube transcripts via Supadata, X/Twitter via official API)
-2. Your agent fetches the feed — one HTTP request, no API keys
-3. Your agent remixes the raw content into a digestible summary using your preferences
-4. The digest is delivered to your messaging app (or shown in-chat)
+2. Your agent fetches that feed and independently prepares public GitHub, HN, and Reddit trend metadata
+3. A local 48-hour state separates a new signal from a repeated item, an empty result, or a source failure
+4. Your agent remixes the prepared JSON into a digestible summary using your preferences
+5. The digest is delivered to your messaging app (or shown in-chat)
 
 See [examples/sample-digest.md](examples/sample-digest.md) for what the output looks like.
 
 ## Privacy
 
-- No API keys are sent anywhere — all content is fetched centrally
-- If you use Telegram/email delivery, those keys are stored locally in `~/.follow-builders/.env`
-- The skill only reads public content (public blog posts, public YouTube videos, public X posts)
-- Your configuration, preferences, and reading history stay on your machine
+- Telegram/email delivery credentials stay locally in `~/.follow-builders/.env`; the prepared output never includes them
+- GitHub/HN/Reddit collection uses public metadata. Fixed, non-sensitive Reddit search terms are sent to AnySearch; post bodies and comments are discarded
+- The rolling trend state stores only IDs, timestamps, and numeric metrics in `~/.follow-builders/trend-state.json`
+- Your configuration, preferences, delivery credentials, and trend state stay on your machine
 
 ## License
 
 MIT
-

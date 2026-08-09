@@ -10,6 +10,7 @@
 //   echo "digest text" | node deliver.js
 //   node deliver.js --message "digest text"
 //   node deliver.js --file /path/to/digest.txt
+//   node deliver.js --file /path/to/digest.txt --telegram-format html
 //
 // The script reads delivery config from ~/.follow-builders/config.json
 // and API keys from ~/.follow-builders/.env
@@ -60,28 +61,99 @@ async function getDigestText() {
 
 // -- Telegram Delivery -------------------------------------------------------
 
-// Sends the digest via Telegram Bot API.
-// The user creates a bot via @BotFather and provides the token.
-// The chat ID is obtained when the user sends their first message to the bot.
-async function sendTelegram(text, botToken, chatId) {
-  // Telegram has a 4096 character limit per message.
-  // If the digest is longer, we split it into chunks.
-  const MAX_LEN = 4000;
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function escapeHtmlAttr(text) {
+  return escapeHtml(text).replace(/"/g, '&quot;');
+}
+
+function formatInlineMarkdown(text) {
+  const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
+  let output = '';
+  let lastIndex = 0;
+  let match;
+
+  function applyInlineFormatting(escaped) {
+    return escaped
+      .replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>')
+      .replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  }
+
+  while ((match = linkPattern.exec(text)) !== null) {
+    output += applyInlineFormatting(escapeHtml(text.slice(lastIndex, match.index)));
+    output += `<a href="${escapeHtmlAttr(match[2])}">${applyInlineFormatting(escapeHtml(match[1]))}</a>`;
+    lastIndex = match.index + match[0].length;
+  }
+
+  output += applyInlineFormatting(escapeHtml(text.slice(lastIndex)));
+  return output;
+}
+
+function markdownToTelegramHtml(text) {
+  return String(text)
+    .split('\n')
+    .map(line => {
+      const trimmed = line.trim();
+      if (trimmed === '---') return '────────';
+
+      const heading = trimmed.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) return `<b>${formatInlineMarkdown(heading[2])}</b>`;
+
+      const bullet = line.match(/^(\s*)[-*]\s+(.+)$/);
+      if (bullet) return `${bullet[1]}• ${formatInlineMarkdown(bullet[2])}`;
+
+      const numbered = line.match(/^(\s*)(\d+)\.\s+(.+)$/);
+      if (numbered) return `${numbered[1]}${numbered[2]}. ${formatInlineMarkdown(numbered[3])}`;
+
+      return formatInlineMarkdown(line);
+    })
+    .join('\n');
+}
+
+function getTelegramFormat(config) {
+  const args = process.argv.slice(2);
+  const idx = args.indexOf('--telegram-format');
+  if (idx !== -1 && args[idx + 1]) return args[idx + 1];
+  return config.delivery?.telegramFormat || config.delivery?.parseMode || 'html';
+}
+
+function splitMessage(text, maxLen = 3600) {
   const chunks = [];
   let remaining = text;
   while (remaining.length > 0) {
-    if (remaining.length <= MAX_LEN) {
+    if (remaining.length <= maxLen) {
       chunks.push(remaining);
       break;
     }
-    // Try to split at a newline near the limit
-    let splitAt = remaining.lastIndexOf('\n', MAX_LEN);
-    if (splitAt < MAX_LEN * 0.5) splitAt = MAX_LEN;
-    chunks.push(remaining.slice(0, splitAt));
-    remaining = remaining.slice(splitAt);
-  }
 
-  for (const chunk of chunks) {
+    let splitAt = remaining.lastIndexOf('\n', maxLen);
+    if (splitAt < maxLen * 0.5) splitAt = maxLen;
+    chunks.push(remaining.slice(0, splitAt));
+    remaining = remaining.slice(splitAt).replace(/^\n+/, '');
+  }
+  return chunks;
+}
+
+// Sends the digest via Telegram Bot API.
+// The user creates a bot via @BotFather and provides the token.
+// The chat ID is obtained when the user sends their first message to the bot.
+async function sendTelegram(text, botToken, chatId, telegramFormat = 'html') {
+  const rawChunks = splitMessage(text);
+  const format = String(telegramFormat || 'html').toLowerCase();
+
+  for (const rawChunk of rawChunks) {
+    const chunk = format === 'html' ? markdownToTelegramHtml(rawChunk) : rawChunk;
+    const parseMode = format === 'plain'
+      ? undefined
+      : format === 'markdown'
+        ? 'Markdown'
+        : 'HTML';
+
     const res = await fetch(
       `https://api.telegram.org/bot${botToken}/sendMessage`,
       {
@@ -90,7 +162,7 @@ async function sendTelegram(text, botToken, chatId) {
         body: JSON.stringify({
           chat_id: chatId,
           text: chunk,
-          parse_mode: 'Markdown',
+          ...(parseMode ? { parse_mode: parseMode } : {}),
           disable_web_page_preview: true
         })
       }
@@ -98,7 +170,7 @@ async function sendTelegram(text, botToken, chatId) {
 
     if (!res.ok) {
       const err = await res.json();
-      // If Markdown parsing fails, retry without parse_mode
+      // If rich text parsing fails, retry the original chunk as plain text.
       if (err.description && err.description.includes("can't parse")) {
         await fetch(
           `https://api.telegram.org/bot${botToken}/sendMessage`,
@@ -107,7 +179,7 @@ async function sendTelegram(text, botToken, chatId) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               chat_id: chatId,
-              text: chunk,
+              text: rawChunk,
               disable_web_page_preview: true
             })
           }
@@ -118,7 +190,7 @@ async function sendTelegram(text, botToken, chatId) {
     }
 
     // Small delay between chunks to avoid rate limiting
-    if (chunks.length > 1) await new Promise(r => setTimeout(r, 500));
+    if (rawChunks.length > 1) await new Promise(r => setTimeout(r, 500));
   }
 }
 
@@ -175,10 +247,12 @@ async function main() {
         const chatId = delivery.chatId;
         if (!botToken) throw new Error('TELEGRAM_BOT_TOKEN not found in .env');
         if (!chatId) throw new Error('delivery.chatId not found in config.json');
-        await sendTelegram(digestText, botToken, chatId);
+        const telegramFormat = getTelegramFormat(config);
+        await sendTelegram(digestText, botToken, chatId, telegramFormat);
         console.log(JSON.stringify({
           status: 'ok',
           method: 'telegram',
+          format: telegramFormat,
           message: 'Digest sent to Telegram'
         }));
         break;
