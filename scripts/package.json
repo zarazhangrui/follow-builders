@@ -1,11 +1,12 @@
 {
   "name": "follow-builders-scripts",
   "version": "1.0.0",
-  "description": "Scripts for Follow Builders skill — feed generation, digest preparation, delivery",
+  "description": "Scripts for Follow Builders skill — feed generation, digest preparation, remixing, delivery",
   "type": "module",
   "scripts": {
     "generate-feed": "node generate-feed.js",
-    "prepare-digest": "node prepare-digest.js"
+    "prepare-digest": "node prepare-digest.js",
+    "remix-digest": "node remix-digest.js"
   },
   "dependencies": {
     "dotenv": "^16.4.0",
