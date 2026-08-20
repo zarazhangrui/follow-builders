@@ -6,7 +6,8 @@
   "scripts": {
     "generate-feed": "node generate-feed.js",
     "prepare-digest": "node prepare-digest.js",
-    "remix-digest": "node remix-digest.js"
+    "remix-digest": "node remix-digest.js",
+    "test": "node remix-digest.test.js"
   },
   "dependencies": {
     "dotenv": "^16.4.0",
