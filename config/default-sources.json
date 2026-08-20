@@ -52,6 +52,13 @@
       "indexUrl": "https://semianalysis.com/feed/",
       "articleBaseUrl": "https://semianalysis.com/",
       "fetchMethod": "http"
+    },
+    {
+      "name": "Baillie Gifford Insights",
+      "type": "scrape",
+      "indexUrl": "https://www.bailliegifford.com/en/uk/institutional-investor/insights",
+      "articleBaseUrl": "https://www.bailliegifford.com/",
+      "fetchMethod": "http"
     }
   ],
   "x_accounts": [

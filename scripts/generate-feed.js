@@ -1017,6 +1017,130 @@ function extractSemiAnalysisArticleContent(html) {
   return { title, author, publishedAt, content };
 }
 
+// Converts an HTML fragment to readable text, preserving block boundaries
+// (headings, paragraphs and list items become line breaks).
+function htmlToText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|h[1-6]|li|ul|ol|blockquote|section)>/gi, "\n")
+    .replace(/<(p|div|h[1-6]|li)\b[^>]*>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#(\d+);/g, (m, code) => String.fromCharCode(Number(code)))
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+// Parses the Baillie Gifford insights index page (a Next.js app).
+// Article data lives in the __NEXT_DATA__ JSON blob as a large array of
+// insight tiles, each carrying tileHeading / url / publishDate / standfirst.
+function parseBaillieGiffordIndex(html) {
+  const nextDataMatch = html.match(
+    /<script[^>]*id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i,
+  );
+  if (!nextDataMatch) return [];
+  let data;
+  try {
+    data = JSON.parse(nextDataMatch[1]);
+  } catch {
+    return [];
+  }
+
+  // Recursively find the main insights array: a large list whose items all
+  // carry publishDate and a /insights/ URL. Stop at the first match.
+  const insights = [];
+  (function findInsights(node) {
+    if (insights.length > 0) return;
+    if (Array.isArray(node)) {
+      const matches =
+        node.filter(
+          (item) =>
+            item &&
+            typeof item === "object" &&
+            item.publishDate &&
+            typeof item.url === "string" &&
+            item.url.includes("/insights/"),
+        ).length;
+      if (node.length >= 50 && matches > node.length * 0.9) {
+        for (const item of node) {
+          // Skip external links (Bloomberg, YouTube, etc.) — their pages
+          // cannot be parsed for article content.
+          if (!item.url.includes("bailliegifford.com")) continue;
+          insights.push({
+            title: item.tileHeading || item.title || "",
+            url: item.url,
+            publishedAt: item.publishDate || null,
+            description: item.standfirst || item.tileDescription || "",
+          });
+        }
+        return;
+      }
+      for (const child of node) {
+        if (child && typeof child === "object") findInsights(child);
+        if (insights.length > 0) return;
+      }
+    } else if (node && typeof node === "object") {
+      for (const key of Object.keys(node)) {
+        findInsights(node[key]);
+        if (insights.length > 0) return;
+      }
+    }
+  })(data);
+
+  return insights;
+}
+
+// Extracts the main text content from a Baillie Gifford insight article page.
+// Metadata and body blocks live in the __NEXT_DATA__ JSON: article.publishDate,
+// article.authors, and insightArticleContents[].bodyText (HTML fragments).
+function extractBaillieGiffordArticleContent(html) {
+  const empty = { title: "", author: "", publishedAt: null, content: "" };
+  const nextDataMatch = html.match(
+    /<script[^>]*id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i,
+  );
+  if (!nextDataMatch) return empty;
+  let data;
+  try {
+    data = JSON.parse(nextDataMatch[1]);
+  } catch {
+    return empty;
+  }
+
+  const article = data?.props?.pageProps?.article || {};
+  const title = article.title || article.tileHeading || "";
+  const publishedAt = article.publishDate || null;
+  const authors = Array.isArray(article.authors)
+    ? article.authors.map((a) => a.name).filter(Boolean).join(", ")
+    : "";
+
+  // Concatenate the standfirst and all body blocks, preserving structure
+  const contents = Array.isArray(article.insightArticleContents)
+    ? article.insightArticleContents
+    : [];
+  const parts = [];
+  if (article.standfirst) parts.push(htmlToText(article.standfirst));
+  for (const block of contents) {
+    if (block && typeof block.bodyText === "string" && block.bodyText.trim()) {
+      parts.push(htmlToText(block.bodyText));
+    }
+  }
+
+  return {
+    title,
+    author: authors,
+    publishedAt,
+    content: parts.filter(Boolean).join("\n\n"),
+  };
+}
+
 // Main blog fetching orchestrator.
 // For each blog source in the config, discovers new articles, deduplicates
 // against previously seen URLs, fetches full article content, and returns
@@ -1049,6 +1173,8 @@ async function fetchBlogContent(blogs, state, errors) {
         candidates = parseClaudeBlogIndex(indexHtml);
       } else if (blog.indexUrl.includes("semianalysis.com")) {
         candidates = parseSemiAnalysisIndex(indexHtml);
+      } else if (blog.indexUrl.includes("bailliegifford.com")) {
+        candidates = parseBaillieGiffordIndex(indexHtml);
       }
 
       // Step 2: Filter to unseen articles, cap at MAX_ARTICLES_PER_BLOG.
@@ -1100,6 +1226,8 @@ async function fetchBlogContent(blogs, state, errors) {
             extracted = extractClaudeBlogArticleContent(articleHtml);
           } else if (article.url.includes("semianalysis.com")) {
             extracted = extractSemiAnalysisArticleContent(articleHtml);
+          } else if (article.url.includes("bailliegifford.com")) {
+            extracted = extractBaillieGiffordArticleContent(articleHtml);
           }
 
           if (!extracted || !extracted.content) {
