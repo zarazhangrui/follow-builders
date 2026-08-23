@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildQuotedTweetLookup } from "./quoted-tweets.js";
+import {
+  buildQuotedTweetFields,
+  buildQuotedTweetLookup,
+} from "./quoted-tweets.js";
 
 test("builds quoted tweet details from expanded tweets and users", () => {
   const lookup = buildQuotedTweetLookup({
@@ -37,4 +40,37 @@ test("falls back when an expanded author is unavailable", () => {
 
 test("handles responses without expansions", () => {
   assert.equal(buildQuotedTweetLookup(null).size, 0);
+});
+
+test("attaches expanded details to a quoted tweet", () => {
+  const fields = buildQuotedTweetFields(
+    { referenced_tweets: [{ type: "quoted", id: "456" }] },
+    new Map([["456", { author: "Builder", text: "Context", url: "url" }]]),
+  );
+
+  assert.deepEqual(fields, {
+    isQuote: true,
+    quotedTweetId: "456",
+    quotedTweet: { author: "Builder", text: "Context", url: "url" },
+  });
+});
+
+test("marks unavailable quoted tweet details as null", () => {
+  const fields = buildQuotedTweetFields(
+    { referenced_tweets: [{ type: "quoted", id: "missing" }] },
+    new Map(),
+  );
+
+  assert.deepEqual(fields, {
+    isQuote: true,
+    quotedTweetId: "missing",
+    quotedTweet: null,
+  });
+});
+
+test("omits quotedTweet for a regular tweet", () => {
+  assert.deepEqual(buildQuotedTweetFields({}, new Map()), {
+    isQuote: false,
+    quotedTweetId: null,
+  });
 });

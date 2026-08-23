@@ -16,7 +16,10 @@
 import { readFile, writeFile } from "fs/promises";
 import { existsSync } from "fs";
 import { join } from "path";
-import { buildQuotedTweetLookup } from "./quoted-tweets.js";
+import {
+  buildQuotedTweetFields,
+  buildQuotedTweetLookup,
+} from "./quoted-tweets.js";
 
 // -- Constants ---------------------------------------------------------------
 
@@ -625,9 +628,6 @@ async function fetchXContent(xAccounts, bearerToken, state, errors) {
         if (state.seenTweets[t.id]) continue; // dedup
         if (newTweets.length >= MAX_TWEETS_PER_USER) break;
 
-        const quotedTweetId =
-          t.referenced_tweets?.find((r) => r.type === "quoted")?.id || null;
-
         newTweets.push({
           id: t.id,
           // note_tweet.text has the full untruncated text for long tweets (>280 chars)
@@ -637,11 +637,7 @@ async function fetchXContent(xAccounts, bearerToken, state, errors) {
           likes: t.public_metrics?.like_count || 0,
           retweets: t.public_metrics?.retweet_count || 0,
           replies: t.public_metrics?.reply_count || 0,
-          isQuote: quotedTweetId !== null,
-          quotedTweetId,
-          ...(quotedTweetId && {
-            quotedTweet: quotedTweetsById.get(quotedTweetId) || null,
-          }),
+          ...buildQuotedTweetFields(t, quotedTweetsById),
         });
 
         // Mark as seen

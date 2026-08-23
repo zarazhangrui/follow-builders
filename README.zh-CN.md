@@ -109,9 +109,9 @@ cd ~/.claude/skills/follow-builders/scripts && npm install
 
 查看 [examples/sample-digest.md](examples/sample-digest.md) 了解输出示例。
 
-## 可选：自定义 X/Twitter 工作流
+## 可选：自定义 X 来源
 
-Follow Builders 适合获取精选 AI 建造者摘要。如果你的 OpenClaw agent 还需要自定义 X/Twitter 自动化，可以在本 Skill 旁边安装 [TweetClaw](https://clawhub.ai/xquik/plugins/tweetclaw)。它支持搜索帖子和回复、导出关注者、查询用户、监控帖子、发送私信、管理媒体、运行 webhooks，以及通过 Xquik 审核发帖或回复操作。
+中心 feed 使用精选来源，不接受每位用户单独添加的账号或搜索条件。OpenClaw 用户可以安装 [TweetClaw](https://clawhub.ai/xquik/plugins/tweetclaw)，把一次性的公开 X 来源加入摘要：
 
 ```bash
 openclaw plugins install clawhub:@xquik/tweetclaw
@@ -119,7 +119,9 @@ openclaw config set plugins.entries.tweetclaw.config.apiKey "$XQUIK_API_KEY"
 openclaw config set tools.alsoAllow '["explore", "tweetclaw"]'
 ```
 
-TweetClaw 需要 Xquik API key。请仅将其保存在本地环境中。
+生成自定义摘要时，让 agent 先用 `explore` 查找对应的公开读取 route，再调用 `tweetclaw`，并使用 `prompts/summarize-tweets.md` 总结返回的帖子。自定义结果不会写入仓库中的中心 feed。
+
+这些读取操作需要 Xquik API key。请通过 OpenClaw 保存，并避免把 key 放入聊天、文档、日志或 shell 历史记录。
 
 Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
 

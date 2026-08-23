@@ -21,3 +21,17 @@ export function buildQuotedTweetLookup(includes = {}) {
     }),
   );
 }
+
+export function buildQuotedTweetFields(tweet, quotedTweetsById) {
+  const quotedTweetId =
+    tweet.referenced_tweets?.find((reference) => reference.type === "quoted")
+      ?.id || null;
+
+  return {
+    isQuote: quotedTweetId !== null,
+    quotedTweetId,
+    ...(quotedTweetId && {
+      quotedTweet: quotedTweetsById.get(quotedTweetId) || null,
+    }),
+  };
+}

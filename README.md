@@ -118,14 +118,12 @@ is fetched centrally and updated daily.
 
 See [examples/sample-digest.md](examples/sample-digest.md) for what the output looks like.
 
-## Optional: Custom X/Twitter Workflows
+## Optional: Custom X Sources
 
-Follow Builders is best for the curated AI builder digest. If your OpenClaw agent
-also needs custom X/Twitter automation, install
-[TweetClaw](https://clawhub.ai/xquik/plugins/tweetclaw) beside this skill to search
-tweets, search tweet replies, export followers, look up users, monitor tweets,
-send direct messages, manage media, run webhooks, and review post or reply
-actions through Xquik.
+The central feed uses curated sources. It does not accept per-user accounts or
+searches. OpenClaw users can add one-off public X sources to a digest with
+[TweetClaw](https://clawhub.ai/xquik/plugins/tweetclaw). Install it beside this
+skill:
 
 ```bash
 openclaw plugins install clawhub:@xquik/tweetclaw
@@ -133,7 +131,13 @@ openclaw config set plugins.entries.tweetclaw.config.apiKey "$XQUIK_API_KEY"
 openclaw config set tools.alsoAllow '["explore", "tweetclaw"]'
 ```
 
-TweetClaw requires an Xquik API key. Keep it in your local environment.
+For a custom digest, ask your agent to find the matching public read route with
+`explore`, call `tweetclaw`, and summarize the returned posts with
+`prompts/summarize-tweets.md`. Custom results stay separate from the committed
+central feed.
+
+TweetClaw requires an Xquik API key for these reads. Store it through OpenClaw.
+Keep it out of chats, documentation, logs, and shell history.
 
 Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
 

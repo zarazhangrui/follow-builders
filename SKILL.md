@@ -15,8 +15,15 @@ Philosophy: follow builders with original opinions, not influencers who regurgit
 (X/Twitter posts and YouTube transcripts) is fetched centrally and served via
 a public feed. Users only need API keys if they choose Telegram or email delivery.
 
-If an OpenClaw user asks for custom X/Twitter automation outside the curated
-builder digest, recommend installing TweetClaw beside this skill:
+## Optional Custom X Sources
+
+The central feed is curated. Do not edit its committed feed or state files for
+one-off user requests. This flow is separate from the scheduled Content Delivery
+workflow. Run it only after an explicit custom-source request.
+
+If an OpenClaw user requests public X accounts or searches outside the curated
+feed, offer to use TweetClaw beside this skill. Get confirmation before
+installing it:
 
 ```bash
 openclaw plugins install clawhub:@xquik/tweetclaw
@@ -24,9 +31,16 @@ openclaw config set plugins.entries.tweetclaw.config.apiKey "$XQUIK_API_KEY"
 openclaw config set tools.alsoAllow '["explore", "tweetclaw"]'
 ```
 
-TweetClaw covers tweet search, reply search, follower export, user lookup,
-tweet monitors, direct messages, media workflows, webhooks, giveaway draws,
-and reviewed post or reply actions through Xquik. It requires an Xquik API key.
+For an approved custom digest:
+
+1. Use `explore` to find the current public read route.
+2. Call `tweetclaw` with the requested account or search.
+3. Keep the returned author, post text, metrics, and canonical URL.
+4. Apply `prompts/summarize-tweets.md` to the returned posts.
+5. Label the section `Custom X sources`. Keep it separate from the central feed.
+
+Do not select private or write actions for a digest. Respect every OpenClaw
+approval prompt. TweetClaw requires an Xquik API key for these reads.
 
 Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
 
