@@ -16,6 +16,10 @@
 import { readFile, writeFile } from "fs/promises";
 import { existsSync } from "fs";
 import { join } from "path";
+import {
+  buildQuotedTweetFields,
+  buildQuotedTweetLookup,
+} from "./quoted-tweets.js";
 
 // -- Constants ---------------------------------------------------------------
 
@@ -595,7 +599,9 @@ async function fetchXContent(xAccounts, bearerToken, state, errors) {
       const res = await fetchXWithRetry(
         `${X_API_BASE}/users/${userData.id}/tweets?` +
           `max_results=5` + // fetch 5, then filter to 3 new ones
-          `&tweet.fields=created_at,public_metrics,referenced_tweets,note_tweet` +
+          `&expansions=referenced_tweets.id,referenced_tweets.id.author_id` +
+          `&tweet.fields=author_id,created_at,public_metrics,referenced_tweets,note_tweet` +
+          `&user.fields=name,username` +
           `&exclude=retweets,replies` +
           `&start_time=${cutoff.toISOString()}`,
         { headers: { Authorization: `Bearer ${bearerToken}` } },
@@ -614,6 +620,7 @@ async function fetchXContent(xAccounts, bearerToken, state, errors) {
 
       const data = await res.json();
       const allTweets = data.data || [];
+      const quotedTweetsById = buildQuotedTweetLookup(data.includes);
 
       // Filter out already-seen tweets, cap at 3
       const newTweets = [];
@@ -630,10 +637,7 @@ async function fetchXContent(xAccounts, bearerToken, state, errors) {
           likes: t.public_metrics?.like_count || 0,
           retweets: t.public_metrics?.retweet_count || 0,
           replies: t.public_metrics?.reply_count || 0,
-          isQuote:
-            t.referenced_tweets?.some((r) => r.type === "quoted") || false,
-          quotedTweetId:
-            t.referenced_tweets?.find((r) => r.type === "quoted")?.id || null,
+          ...buildQuotedTweetFields(t, quotedTweetsById),
         });
 
         // Mark as seen
