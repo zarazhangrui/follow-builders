@@ -1,0 +1,245 @@
+# =============================================================================
+# Follow Builders — Daily Digest Workflow
+# =============================================================================
+# Orchestrates the full digest pipeline: prepare → LLM remix → deliver.
+# Runs daily after feed generation, or on-demand via workflow_dispatch.
+#
+# ── Required GitHub Secrets ──────────────────────────────────────────────────
+#
+#   LLM API (at least one required):
+#     ANTHROPIC_API_KEY    — Anthropic Claude API key (priority)
+#     OPENAI_API_KEY       — OpenAI API key (fallback)
+#
+#   Telegram delivery (when DELIVERY_METHOD = telegram):
+#     TELEGRAM_BOT_TOKEN   — Bot token from @BotFather
+#     TELEGRAM_CHAT_ID     — Target chat/group ID
+#
+#   Email delivery (when DELIVERY_METHOD = email):
+#     RESEND_API_KEY       — Resend.com API key
+#     DIGEST_EMAIL         — Destination email address
+#
+# ── Required GitHub Variables ────────────────────────────────────────────────
+#
+#   DIGEST_FEATURE_FLAG    — Set to 'true' to enable this workflow.
+#                            Not set in upstream repo (workflow never runs).
+#
+# ── Optional GitHub Variables ────────────────────────────────────────────────
+#
+#   DIGEST_LANGUAGE        — 'en' (default), 'zh', or 'bilingual'
+#   DELIVERY_METHOD        — 'telegram' (default), 'email', or 'stdout'
+#   LLM_MODEL              — Override default LLM model name
+#
+# =============================================================================
+
+name: Daily Digest
+
+on:
+  schedule:
+    # Run daily at 7:00 UTC — one hour after feed generation (6:00 UTC)
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    inputs:
+      language:
+        description: 'Digest language'
+        required: false
+        default: 'en'
+        type: choice
+        options:
+          - en
+          - zh
+          - bilingual
+      delivery_method:
+        description: 'Delivery method'
+        required: false
+        default: 'telegram'
+        type: choice
+        options:
+          - telegram
+          - email
+          - stdout
+      llm_model:
+        description: 'LLM model override (optional)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  digest:
+    # Feature flag — skips entire job when not 'true'.
+    # Upstream repo leaves this unset so the workflow never executes there.
+    if: vars.DIGEST_FEATURE_FLAG == 'true'
+    runs-on: ubuntu-latest
+
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      DIGEST_EMAIL: ${{ secrets.DIGEST_EMAIL }}
+      DIGEST_LANGUAGE: ${{ inputs.language || vars.DIGEST_LANGUAGE || 'en' }}
+      DELIVERY_METHOD: ${{ inputs.delivery_method || vars.DELIVERY_METHOD || 'telegram' }}
+      LLM_MODEL: ${{ inputs.llm_model || vars.LLM_MODEL || '' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: cd scripts && npm install
+
+      # ── Task 3.2: Validate secrets ────────────────────────────────────────
+      - name: Validate secrets
+        run: |
+          MISSING=""
+
+          # At least one LLM API key is required
+          if [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$OPENAI_API_KEY" ]; then
+            MISSING="${MISSING}  - ANTHROPIC_API_KEY or OPENAI_API_KEY (at least one LLM API key required)\n"
+          fi
+
+          # Delivery-method-specific secrets
+          if [ "$DELIVERY_METHOD" = "telegram" ]; then
+            if [ -z "$TELEGRAM_BOT_TOKEN" ]; then
+              MISSING="${MISSING}  - TELEGRAM_BOT_TOKEN (required for Telegram delivery)\n"
+            fi
+            if [ -z "$TELEGRAM_CHAT_ID" ]; then
+              MISSING="${MISSING}  - TELEGRAM_CHAT_ID (required for Telegram delivery)\n"
+            fi
+          elif [ "$DELIVERY_METHOD" = "email" ]; then
+            if [ -z "$RESEND_API_KEY" ]; then
+              MISSING="${MISSING}  - RESEND_API_KEY (required for Email delivery)\n"
+            fi
+            if [ -z "$DIGEST_EMAIL" ]; then
+              MISSING="${MISSING}  - DIGEST_EMAIL (required for Email delivery)\n"
+            fi
+          fi
+          # stdout needs no delivery secrets
+
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing required secrets:"
+            printf "$MISSING" | while IFS= read -r line; do echo "::error::$line"; done
+            echo ""
+            echo "❌ Missing required secrets:"
+            printf "$MISSING"
+            echo ""
+            echo "Please configure the missing secrets in your repository settings."
+            exit 1
+          fi
+
+          echo "✅ All required secrets are configured."
+
+      # ── Task 3.3: Prepare → check-content → remix ────────────────────────
+      - name: Prepare digest data
+        id: prepare
+        run: cd scripts && node prepare-digest.js > /tmp/prepare-output.json
+
+      - name: Check content availability
+        id: check-content
+        run: |
+          HAS_CONTENT=$(node -e "
+            const data = JSON.parse(require('fs').readFileSync('/tmp/prepare-output.json', 'utf-8'));
+            const s = data.stats || {};
+            const has = (s.podcastEpisodes || 0) > 0 || (s.xBuilders || 0) > 0 || (s.blogPosts || 0) > 0;
+            console.log(has ? 'true' : 'false');
+          ")
+          echo "has_content=$HAS_CONTENT" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_CONTENT" = "false" ]; then
+            echo "ℹ️ No new content found in feeds. Skipping remix and delivery."
+          else
+            echo "✅ Content found — proceeding with remix."
+          fi
+
+      - name: Remix digest with LLM
+        id: remix
+        if: steps.check-content.outputs.has_content == 'true'
+        run: |
+          MODEL_FLAG=""
+          if [ -n "$LLM_MODEL" ]; then
+            MODEL_FLAG="--model $LLM_MODEL"
+          fi
+          cd scripts && node remix-digest.js \
+            --file /tmp/prepare-output.json \
+            --language "$DIGEST_LANGUAGE" \
+            $MODEL_FLAG \
+            > /tmp/digest-output.txt
+
+      # ── Task 3.4: Deliver with artifact fallback ─────────────────────────
+      - name: Setup delivery config
+        id: setup-deliver-config
+        if: steps.check-content.outputs.has_content == 'true'
+        run: |
+          mkdir -p ~/.follow-builders
+
+          # Build config.json and .env using node for clean JSON output
+          node -e "
+            const fs = require('fs');
+            const method = process.env.DELIVERY_METHOD;
+            const lang = process.env.DIGEST_LANGUAGE;
+            const config = { language: lang, delivery: { method } };
+
+            if (method === 'telegram') {
+              config.delivery.chatId = process.env.TELEGRAM_CHAT_ID;
+            } else if (method === 'email') {
+              config.delivery.email = process.env.DIGEST_EMAIL;
+            }
+
+            const dir = require('os').homedir() + '/.follow-builders';
+            fs.writeFileSync(dir + '/config.json', JSON.stringify(config, null, 2));
+
+            let envContent = '';
+            if (method === 'telegram') {
+              envContent = 'TELEGRAM_BOT_TOKEN=' + process.env.TELEGRAM_BOT_TOKEN;
+            } else if (method === 'email') {
+              envContent = 'RESEND_API_KEY=' + process.env.RESEND_API_KEY;
+            }
+            fs.writeFileSync(dir + '/.env', envContent);
+          "
+
+      - name: Deliver digest
+        id: deliver
+        if: steps.check-content.outputs.has_content == 'true'
+        run: cd scripts && node deliver.js --file /tmp/digest-output.txt
+
+      - name: Upload digest artifact (fallback)
+        if: failure() && steps.remix.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-output
+          path: /tmp/digest-output.txt
+          retention-days: 7
+
+      - name: Output run summary
+        if: always() && steps.check-content.outputs.has_content == 'true'
+        run: |
+          # Determine LLM provider used
+          if [ -n "$ANTHROPIC_API_KEY" ]; then
+            LLM_PROVIDER="Anthropic"
+          elif [ -n "$OPENAI_API_KEY" ]; then
+            LLM_PROVIDER="OpenAI"
+          else
+            LLM_PROVIDER="N/A"
+          fi
+
+          # Parse stats and write summary
+          node -e "
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('/tmp/prepare-output.json', 'utf-8'));
+            const s = data.stats || {};
+            const summary = [
+              '## 📰 AI Builders Digest — Run Summary',
+              '',
+              '| Metric | Count |',
+              '|--------|-------|',
+              '| 🐦 Tweets | ' + (s.totalTweets || 0) + ' |',
+              '| 🎙️ Podcasts | ' + (s.podcastEpisodes || 0) + ' |',
+              '| 📝 Blog posts | ' + (s.blogPosts || 0) + ' |',
+              '| 🤖 LLM Provider | ${LLM_PROVIDER} |',
+              '| 🌐 Language | ${DIGEST_LANGUAGE} |',
+              '| 📬 Delivery | ${DELIVERY_METHOD} |',
+            ].join('\n');
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + '\n');
+          "

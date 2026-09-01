@@ -100,6 +100,43 @@ git clone https://github.com/zarazhangrui/follow-builders.git ~/.claude/skills/f
 cd ~/.claude/skills/follow-builders/scripts && npm install
 ```
 
+## Deploy via GitHub Actions (No Computer Needed)
+
+If you don't want to keep a local agent running, you can use GitHub Actions to automatically generate and deliver your digest in the cloud.
+
+### Setup
+
+1. **Fork** this repository
+2. Go to **Settings → Secrets and variables → Actions**
+3. Under the **Variables** tab, create `DIGEST_FEATURE_FLAG` and set it to `true`
+4. Under the **Secrets** tab, add at least one LLM API key and your delivery secrets (see table below)
+5. Go to the **Actions** tab and enable workflows for your fork
+6. (Optional) Trigger manually via **Actions → Daily Digest → Run workflow** to test
+
+### Secrets & Variables Reference
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `DIGEST_FEATURE_FLAG` | Variable | Yes | Set to `true` to enable the digest workflow |
+| `ANTHROPIC_API_KEY` | Secret | At least one | Anthropic Claude API key (used by default if both are set) |
+| `OPENAI_API_KEY` | Secret | At least one | OpenAI API key (fallback if Anthropic key is not set) |
+| `TELEGRAM_BOT_TOKEN` | Secret | For Telegram | Bot token from @BotFather |
+| `TELEGRAM_CHAT_ID` | Secret | For Telegram | Target chat or group ID |
+| `RESEND_API_KEY` | Secret | For Email | Resend.com API key |
+| `DIGEST_EMAIL` | Secret | For Email | Destination email address |
+| `DIGEST_LANGUAGE` | Variable | No | `en` (default), `zh`, or `bilingual` |
+| `DELIVERY_METHOD` | Variable | No | `telegram` (default), `email`, or `stdout` |
+| `LLM_MODEL` | Variable | No | Override the default LLM model name |
+
+### Deployment Methods Comparison
+
+| | Local Agent (Kiro / Claude Code) | OpenClaw | GitHub Actions |
+|---|---|---|---|
+| Quality | Best (full LLM remix) | Best (persistent agent) | Good (API-based remix) |
+| Always-on | No — requires computer to be on | Yes — automatic delivery | Yes — runs in cloud |
+| Setup | Install skill, configure via chat | Install agent, configure | Fork repo, add secrets |
+| Best for | Hands-on users who want full control | Always-on, set-and-forget | Easy cloud setup, no computer needed |
+
 ## Requirements
 
 - An AI agent (OpenClaw, Claude Code, or similar)
