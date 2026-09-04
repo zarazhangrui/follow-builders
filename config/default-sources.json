@@ -3,32 +3,62 @@
     {
       "name": "Latent Space",
       "rssUrl": "https://pod2txt.vercel.app/api/feed?url=https://api.substack.com/feed/podcast/1084089.rss",
-      "url": "https://www.youtube.com/@LatentSpacePod"
+      "url": "https://www.youtube.com/@LatentSpacePod",
+      "topics": ["ai-engineering", "agents", "developer-tools"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "AI Engineer / agent 生态深访，适合提炼成方法论或趋势辅助稿。"
+      }
     },
     {
       "name": "Training Data",
       "rssUrl": "https://feeds.megaphone.fm/trainingdata",
-      "url": "https://www.youtube.com/playlist?list=PLOhHNjZItNnMm5tdW61JpnyxeYH5NDDx8"
+      "url": "https://www.youtube.com/playlist?list=PLOhHNjZItNnMm5tdW61JpnyxeYH5NDDx8",
+      "topics": ["ai-product", "agent-workflow", "ai-coding"],
+      "wechat": {
+        "priority": "high",
+        "fit": "AI 产品、AI coding 和企业工作流访谈，适合拆成公众号案例稿。"
+      }
     },
     {
       "name": "No Priors",
       "rssUrl": "https://feeds.megaphone.fm/nopriors",
-      "url": "https://www.youtube.com/@NoPriorsPodcast"
+      "url": "https://www.youtube.com/@NoPriorsPodcast",
+      "topics": ["ai-product", "founders", "frontier-ai"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "大厂 CEO、AI founder 和产品判断，适合做人物判断或宏观辅助稿。"
+      }
     },
     {
       "name": "Unsupervised Learning",
       "rssUrl": "https://feeds.simplecast.com/dOSE_bdP",
-      "url": "https://www.youtube.com/@RedpointAI"
+      "url": "https://www.youtube.com/@RedpointAI",
+      "topics": ["ai-research", "agents", "frontier-ai"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "AI 研究和 agent scaffold 判断，适合作为技术趋势辅助来源。"
+      }
     },
     {
       "name": "The MAD Podcast with Matt Turck",
       "rssUrl": "https://anchor.fm/s/f2ee4948/podcast/rss",
-      "url": "https://www.youtube.com/@DataDrivenNYC/videos"
+      "url": "https://www.youtube.com/@DataDrivenNYC/videos",
+      "topics": ["data-infra", "ai-infra", "enterprise-ai"],
+      "wechat": {
+        "priority": "low",
+        "fit": "数据/AI infra 长访谈，适合补充企业 AI 背景，不优先做推荐流主稿。"
+      }
     },
     {
       "name": "AI & I by Every",
       "rssUrl": "https://anchor.fm/s/ed1f5584/podcast/rss",
-      "url": "https://www.youtube.com/playlist?list=PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL"
+      "url": "https://www.youtube.com/playlist?list=PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL",
+      "topics": ["ai-writing", "agent-workflow", "ai-native-apps"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "Every 的 AI workflow 和 AI-native 应用案例，适合做实操/产品辅助稿。"
+      }
     }
   ],
   "blogs": [
@@ -37,42 +67,252 @@
       "type": "scrape",
       "indexUrl": "https://www.anthropic.com/engineering",
       "articleBaseUrl": "https://www.anthropic.com/engineering/",
-      "fetchMethod": "http"
+      "fetchMethod": "http",
+      "topics": ["claude", "agent-infra", "ai-coding"],
+      "wechat": {
+        "priority": "high",
+        "fit": "官方工程复盘、架构细节和产品质量事故，适合拆成公众号深度稿。"
+      }
     },
     {
       "name": "Claude Blog",
       "type": "scrape",
       "indexUrl": "https://claude.com/blog",
       "articleBaseUrl": "https://claude.com/blog/",
-      "fetchMethod": "http"
+      "fetchMethod": "http",
+      "topics": ["claude", "claude-code", "agent-workflow"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Claude / Claude Code 产品更新和工作流案例，适合公众号推荐流。"
+      }
+    },
+    {
+      "name": "Claude Code Releases",
+      "type": "atom",
+      "feedUrl": "https://github.com/anthropics/claude-code/releases.atom",
+      "indexUrl": "https://github.com/anthropics/claude-code/releases",
+      "topics": ["claude-code", "ai-coding", "agent-workflow"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Claude Code 版本变化、能力边界和开发者痛点，适合做短拆解。"
+      }
+    },
+    {
+      "name": "OpenAI Codex Releases",
+      "type": "atom",
+      "feedUrl": "https://github.com/openai/codex/releases.atom",
+      "indexUrl": "https://github.com/openai/codex/releases",
+      "topics": ["codex", "openai", "ai-coding"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Codex CLI 和 coding agent 更新，适合和 Claude Code 对照写。"
+      }
     }
   ],
   "x_accounts": [
     { "name": "Andrej Karpathy", "handle": "karpathy" },
-    { "name": "Swyx", "handle": "swyx" },
+    {
+      "name": "Swyx",
+      "handle": "swyx",
+      "topics": ["ai-engineering", "agents"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "AI Engineer 视角，适合作为趋势和方法论辅助来源。"
+      }
+    },
     { "name": "Josh Woodward", "handle": "joshwoodward" },
-    { "name": "Boris Cherny", "handle": "bcherny" },
-    { "name": "Thibault Sottiaux", "handle": "thsottiaux" },
-    { "name": "Peter Yang", "handle": "petergyang" },
+    {
+      "name": "Boris Cherny",
+      "handle": "bcherny",
+      "topics": ["claude", "claude-code", "agent-workflow"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Claude / Claude Code 一线产品信号，适合公众号主选题。"
+      }
+    },
+    {
+      "name": "Thibault Sottiaux",
+      "handle": "thsottiaux",
+      "topics": ["codex", "openai", "ai-coding"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Codex 一线产品信号，适合和 Claude Code 做对照。"
+      }
+    },
+    { "name": "Kevin Weil", "handle": "kevinweil" },
+    {
+      "name": "OpenAI Developers",
+      "handle": "OpenAIDevs",
+      "topics": ["openai", "codex", "developer-platform"],
+      "wechat": {
+        "priority": "high",
+        "fit": "OpenAI 开发者平台与 Codex 相关更新，适合做官方变化速读。"
+      }
+    },
+    {
+      "name": "Anthropic",
+      "handle": "AnthropicAI",
+      "topics": ["anthropic", "claude", "agent-workflow"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Anthropic 官方发布和 Claude 生态更新，适合补强官方来源。"
+      }
+    },
+    {
+      "name": "Peter Yang",
+      "handle": "petergyang",
+      "topics": ["agent-workflow", "ai-product"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Agent 工作流和产品化经验，适合写实用方法稿。"
+      }
+    },
     { "name": "Nan Yu", "handle": "thenanyu" },
     { "name": "Madhu Guru", "handle": "realmadhuguru" },
     { "name": "Amanda Askell", "handle": "AmandaAskell" },
-    { "name": "Cat Wu", "handle": "_catwu" },
-    { "name": "Thariq", "handle": "trq212" },
+    {
+      "name": "Cat Wu",
+      "handle": "_catwu",
+      "topics": ["claude-code", "agent-evals", "ai-product"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Claude Code PM / eval 相关信号，适合拆 agent 产品质量。"
+      }
+    },
+    {
+      "name": "Thariq",
+      "handle": "trq212",
+      "topics": ["claude-code", "agent-workflow", "html-artifacts"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Claude Code 使用方法和 artifact/workflow，适合公众号实操稿。"
+      }
+    },
     { "name": "Google Labs", "handle": "GoogleLabs" },
     { "name": "Amjad Masad", "handle": "amasad" },
-    { "name": "Guillermo Rauch", "handle": "rauchg" },
-    { "name": "Alex Albert", "handle": "alexalbert__" },
+    {
+      "name": "Guillermo Rauch",
+      "handle": "rauchg",
+      "topics": ["agent-infra", "vercel", "ai-coding"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "Agent infra、runtime 和开发平台判断，适合辅助 Claude/Codex 主线。"
+      }
+    },
+    {
+      "name": "Alex Albert",
+      "handle": "alexalbert__",
+      "topics": ["claude", "developer-relations", "agent-workflow"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Claude 开发者生态和产品提示，适合做 Claude 生态观察。"
+      }
+    },
     { "name": "Aaron Levie", "handle": "levie" },
-    { "name": "Ryo Lu", "handle": "ryolu_" },
+    {
+      "name": "Ryo Lu",
+      "handle": "ryolu_",
+      "topics": ["cursor", "ai-coding", "design-in-code"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "Cursor 和 design-in-code 视角，适合做 AI coding 产品体验辅助来源。"
+      }
+    },
     { "name": "Garry Tan", "handle": "garrytan" },
     { "name": "Matt Turck", "handle": "mattturck" },
     { "name": "Zara Zhang", "handle": "zarazhangrui" },
     { "name": "Nikunj Kothari", "handle": "nikunj" },
-    { "name": "Peter Steinberger", "handle": "steipete" },
-    { "name": "Dan Shipper", "handle": "danshipper" },
+    {
+      "name": "Peter Steinberger",
+      "handle": "steipete",
+      "topics": ["codex", "openclaw", "agent-workflow"],
+      "wechat": {
+        "priority": "high",
+        "fit": "真实 coding agent 长任务和工具链经验，适合写实操复盘。"
+      }
+    },
+    {
+      "name": "Dan Shipper",
+      "handle": "danshipper",
+      "topics": ["codex", "ai-native-apps", "agent-workflow"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "AI-native apps 和写作/产品工作流，适合做案例辅助来源。"
+      }
+    },
     { "name": "Aditya Agarwal", "handle": "adityaag" },
     { "name": "Sam Altman", "handle": "sama" },
-    { "name": "Claude", "handle": "claudeai" }
+    {
+      "name": "Claude",
+      "handle": "claudeai",
+      "topics": ["claude", "claude-code", "agent-workflow"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Claude 官方产品发布，适合作为主选题事实来源。"
+      }
+    },
+    {
+      "name": "Matt Van Horn",
+      "handle": "mvanhorn",
+      "topics": ["agentic-engineering", "claude-code", "codex"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Agentic engineering 实操经验，适合拆成工具流和方法论稿。"
+      }
+    },
+    {
+      "name": "Simon Willison",
+      "handle": "simonw",
+      "topics": ["llm-tools", "agents", "ai-coding"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "LLM 工具、agent 安全和开发者实践，适合补技术可信度。"
+      }
+    },
+    {
+      "name": "Harrison Chase",
+      "handle": "hwchase17",
+      "topics": ["langchain", "langgraph", "agents"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "LangGraph / agent workflow 生态，适合做应用层和工程层辅助来源。"
+      }
+    },
+    {
+      "name": "Cognition",
+      "handle": "cognition_labs",
+      "topics": ["devin", "ai-coding", "agent-evals"],
+      "wechat": {
+        "priority": "high",
+        "fit": "Devin、真实工程任务和 agent eval，适合做推荐池强关键词选题。"
+      }
+    },
+    {
+      "name": "Cursor",
+      "handle": "cursor_ai",
+      "topics": ["cursor", "ai-coding", "developer-tools"],
+      "wechat": {
+        "priority": "high",
+        "fit": "AI coding 主流产品更新，适合和 Claude Code / Codex 对照。"
+      }
+    },
+    {
+      "name": "LangChain",
+      "handle": "LangChainAI",
+      "topics": ["langchain", "langgraph", "agents"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "Agent 框架和企业落地案例，适合做技术生态辅助来源。"
+      }
+    },
+    {
+      "name": "LlamaIndex",
+      "handle": "llama_index",
+      "topics": ["agents", "retrieval", "agent-workflow"],
+      "wechat": {
+        "priority": "medium",
+        "fit": "Agent retrieval / workflow 生态，适合补充应用层素材。"
+      }
+    }
   ]
 }
