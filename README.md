@@ -19,6 +19,7 @@ WhatsApp, etc.) with:
 - Full articles from official AI company blogs (Anthropic Engineering, Claude Blog)
 - Links to all original content
 - Available in English, Chinese, or bilingual
+- Optional sync to append each digest to your Obsidian Daily note
 
 ## Quick Start
 
@@ -30,6 +31,7 @@ The agent will ask you:
 - How often you want your digest (daily or weekly) and what time
 - What language you prefer
 - How you want it delivered (Telegram, email, or in-chat)
+- Whether to also archive a copy to your Obsidian vault
 
 No API keys needed — all content is fetched centrally.
 Your first digest arrives immediately after setup.
@@ -45,6 +47,12 @@ Your delivery preferences are configurable through conversation. Just tell your 
 
 The source list (builders and podcasts) is curated centrally and updates
 automatically — you always get the latest sources without doing anything.
+
+## Obsidian Integration
+
+If you use Obsidian, Follow Builders can automatically archive a copy of your daily/weekly digest into your vault.
+During the setup process, simply provide the name of your Obsidian Vault. The skill will automatically locate the vault on your machine and append each digest to your Daily note (`Daily/YYYY-MM-DD.md`) under the `## AI Builders Digest` heading.
+No plugins required — it uses Obsidian's native URI capabilities.
 
 ## Customizing the Summaries
 

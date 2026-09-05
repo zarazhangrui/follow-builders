@@ -20,11 +20,12 @@
 //   - "stdout" (default): just prints to terminal
 // ============================================================================
 
-import { readFile } from 'fs/promises';
+import { readFile, appendFile, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
 import { config as loadEnv } from 'dotenv';
+import { execFileSync } from 'child_process';
 
 // -- Constants ---------------------------------------------------------------
 
@@ -122,6 +123,64 @@ async function sendTelegram(text, botToken, chatId) {
   }
 }
 
+// -- Save to Obsidian Daily Note ---------------------------------------------
+
+function getLocalDateString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function runObsidian(args, vaultName) {
+  const finalArgs = [];
+  finalArgs.push(...args);
+  if (vaultName) finalArgs.push(vaultName);
+  finalArgs.push('--silent');
+  const obsidianPath = '/Applications/Obsidian.app/Contents/MacOS/obsidian';
+  return execFileSync(obsidianPath, finalArgs, { encoding: 'utf-8' });
+}
+
+// Appends the digest to today's Daily note using Obsidian CLI
+async function saveToObsidian(text, obsidianConfig) {
+  const date = getLocalDateString();
+  const dailyDir = obsidianConfig.dailyDir || 'Daily';
+  const sectionTitle = obsidianConfig.sectionTitle || 'AI Builders Digest';
+  const vaultName = obsidianConfig.vaultName;
+  const vaultPath = obsidianConfig.vaultPath;
+  const dailyNotePath = `${dailyDir}/${date}.md`;
+
+  if (!vaultPath) {
+    throw new Error('Obsidian Vault path is not provided in config under obsidian.vaultPath');
+  }
+
+  try {
+    // Construct full file path
+    const filePath = join(vaultPath, dailyDir, `${date}.md`);
+
+    // Check if file exists
+    if (!existsSync(filePath)) {
+      // File doesn't exist, create with daily command
+      runObsidian(['daily', 'create'], vaultName);
+
+      // Wait for file to be created (max 10 seconds)
+      for (let i = 0; i < 20; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        if (existsSync(filePath)) break;
+      }
+    }
+
+    // Append the digest content
+    const content = `\n## ${sectionTitle}\n\n${text}\n`;
+    runObsidian(['append', `file=${dailyNotePath}`, `content=${content}`], vaultName);
+
+    return dailyNotePath;
+  } catch (err) {
+    throw new Error(`Failed to save to Obsidian: ${err.message}`);
+  }
+}
+
 // -- Email Delivery (Resend) -------------------------------------------------
 
 // Sends the digest via Resend's email API.
@@ -161,6 +220,7 @@ async function main() {
   }
 
   const delivery = config.delivery || { method: 'stdout' };
+  const obsidian = config.obsidian || { enabled: false };
   const digestText = await getDigestText();
 
   if (!digestText || digestText.trim().length === 0) {
@@ -176,10 +236,17 @@ async function main() {
         if (!botToken) throw new Error('TELEGRAM_BOT_TOKEN not found in .env');
         if (!chatId) throw new Error('delivery.chatId not found in config.json');
         await sendTelegram(digestText, botToken, chatId);
+
+        let savedPath;
+        if (obsidian.enabled) {
+          savedPath = await saveToObsidian(digestText, obsidian);
+        }
+
         console.log(JSON.stringify({
           status: 'ok',
           method: 'telegram',
-          message: 'Digest sent to Telegram'
+          message: 'Digest sent to Telegram',
+          ...(savedPath ? { savedTo: savedPath } : {})
         }));
         break;
       }
@@ -190,16 +257,26 @@ async function main() {
         if (!apiKey) throw new Error('RESEND_API_KEY not found in .env');
         if (!toEmail) throw new Error('delivery.email not found in config.json');
         await sendEmail(digestText, apiKey, toEmail);
+
+        let savedPath;
+        if (obsidian.enabled) {
+          savedPath = await saveToObsidian(digestText, obsidian);
+        }
+
         console.log(JSON.stringify({
           status: 'ok',
           method: 'email',
-          message: `Digest sent to ${toEmail}`
+          message: `Digest sent to ${toEmail}`,
+          ...(savedPath ? { savedTo: savedPath } : {})
         }));
         break;
       }
 
       case 'stdout':
       default:
+        if (obsidian.enabled) {
+          await saveToObsidian(digestText, obsidian);
+        }
         // Just print to terminal — the agent or OpenClaw handles delivery
         console.log(digestText);
         break;
