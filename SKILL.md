@@ -359,6 +359,45 @@ Read the prompts from the `prompts` field in the JSON:
 
 Assemble the digest following `prompts.digest_intro`.
 
+Because OpenClaw stdout is often delivered into Feishu IM as chat text, do a final
+layout pass after drafting:
+- Treat the output like a message typed manually into the Feishu composer
+- Put exactly one blank line before each major section heading
+- Put exactly one blank line before each new digest item
+- Put each item title on its own line in bold markdown like `**Title**`
+- Keep each item internally compact: title, English paragraph, Chinese paragraph,
+  and `Source:` lines with no extra blank lines between them
+- If an item has multiple links, put each one on its own `Source:` line
+- Do not use markdown headings (`#`, `##`) in the final digest body
+- Before delivering, visually scan the final text once to confirm the spacing pattern
+  is consistent from top to bottom
+
+If the output is intended for chat delivery, normalize the spacing with:
+
+```bash
+echo '<your digest text>' > /tmp/fb-digest-raw.txt
+cd ${CLAUDE_SKILL_DIR}/scripts && node format-chat-digest.js --file /tmp/fb-digest-raw.txt > /tmp/fb-digest.txt
+```
+
+Use `/tmp/fb-digest.txt` as the final version to send or print.
+
+If the digest is going to Feishu and the user prefers cards, render the final
+formatted digest into an interactive card instead of relying on plain stdout text:
+
+```bash
+cd ${CLAUDE_SKILL_DIR}/scripts && node render-feishu-card.js --file /tmp/fb-digest.txt > /tmp/fb-card.json
+```
+
+The renderer expects the formatted digest structure you just produced:
+- digest title on the first line
+- `TL;DR` or `Top Signals` with `•` bullets
+- section headings such as `X / TWITTER`
+- each item title wrapped in `**...**`
+- `Source:` lines for original links
+
+This card layout is preferred for Feishu because section headings and item titles
+stay bold, item blocks are visually separated, and spacing does not collapse.
+
 **ABSOLUTE RULES:**
 - NEVER invent or fabricate content. Only use what's in the JSON.
 - Every piece of content MUST have its URL. No URL = do not include.
@@ -371,22 +410,20 @@ Read `config.language` from the JSON:
 - **"en":** Entire digest in English.
 - **"zh":** Entire digest in Chinese. Follow `prompts.translate`.
 - **"bilingual":** Interleave English and Chinese **paragraph by paragraph**.
-  For each builder's tweet summary: English version, then Chinese translation
-  directly below, then the next builder. For the podcast: English summary,
-  then Chinese translation directly below. Like this:
+  For each builder's tweet summary: title, English version, Chinese translation,
+  and source link(s), then the next builder. For the podcast: title, English summary,
+  Chinese translation, and source link(s). Like this:
 
   ```
-  Box CEO Aaron Levie argues that AI agents will reshape software procurement...
-  https://x.com/levie/status/123
+  **Aaron Levie, CEO of Box**
+  Aaron Levie argues that AI agents will reshape software procurement...
+  Aaron Levie 认为 AI agent 将从根本上重塑软件采购...
+  Source: https://x.com/levie/status/123
 
-  Box CEO Aaron Levie 认为 AI agent 将从根本上重塑软件采购...
-  https://x.com/levie/status/123
-
-  Replit CEO Amjad Masad launched Agent 4...
-  https://x.com/amasad/status/456
-
-  Replit CEO Amjad Masad 发布了 Agent 4...
-  https://x.com/amasad/status/456
+  **Amjad Masad, CEO of Replit**
+  Amjad Masad launched Agent 4...
+  Amjad Masad 发布了 Agent 4...
+  Source: https://x.com/amasad/status/456
   ```
 
   Do NOT output all English first then all Chinese. Interleave them.
@@ -399,13 +436,32 @@ Read `config.delivery.method` from the JSON:
 
 **If "telegram" or "email":**
 ```bash
-echo '<your digest text>' > /tmp/fb-digest.txt
+echo '<your digest text>' > /tmp/fb-digest-raw.txt
+cd ${CLAUDE_SKILL_DIR}/scripts && node format-chat-digest.js --file /tmp/fb-digest-raw.txt > /tmp/fb-digest.txt
 cd ${CLAUDE_SKILL_DIR}/scripts && node deliver.js --file /tmp/fb-digest.txt 2>/dev/null
 ```
 If delivery fails, show the digest in the terminal as fallback.
 
 **If "stdout" (default):**
-Just output the digest directly.
+Check whether the config also includes:
+- `delivery.channel = "feishu"`
+- `delivery.target = "<user open_id or chat_id>"`
+- `delivery.format = "interactive_card"`
+
+If all three are present, send the digest as a Feishu interactive card:
+
+```bash
+echo '<your digest text>' > /tmp/fb-digest-raw.txt
+cd ${CLAUDE_SKILL_DIR}/scripts && node format-chat-digest.js --file /tmp/fb-digest-raw.txt > /tmp/fb-digest.txt
+cd ${CLAUDE_SKILL_DIR}/scripts && node render-feishu-card.js --file /tmp/fb-digest.txt > /tmp/fb-card.json
+lark-cli im +messages-send --as bot --user-id "<delivery.target>" --msg-type interactive --content "$(cat /tmp/fb-card.json)"
+```
+
+If that send succeeds, do NOT print the full digest to stdout again, because that
+would create a duplicate plain-text Feishu message in the same chat.
+
+If `delivery.channel/target/format` are missing, or if the direct Feishu send fails,
+fall back to outputting the formatted digest from `/tmp/fb-digest.txt` directly.
 
 ---
 
@@ -431,6 +487,8 @@ open an issue at https://github.com/zarazhangrui/follow-builders."
 - "Switch to Telegram/email" → Update `delivery.method` in config.json, guide user through setup if needed
 - "Change my email" → Update `delivery.email` in config.json
 - "Send to this chat instead" → Set `delivery.method` to "stdout"
+- "Use Feishu card layout" → Set `delivery.channel` to `"feishu"`, `delivery.target` to the user's open_id or chat_id, and `delivery.format` to `"interactive_card"`
+- "Use plain chat text again" → Remove `delivery.format` or set it to `"plain_text"`
 
 ### Prompt Changes
 When a user wants to customize how their digest sounds, copy the relevant prompt
