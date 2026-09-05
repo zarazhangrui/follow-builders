@@ -16,15 +16,16 @@
 // Output: JSON to stdout
 // ============================================================================
 
-import { readFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import { join } from 'path';
-import { homedir } from 'os';
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 // -- Constants ---------------------------------------------------------------
 
-const USER_DIR = join(homedir(), '.follow-builders');
-const CONFIG_PATH = join(USER_DIR, 'config.json');
+const DEFAULT_USER_DIR = join(homedir(), '.follow-builders');
+const SCRIPT_DIRECTORY = dirname(fileURLToPath(import.meta.url));
 
 const FEED_X_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json';
 const FEED_PODCASTS_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json';
@@ -41,22 +42,48 @@ const PROMPT_FILES = [
 
 // -- Fetch helpers -----------------------------------------------------------
 
-async function fetchJSON(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.json();
+async function fetchJSON(url, fetchImpl) {
+  try {
+    const response = await fetchImpl(url);
+    if (!response.ok) {
+      const suffix = response.statusText ? ` ${response.statusText}` : '';
+      return { data: null, error: `HTTP ${response.status}${suffix}` };
+    }
+    return { data: await response.json(), error: null };
+  } catch (error) {
+    return { data: null, error: error.message };
+  }
 }
 
-async function fetchText(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.text();
+async function fetchText(url, fetchImpl) {
+  try {
+    const response = await fetchImpl(url);
+    if (!response.ok) return null;
+    return response.text();
+  } catch {
+    return null;
+  }
+}
+
+function validateFeedResult(result, contentField) {
+  if (result.data && !Array.isArray(result.data[contentField])) {
+    return {
+      data: null,
+      error: `Invalid feed payload: missing ${contentField} array`
+    };
+  }
+  return result;
 }
 
 // -- Main --------------------------------------------------------------------
 
-async function main() {
+export async function prepareDigest({
+  fetchImpl = globalThis.fetch,
+  userDir = DEFAULT_USER_DIR,
+  now = () => new Date()
+} = {}) {
   const errors = [];
+  const configPath = join(userDir, 'config.json');
 
   // 1. Read user config
   let config = {
@@ -64,35 +91,56 @@ async function main() {
     frequency: 'daily',
     delivery: { method: 'stdout' }
   };
-  if (existsSync(CONFIG_PATH)) {
+  if (existsSync(configPath)) {
     try {
-      config = JSON.parse(await readFile(CONFIG_PATH, 'utf-8'));
+      config = JSON.parse(await readFile(configPath, 'utf-8'));
     } catch (err) {
       errors.push(`Could not read config: ${err.message}`);
     }
   }
 
   // 2. Fetch all three feeds
-  const [feedX, feedPodcasts, feedBlogs] = await Promise.all([
-    fetchJSON(FEED_X_URL),
-    fetchJSON(FEED_PODCASTS_URL),
-    fetchJSON(FEED_BLOGS_URL)
+  const [rawXResult, rawPodcastResult, rawBlogResult] = await Promise.all([
+    fetchJSON(FEED_X_URL, fetchImpl),
+    fetchJSON(FEED_PODCASTS_URL, fetchImpl),
+    fetchJSON(FEED_BLOGS_URL, fetchImpl)
   ]);
+  const xResult = validateFeedResult(rawXResult, 'x');
+  const podcastResult = validateFeedResult(rawPodcastResult, 'podcasts');
+  const blogResult = validateFeedResult(rawBlogResult, 'blogs');
 
-  if (!feedX) errors.push('Could not fetch tweet feed');
-  if (!feedPodcasts) errors.push('Could not fetch podcast feed');
-  if (!feedBlogs) errors.push('Could not fetch blog feed');
-  if (feedX?.errors?.length) {
+  const feedX = xResult.data;
+  const feedPodcasts = podcastResult.data;
+  const feedBlogs = blogResult.data;
+
+  if (xResult.error) {
+    errors.push(`Tweet feed problem: ${xResult.error}`);
+  }
+  if (podcastResult.error) {
+    errors.push(`Podcast feed problem: ${podcastResult.error}`);
+  }
+  if (blogResult.error) {
+    errors.push(`Blog feed problem: ${blogResult.error}`);
+  }
+
+  let hasUpstreamFeedErrors = false;
+  if (Array.isArray(feedX?.errors) && feedX.errors.length) {
+    hasUpstreamFeedErrors = true;
     errors.push(
       ...feedX.errors.map((error) => `Tweet feed problem: ${error}`)
     );
   }
-  if (feedPodcasts?.errors?.length) {
+  if (
+    Array.isArray(feedPodcasts?.errors) &&
+    feedPodcasts.errors.length
+  ) {
+    hasUpstreamFeedErrors = true;
     errors.push(
       ...feedPodcasts.errors.map((error) => `Podcast feed problem: ${error}`)
     );
   }
-  if (feedBlogs?.errors?.length) {
+  if (Array.isArray(feedBlogs?.errors) && feedBlogs.errors.length) {
+    hasUpstreamFeedErrors = true;
     errors.push(
       ...feedBlogs.errors.map((error) => `Blog feed problem: ${error}`)
     );
@@ -105,9 +153,8 @@ async function main() {
   // Otherwise, fetch the latest from GitHub so they get central improvements.
   // If GitHub is unreachable, fall back to the local copy shipped with the skill.
   const prompts = {};
-  const scriptDir = decodeURIComponent(new URL('.', import.meta.url).pathname);
-  const localPromptsDir = join(scriptDir, '..', 'prompts');
-  const userPromptsDir = join(USER_DIR, 'prompts');
+  const localPromptsDir = join(SCRIPT_DIRECTORY, '..', 'prompts');
+  const userPromptsDir = join(userDir, 'prompts');
 
   for (const filename of PROMPT_FILES) {
     const key = filename.replace('.md', '').replace(/-/g, '_');
@@ -121,7 +168,7 @@ async function main() {
     }
 
     // Priority 2: latest from GitHub (central updates)
-    const remote = await fetchText(`${PROMPTS_BASE}/${filename}`);
+    const remote = await fetchText(`${PROMPTS_BASE}/${filename}`, fetchImpl);
     if (remote) {
       prompts[key] = remote;
       continue;
@@ -135,10 +182,37 @@ async function main() {
     }
   }
 
+  const feedStatus = {
+    x: {
+      status: feedX ? 'ok' : 'error',
+      generatedAt: feedX?.generatedAt || null,
+      ...(xResult.error ? { error: xResult.error } : {})
+    },
+    podcasts: {
+      status: feedPodcasts ? 'ok' : 'error',
+      generatedAt: feedPodcasts?.generatedAt || null,
+      ...(podcastResult.error ? { error: podcastResult.error } : {})
+    },
+    blogs: {
+      status: feedBlogs ? 'ok' : 'error',
+      generatedAt: feedBlogs?.generatedAt || null,
+      ...(blogResult.error ? { error: blogResult.error } : {})
+    }
+  };
+
+  const loadedFeedCount = [feedX, feedPodcasts, feedBlogs].filter(Boolean).length;
+  const status =
+    loadedFeedCount === 0
+      ? 'error'
+      : loadedFeedCount < 3 || hasUpstreamFeedErrors
+        ? 'partial'
+        : 'ok';
+
   // 4. Build the output — everything the LLM needs in one blob
   const output = {
-    status: 'ok',
-    generatedAt: new Date().toISOString(),
+    status,
+    generatedAt: now().toISOString(),
+    feedStatus,
 
     // User preferences
     config: {
@@ -156,7 +230,11 @@ async function main() {
     stats: {
       podcastEpisodes: feedPodcasts?.podcasts?.length || 0,
       xBuilders: feedX?.x?.length || 0,
-      totalTweets: (feedX?.x || []).reduce((sum, a) => sum + a.tweets.length, 0),
+      totalTweets: (feedX?.x || []).reduce(
+        (sum, builder) =>
+          sum + (Array.isArray(builder.tweets) ? builder.tweets.length : 0),
+        0
+      ),
       blogPosts: feedBlogs?.blogs?.length || 0,
       feedGeneratedAt: feedX?.generatedAt || feedPodcasts?.generatedAt || feedBlogs?.generatedAt || null
     },
@@ -168,13 +246,29 @@ async function main() {
     errors: errors.length > 0 ? errors : undefined
   };
 
-  console.log(JSON.stringify(output, null, 2));
+  return output;
 }
 
-main().catch(err => {
-  console.error(JSON.stringify({
-    status: 'error',
-    message: err.message
-  }));
-  process.exit(1);
-});
+async function runCli() {
+  const output = await prepareDigest();
+  console.log(JSON.stringify(output, null, 2));
+  if (output.status === 'error') {
+    process.exitCode = 1;
+  }
+}
+
+const isDirectRun =
+  process.argv[1] &&
+  pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
+
+if (isDirectRun) {
+  runCli().catch((error) => {
+    console.error(
+      JSON.stringify({
+        status: 'error',
+        message: error.message
+      })
+    );
+    process.exitCode = 1;
+  });
+}
