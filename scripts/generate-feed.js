@@ -969,6 +969,16 @@ async function fetchBlogContent(blogs, state, errors) {
             continue;
           }
 
+          // Step 3.5: Re-check the lookback window once the real publish
+          // date is known. The index listed this article with publishedAt:
+          // null, so the Step-2 cutoff test passed. If the date resolved
+          // from the article page is outside the window, mark it seen so
+          // it isn't refetched every run and skip it (fail-open otherwise).
+          const resolvedPub = extracted.publishedAt || article.publishedAt || null;
+          if (resolvedPub && new Date(resolvedPub) < cutoff) {
+            state.seenArticles[article.url] = Date.now();
+            continue;
+          }
           // Merge extracted data with what we already have from the index
           results.push({
             source: "blog",
