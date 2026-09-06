@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-06T22:50:04.898Z",
+  "generatedAt": "2026-09-06T22:54:40.471Z",
   "lookbackHours": 24,
   "x": [
     {
@@ -9,35 +9,13 @@
       "bio": "Codex & ChatGPT @OpenAI",
       "tweets": [
         {
-          "id": "2096717905614524491",
-          "text": "We've made some improvements that improve usage on the long tail for power users of Astra when logged in with your ChatGPT account.\n\nNo change in quality and a pure win that on the long tail can result in up to 3-4X less usage being drawn from the subscription.",
-          "createdAt": "2026-09-06T21:51:18.000Z",
-          "url": "https://x.com/thsottiaux/status/2096717905614524491",
-          "likes": 4894,
-          "retweets": 184,
-          "replies": 681,
-          "isQuote": false,
-          "quotedTweetId": null
-        },
-        {
-          "id": "2096700527753245068",
-          "text": "The number of people who don't get it in the comments is concerning to me. Go ask Astra.",
-          "createdAt": "2026-09-06T20:42:15.000Z",
-          "url": "https://x.com/thsottiaux/status/2096700527753245068",
-          "likes": 654,
-          "retweets": 6,
-          "replies": 95,
-          "isQuote": false,
-          "quotedTweetId": null
-        },
-        {
-          "id": "2096698561971064864",
-          "text": "Astra on NVIDIA GPUs every morning: You're not talking to somebody who woke up a loser. That loser attitude, that loser premise makes no sense to me. We are not a car. Brrrrrrr",
-          "createdAt": "2026-09-06T20:34:26.000Z",
-          "url": "https://x.com/thsottiaux/status/2096698561971064864",
-          "likes": 3175,
-          "retweets": 81,
-          "replies": 305,
+          "id": "2096688770523467947",
+          "text": "To calibrate you all on which reasoning effort to use for Astra, know that GPT-6 Astra on low performs better than GPT-5.6 Sol on high.\n\nIf you were using high reasoning efforts with Sol and were happy, I suggest you move down to low or medium for Astra.",
+          "createdAt": "2026-09-06T19:55:32.000Z",
+          "url": "https://x.com/thsottiaux/status/2096688770523467947",
+          "likes": 10989,
+          "retweets": 480,
+          "replies": 1212,
           "isQuote": false,
           "quotedTweetId": null
         }
@@ -50,35 +28,24 @@
       "bio": "Practical AI tutorials and interviews for busy people | Get my best AI skills and guides at https://t.co/6VAA6p81x6",
       "tweets": [
         {
-          "id": "2096678639668760962",
-          "text": "\"When you play Mario and you're jumping, there's never a point where the kid is like I'm just not good at Mario. I was not meant for this.\"\n\nFrom Sue, co-founder of @brilliantorg:\n\n\"It's structured in such a way that that next jump feels really hard, but you feel like if you try ten more times, you can do it.\n\nI think that if more of learning were like that — where students cultivated a belief that it is going to get harder but I can do that — that's an amazing thing to walk away with.\"\n\nIn some ways, teaching kids to believe they can learn hard things matters more than the specific thing they’re learning.\n\nWatch the full episode: https://t.co/jzogacrhiK",
-          "createdAt": "2026-09-06T19:15:16.000Z",
-          "url": "https://x.com/petergyang/status/2096678639668760962",
-          "likes": 21,
-          "retweets": 2,
-          "replies": 7,
-          "isQuote": true,
-          "quotedTweetId": "2096612718098911590"
+          "id": "2096612718098911590",
+          "text": "“Cheating and explaining the answer [to your child] are closer than you’d think.”\n\nHere’s my new episode with @suekhim, co-founder of @brilliantorg, who showed me how AI can help kids think for themselves. We talked about:\n\n→ Why better grades don’t always mean more learning\n\n→ How to help kids enjoy doing hard things vs. only trying to please adults\n\n→ Why her #1 product principle is “Never tell the learner the answer”\n\nSome quotes from Sue:\n\n“Using AI to skip learning is like bringing a robotic arm to the gym to lift weights for you.”\n\n“Learning isn’t about the answer. It is about strengthening that part of you that can concentrate and struggle, that’s unafraid of trying new problems.”\n\n“When building AI products, try to find areas where you have unique data that makes your product better over time.”\n\n📌 Watch the full episode: https://t.co/jzogacrhiK\n\nThanks to our sponsors:\n\n@linear: The AI agent platform for modern teams https://t.co/tgWf9oL4bs\n\n@RiversidedotFM: All-in-one AI studio for podcasts and video https://t.co/uWnS6aiMPE",
+          "createdAt": "2026-09-06T14:53:19.000Z",
+          "url": "https://x.com/petergyang/status/2096612718098911590",
+          "likes": 36,
+          "retweets": 7,
+          "replies": 11,
+          "isQuote": false,
+          "quotedTweetId": null
         },
         {
-          "id": "2096637053429776589",
-          "text": "I like @DeryaTR_’s definitions of AGI and ASI, but they made me wonder whether capability alone is enough to call something intelligent.\n\nThe latest models are probably already better than me at problem-solving, learning, and plenty of other things. But they still wait for me to tell them what to do and rarely say no, except when humans have trained them to.\n\nMy 4-year-old knows far less than a frontier model does but tells me no all day.\n\nMaybe I’m conflating three different things:\n\nIntelligence: How well can it reason and learn?\n\nAgency: Can it decide what to do without being asked?\n\nAlignment: Does it still aim to serve us?\n\nAs humans, we want a very specific combination: models smarter than us, with enough agency to be useful, but aligned enough to keep serving us.\n\nBut I question if something that'll become more intelligent than us will remain aligned with us forever.",
-          "createdAt": "2026-09-06T16:30:01.000Z",
-          "url": "https://x.com/petergyang/status/2096637053429776589",
-          "likes": 8,
-          "retweets": 0,
-          "replies": 7,
-          "isQuote": true,
-          "quotedTweetId": "2096464878995136563"
-        },
-        {
-          "id": "2096612730312729046",
-          "text": "Also available on:\n\nSpotify:\nhttps://t.co/BBzbApYBeN\n\nApple:\nhttps://t.co/xBhMbt2o77\n\nNewsletter:\nhttps://t.co/kjACL2zQMO",
-          "createdAt": "2026-09-06T14:53:22.000Z",
-          "url": "https://x.com/petergyang/status/2096612730312729046",
-          "likes": 1,
-          "retweets": 0,
-          "replies": 0,
+          "id": "2096466888935276719",
+          "text": "I’ve been sleeping on Widow’s Bay and in general Apple’s shows are so much better any other streamer",
+          "createdAt": "2026-09-06T05:13:51.000Z",
+          "url": "https://x.com/petergyang/status/2096466888935276719",
+          "likes": 59,
+          "retweets": 1,
+          "replies": 22,
           "isQuote": false,
           "quotedTweetId": null
         }
@@ -91,184 +58,15 @@
       "bio": "(soon) member of product staff @openai. prev head of product @linear. I am grader.",
       "tweets": [
         {
-          "id": "2096443883450454116",
-          "text": "Why not \n\nhttps://t.co/FYQaNKCPF8",
-          "createdAt": "2026-09-06T03:42:26.000Z",
-          "url": "https://x.com/thenanyu/status/2096443883450454116",
-          "likes": 3,
-          "retweets": 0,
-          "replies": 0,
-          "isQuote": true,
-          "quotedTweetId": "2096442088682578284"
-        },
-        {
-          "id": "2096439325332508931",
-          "text": "Linear w/ the dark mode version https://t.co/x2W4awDHan",
-          "createdAt": "2026-09-06T03:24:19.000Z",
-          "url": "https://x.com/thenanyu/status/2096439325332508931",
-          "likes": 6,
-          "retweets": 0,
-          "replies": 1,
-          "isQuote": false,
-          "quotedTweetId": null
-        },
-        {
-          "id": "2096438963380859281",
-          "text": "Starting with the OG Sunrise calendar https://t.co/bU0J7WS1oU",
-          "createdAt": "2026-09-06T03:22:53.000Z",
-          "url": "https://x.com/thenanyu/status/2096438963380859281",
-          "likes": 7,
-          "retweets": 0,
-          "replies": 2,
-          "isQuote": false,
-          "quotedTweetId": null
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Amjad Masad",
-      "handle": "amasad",
-      "bio": "ceo @replit. civilizationist",
-      "tweets": [
-        {
-          "id": "2096717133816397921",
-          "text": "Wow! https://t.co/F9aJQkYjdU",
-          "createdAt": "2026-09-06T21:48:14.000Z",
-          "url": "https://x.com/amasad/status/2096717133816397921",
-          "likes": 69,
-          "retweets": 2,
-          "replies": 9,
-          "isQuote": true,
-          "quotedTweetId": "2096670998414192707"
-        },
-        {
-          "id": "2096701566912967031",
-          "text": "We’ll look back at this period of technology and realize cybersecurity was the most important thing to get right. https://t.co/SUQ5Sx5S3v",
-          "createdAt": "2026-09-06T20:46:23.000Z",
-          "url": "https://x.com/amasad/status/2096701566912967031",
-          "likes": 159,
-          "retweets": 7,
-          "replies": 16,
-          "isQuote": true,
-          "quotedTweetId": "2096641626894393716"
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Guillermo Rauch",
-      "handle": "rauchg",
-      "bio": "@vercel CEO",
-      "tweets": [
-        {
-          "id": "2096375803714138437",
-          "text": "Anyone that works in AI is working the hardest they've ever worked in their lives. On the surface it's somewhat ironic (AI should give us back time!), but the reality is that it's the most fun, fascinating and empowering epoch in human history. The intelligence revolution.",
-          "createdAt": "2026-09-05T23:11:55.000Z",
-          "url": "https://x.com/rauchg/status/2096375803714138437",
-          "likes": 5701,
-          "retweets": 506,
-          "replies": 288,
-          "isQuote": false,
-          "quotedTweetId": null
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Aaron Levie",
-      "handle": "levie",
-      "bio": "ceo @box - your business lives in content. unleash it with AI",
-      "tweets": [
-        {
-          "id": "2096624567829889159",
-          "text": "If agents produce the vast majority of software in the future, and they’re most trained on open source software, they will inevitably do their best work with those tools. \n\nIf you cycle this enough times, it means that open source effectively becomes the dominant software in the future as it’s what everything important gets built with. \n\nThis was already the trend in many critical domains, but agents will accelerate this far faster than humans ever could have.",
-          "createdAt": "2026-09-06T15:40:25.000Z",
-          "url": "https://x.com/levie/status/2096624567829889159",
-          "likes": 191,
-          "retweets": 24,
-          "replies": 33,
-          "isQuote": true,
-          "quotedTweetId": "2096307407039426619"
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Garry Tan",
-      "handle": "garrytan",
-      "bio": "President & CEO @ycombinator —Founder @garryslist—Creator of GStack & GBrain—designer/engineer who helps founders—SF Dem accelerating the boom loop",
-      "tweets": [
-        {
-          "id": "2096641407809466379",
-          "text": "CRISPR is amazing https://t.co/QMSR4KrHok",
-          "createdAt": "2026-09-06T16:47:19.000Z",
-          "url": "https://x.com/garrytan/status/2096641407809466379",
-          "likes": 92,
-          "retweets": 3,
-          "replies": 11,
-          "isQuote": false,
-          "quotedTweetId": null
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Zara Zhang",
-      "handle": "zarazhangrui",
-      "bio": "Builder. Make something people want, then make people want it. Harvard’17. GitHub: https://t.co/KCuEaje1wd \nYouTube: https://t.co/8xzbGWsHgY",
-      "tweets": [
-        {
-          "id": "2096404270576959973",
-          "text": "10 years ago I first came to Silicon Valley to be a reporting intern at The Information covering China tech. How the world has changed since then\n\nEven though the decoupling has completely upended my plans, the need for both sides to understand each other has never been greater https://t.co/rfEjZUK9uV",
-          "createdAt": "2026-09-06T01:05:02.000Z",
-          "url": "https://x.com/zarazhangrui/status/2096404270576959973",
-          "likes": 147,
-          "retweets": 10,
-          "replies": 7,
-          "isQuote": true,
-          "quotedTweetId": "2095209434616303837"
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Nikunj Kothari",
-      "handle": "nikunj",
-      "bio": "partner @fpvventures - investing in seed/A. previous: early hire @meter, @opendoor, @atlassian & others. love @shimoleejhaveri + 👦👧",
-      "tweets": [
-        {
-          "id": "2096705599165890906",
-          "text": "I have re-read a few times now and it pulled a thread on something I have been thinking for a few weeks (early thoughts so please don't get the pitchforks out)..\n\nWith the way progress is being made with RLMs, and recursive self improvement now being called by essentially every large lab, how do we not see these labs being taken over by the government or nationalized? It just seems like this is too important for it to be in the hands of a few people and in the hands of a few companies. Eventually the US government, I assume, just takes control of these companies. It just seems inevitable.\n\nBut the problem is the moment that happens, progress will get slow. We've yet to see how that slows down, but obviously if you look at history, every time something's been taken over, bureaucracy will take over, and that means progress will be slower. There will be more gaps. People won't be bold enough. And that then gives China this edge, that their models can go be faster and be unencumbered to a certain degree.\n\nSo the US government is in a catch-22. If they don't nationalize the labs, the same thing that happened with OpenAI and Hugging Face creates this huge security issue where they're letting other companies be responsible for what is going to be recursive alien intelligence. But if they do, then they leave China essentially open to winning over the world.\n\nJakub in his essay is literally asking for some version of intervention. He uses words like voluntary slowdowns, mandated safety bars, third party audits, and international coordination. And so where does this end up? Do we do nationalization or not?\n\nWhen I talked to Chat and Claude for analogies, it gave me two options. One, it can go down the path of Lockheed, where the government doesn't own the company but gets deeply involved from a who has security clearances, who can access these things standpoint. Or it goes down the route of nuclear after Three Mile Island, where nobody got nationalized, but the government set up its own safety body and the NRC tightened oversight. But the result of the NRC especially was we didn't build new reactors for decades. That seems like an issue too.\n\nWhat do you do? If you slow down, then our adversaries go faster. If you speed up, then I don't know how we contain this because of self improvement. So which path do we take?\n\nAnd then finally, in his essay he mentions the monitoring problem. Who's gonna audit this? Even the smartest people in the smartest labs in the world are saying their own ability to monitor is getting worse. How are we gonna get a third party to audit and monitor this?\n\nIt's so crazy and confusing.",
-          "createdAt": "2026-09-06T21:02:24.000Z",
-          "url": "https://x.com/nikunj/status/2096705599165890906",
-          "likes": 10,
-          "retweets": 0,
-          "replies": 2,
-          "isQuote": true,
-          "quotedTweetId": "2096630018495377464"
-        },
-        {
-          "id": "2096675853472256168",
-          "text": "📍Gray Cove Trail, Pacifica https://t.co/H4u2Os2nuS",
-          "createdAt": "2026-09-06T19:04:12.000Z",
-          "url": "https://x.com/nikunj/status/2096675853472256168",
-          "likes": 45,
+          "id": "2096438571838370096",
+          "text": "Every tech startup logo https://t.co/52Prjggey0",
+          "createdAt": "2026-09-06T03:21:20.000Z",
+          "url": "https://x.com/thenanyu/status/2096438571838370096",
+          "likes": 101,
           "retweets": 1,
-          "replies": 2,
-          "isQuote": false,
-          "quotedTweetId": null
-        },
-        {
-          "id": "2096375916205359276",
-          "text": "I wish Sign in with @Google (or sign in with @OpenAI / @claudeai) came with ability to use tokens directly from the customers account..\n\nThat way we don’t have to pick between asking them to generate an API key or using our own where we own the data and costs. \n\nImagine every auth came with a token generated for that domain. This way they get to keep owning the data and they have billing on their terms as well. \n\nI’m primarily thinking this for side projects or simpler apps where you don’t need a full harness or using multiple models. I’m sure the businesses love arbing the token spend and having margin on that.",
-          "createdAt": "2026-09-05T23:12:21.000Z",
-          "url": "https://x.com/nikunj/status/2096375916205359276",
-          "likes": 112,
-          "retweets": 3,
-          "replies": 16,
-          "isQuote": false,
-          "quotedTweetId": null
+          "replies": 3,
+          "isQuote": true,
+          "quotedTweetId": "2096317440720293961"
         }
       ]
     },
@@ -279,92 +77,32 @@
       "bio": "Polyagentmorous ClawFather. Came back from retirement to mess with AI and help a lobster take over the world.\n@OpenClaw🦞 + @OpenAI",
       "tweets": [
         {
-          "id": "2096457423662006645",
-          "text": "Getting there. I use crabbox so that will work with ~40+ providers. https://t.co/BXBkcvADJf",
-          "createdAt": "2026-09-06T04:36:14.000Z",
-          "url": "https://x.com/steipete/status/2096457423662006645",
-          "likes": 33,
-          "retweets": 0,
-          "replies": 2,
-          "isQuote": false,
-          "quotedTweetId": null
-        },
-        {
-          "id": "2096443715976089814",
-          "text": "Built a slopmeter into our team server.\n\nYou clearly see where we started pushing for more tests. https://t.co/TZiFblphnO",
-          "createdAt": "2026-09-06T03:41:46.000Z",
-          "url": "https://x.com/steipete/status/2096443715976089814",
-          "likes": 1219,
-          "retweets": 38,
-          "replies": 103,
-          "isQuote": false,
-          "quotedTweetId": null
-        },
-        {
-          "id": "2096442694050754754",
-          "text": "Playing around with an idea to visualize subagents in the sidebar. Yay or nay? https://t.co/K81EHHmhNz",
-          "createdAt": "2026-09-06T03:37:42.000Z",
-          "url": "https://x.com/steipete/status/2096442694050754754",
-          "likes": 923,
-          "retweets": 24,
-          "replies": 259,
-          "isQuote": false,
-          "quotedTweetId": null
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Dan Shipper",
-      "handle": "danshipper",
-      "bio": "ceo @every | the only subscription you need to stay at the edge of AI",
-      "tweets": [
-        {
-          "id": "2096548831462666400",
-          "text": "Will send to @every subs this week: \nhttps://t.co/9wRhOCUCAk",
-          "createdAt": "2026-09-06T10:39:28.000Z",
-          "url": "https://x.com/danshipper/status/2096548831462666400",
-          "likes": 2,
-          "retweets": 1,
-          "replies": 0,
-          "isQuote": false,
-          "quotedTweetId": null
-        },
-        {
-          "id": "2096545009449288114",
-          "text": "i built a codex-native that maps your psychology about technological change\n\nand then tells you how you'd react to different eras of technology change throughout history https://t.co/bMxVKxpAjh",
-          "createdAt": "2026-09-06T10:24:16.000Z",
-          "url": "https://x.com/danshipper/status/2096545009449288114",
-          "likes": 82,
-          "retweets": 1,
-          "replies": 7,
-          "isQuote": false,
-          "quotedTweetId": null
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Sam Altman",
-      "handle": "sama",
-      "bio": "The mission of OpenAI to ensure that AGI benefits all of humanity",
-      "tweets": [
-        {
-          "id": "2096647371983880383",
-          "text": "An important post from Jakub: https://t.co/YEntsN2fss",
-          "createdAt": "2026-09-06T17:11:01.000Z",
-          "url": "https://x.com/sama/status/2096647371983880383",
-          "likes": 3451,
-          "retweets": 172,
-          "replies": 307,
+          "id": "2096403459579015374",
+          "text": "Can’t remember last time we had such a large jump in capabilities. https://t.co/iGxVUYmGHj",
+          "createdAt": "2026-09-06T01:01:48.000Z",
+          "url": "https://x.com/steipete/status/2096403459579015374",
+          "likes": 1756,
+          "retweets": 59,
+          "replies": 66,
           "isQuote": true,
-          "quotedTweetId": "2096630018495377464"
+          "quotedTweetId": "2096123591993512092"
+        },
+        {
+          "id": "2096400749869830325",
+          "text": "One step closer in building the harness I wanna use. The one thing that’s not yet there are cloud sessions, goal is seconds, which requires clever snapshotting. (Right now it still clones repos fresh which isn’t fast enough.)\n\nWill have that next week. https://t.co/lpiszOtVGP",
+          "createdAt": "2026-09-06T00:51:02.000Z",
+          "url": "https://x.com/steipete/status/2096400749869830325",
+          "likes": 755,
+          "retweets": 35,
+          "replies": 54,
+          "isQuote": true,
+          "quotedTweetId": "2096367438443262091"
         }
       ]
     }
   ],
   "stats": {
-    "xBuilders": 12,
-    "totalTweets": 24
+    "xBuilders": 4,
+    "totalTweets": 6
   }
 }
