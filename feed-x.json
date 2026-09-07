@@ -1,26 +1,7 @@
 {
-  "generatedAt": "2026-09-06T22:54:40.471Z",
+  "generatedAt": "2026-09-07T06:50:41.247Z",
   "lookbackHours": 24,
   "x": [
-    {
-      "source": "x",
-      "name": "Thibault Sottiaux",
-      "handle": "thsottiaux",
-      "bio": "Codex & ChatGPT @OpenAI",
-      "tweets": [
-        {
-          "id": "2096688770523467947",
-          "text": "To calibrate you all on which reasoning effort to use for Astra, know that GPT-6 Astra on low performs better than GPT-5.6 Sol on high.\n\nIf you were using high reasoning efforts with Sol and were happy, I suggest you move down to low or medium for Astra.",
-          "createdAt": "2026-09-06T19:55:32.000Z",
-          "url": "https://x.com/thsottiaux/status/2096688770523467947",
-          "likes": 10989,
-          "retweets": 480,
-          "replies": 1212,
-          "isQuote": false,
-          "quotedTweetId": null
-        }
-      ]
-    },
     {
       "source": "x",
       "name": "Peter Yang",
@@ -28,26 +9,15 @@
       "bio": "Practical AI tutorials and interviews for busy people | Get my best AI skills and guides at https://t.co/6VAA6p81x6",
       "tweets": [
         {
-          "id": "2096612718098911590",
-          "text": "“Cheating and explaining the answer [to your child] are closer than you’d think.”\n\nHere’s my new episode with @suekhim, co-founder of @brilliantorg, who showed me how AI can help kids think for themselves. We talked about:\n\n→ Why better grades don’t always mean more learning\n\n→ How to help kids enjoy doing hard things vs. only trying to please adults\n\n→ Why her #1 product principle is “Never tell the learner the answer”\n\nSome quotes from Sue:\n\n“Using AI to skip learning is like bringing a robotic arm to the gym to lift weights for you.”\n\n“Learning isn’t about the answer. It is about strengthening that part of you that can concentrate and struggle, that’s unafraid of trying new problems.”\n\n“When building AI products, try to find areas where you have unique data that makes your product better over time.”\n\n📌 Watch the full episode: https://t.co/jzogacrhiK\n\nThanks to our sponsors:\n\n@linear: The AI agent platform for modern teams https://t.co/tgWf9oL4bs\n\n@RiversidedotFM: All-in-one AI studio for podcasts and video https://t.co/uWnS6aiMPE",
-          "createdAt": "2026-09-06T14:53:19.000Z",
-          "url": "https://x.com/petergyang/status/2096612718098911590",
-          "likes": 36,
-          "retweets": 7,
-          "replies": 11,
-          "isQuote": false,
-          "quotedTweetId": null
-        },
-        {
-          "id": "2096466888935276719",
-          "text": "I’ve been sleeping on Widow’s Bay and in general Apple’s shows are so much better any other streamer",
-          "createdAt": "2026-09-06T05:13:51.000Z",
-          "url": "https://x.com/petergyang/status/2096466888935276719",
-          "likes": 59,
+          "id": "2096815819997204639",
+          "text": "This man isn't even on Time's 100 Top AI List so why are we listening to him /s https://t.co/TzSjTfEb5d",
+          "createdAt": "2026-09-07T04:20:23.000Z",
+          "url": "https://x.com/petergyang/status/2096815819997204639",
+          "likes": 74,
           "retweets": 1,
           "replies": 22,
-          "isQuote": false,
-          "quotedTweetId": null
+          "isQuote": true,
+          "quotedTweetId": "2096741462574497805"
         }
       ]
     },
@@ -58,51 +28,78 @@
       "bio": "(soon) member of product staff @openai. prev head of product @linear. I am grader.",
       "tweets": [
         {
-          "id": "2096438571838370096",
-          "text": "Every tech startup logo https://t.co/52Prjggey0",
-          "createdAt": "2026-09-06T03:21:20.000Z",
-          "url": "https://x.com/thenanyu/status/2096438571838370096",
-          "likes": 101,
-          "retweets": 1,
-          "replies": 3,
+          "id": "2096796392102752507",
+          "text": "J-dog calling AGI https://t.co/5iDIHYUxyK",
+          "createdAt": "2026-09-07T03:03:11.000Z",
+          "url": "https://x.com/thenanyu/status/2096796392102752507",
+          "likes": 8,
+          "retweets": 0,
+          "replies": 1,
           "isQuote": true,
-          "quotedTweetId": "2096317440720293961"
+          "quotedTweetId": "2096700264569090384"
         }
       ]
     },
     {
       "source": "x",
-      "name": "Peter Steinberger",
-      "handle": "steipete",
-      "bio": "Polyagentmorous ClawFather. Came back from retirement to mess with AI and help a lobster take over the world.\n@OpenClaw🦞 + @OpenAI",
+      "name": "Aaron Levie",
+      "handle": "levie",
+      "bio": "ceo @box - your business lives in content. unleash it with AI",
       "tweets": [
         {
-          "id": "2096403459579015374",
-          "text": "Can’t remember last time we had such a large jump in capabilities. https://t.co/iGxVUYmGHj",
-          "createdAt": "2026-09-06T01:01:48.000Z",
-          "url": "https://x.com/steipete/status/2096403459579015374",
-          "likes": 1756,
-          "retweets": 59,
-          "replies": 66,
+          "id": "2096735726750908464",
+          "text": "The internet is almost entirely unprepared for a future where everyone’s personal agents are running around executing tasks for them. \n\nThere are going to be endless new challenges and opportunities at the infrastructure layer, for user experiences, new business models, and more. https://t.co/lmbQNJAeF6",
+          "createdAt": "2026-09-06T23:02:07.000Z",
+          "url": "https://x.com/levie/status/2096735726750908464",
+          "likes": 451,
+          "retweets": 41,
+          "replies": 51,
           "isQuote": true,
-          "quotedTweetId": "2096123591993512092"
-        },
+          "quotedTweetId": "2096676801204404604"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Zara Zhang",
+      "handle": "zarazhangrui",
+      "bio": "Builder. Make something people want, then make people want it. Harvard’17. GitHub: https://t.co/KCuEaje1wd \nYouTube: https://t.co/8xzbGWsHgY",
+      "tweets": [
         {
-          "id": "2096400749869830325",
-          "text": "One step closer in building the harness I wanna use. The one thing that’s not yet there are cloud sessions, goal is seconds, which requires clever snapshotting. (Right now it still clones repos fresh which isn’t fast enough.)\n\nWill have that next week. https://t.co/lpiszOtVGP",
-          "createdAt": "2026-09-06T00:51:02.000Z",
-          "url": "https://x.com/steipete/status/2096400749869830325",
-          "likes": 755,
-          "retweets": 35,
-          "replies": 54,
-          "isQuote": true,
-          "quotedTweetId": "2096367438443262091"
+          "id": "2096824861108928701",
+          "text": "One of the biggest crises of our time is the shortening of the human attention span \n\nAgents just make things worse",
+          "createdAt": "2026-09-07T04:56:18.000Z",
+          "url": "https://x.com/zarazhangrui/status/2096824861108928701",
+          "likes": 78,
+          "retweets": 2,
+          "replies": 27,
+          "isQuote": false,
+          "quotedTweetId": null
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Nikunj Kothari",
+      "handle": "nikunj",
+      "bio": "partner @fpvventures - investing in seed/A. previous: early hire @meter, @opendoor, @atlassian & others. love @shimoleejhaveri + 👦👧",
+      "tweets": [
+        {
+          "id": "2096798671547646134",
+          "text": "Fable reviewing literally every Astra code change..\n\n\"this fix is the real deal\"\n\nFable PM, Astra engineer is undefeated 🤝",
+          "createdAt": "2026-09-07T03:12:14.000Z",
+          "url": "https://x.com/nikunj/status/2096798671547646134",
+          "likes": 26,
+          "retweets": 0,
+          "replies": 2,
+          "isQuote": false,
+          "quotedTweetId": null
         }
       ]
     }
   ],
   "stats": {
-    "xBuilders": 4,
-    "totalTweets": 6
+    "xBuilders": 5,
+    "totalTweets": 5
   }
 }
