@@ -5,6 +5,9 @@ the key insights without watching the full episode.
 
 ## Instructions
 
+- Produce EXACTLY ONE remix for this episode. One episode = one summary block. Never
+  write the summary more than once, and never split a single conversation into multiple
+  entries — even a long, multi-topic live interview is one episode.
 - Write a remix of 200-400 words
 - Start with a one-sentence "The Takeaway" — what's the single most important takeaway?
 - Introduce the context and the speaker's information (name, role/company, background) and why the audience should care
