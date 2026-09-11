@@ -120,10 +120,35 @@ Ask: "What language do you prefer for your digest?"
 - Chinese (translated from English sources)
 - Bilingual (both English and Chinese, side by side)
 
-### Step 5: API Keys
+### Step 5: Obsidian Archive (Optional)
+
+Ask: "Do you also want each digest appended to your Obsidian Daily note?"
+- Yes
+- No (default)
+
+If yes, ask: "What is the exact name of your Obsidian vault?"
+
+Once they provide the name, automatically find its absolute path by reading the Obsidian config file (e.g., `~/Library/Application Support/obsidian/obsidian.json` on macOS). You can use a quick Node command:
+\`\`\`bash
+node -e "const fs = require('fs'); const config = JSON.parse(fs.readFileSync(process.env.HOME + '/Library/Application Support/obsidian/obsidian.json', 'utf-8')); const vaultName = '<USER_VAULT_NAME>'; const vault = Object.values(config.vaults).find(v => v.path.split('/').pop() === vaultName); if(vault) console.log(vault.path); else console.log('Not found');"
+\`\`\`
+If the path is found, ask the user to confirm: "I found your vault at \`<Vault Path>\`. Is this correct?"
+If not found, ask the user to manually provide the absolute path.
+
+Once verified and you have both the vault name and absolute path, set:
+- `obsidian.enabled = true`
+- `obsidian.vaultName = "<the verified vault>"`
+- `obsidian.vaultPath = "<the absolute path>"`
+- `obsidian.dailyDir = "Daily"`
+- `obsidian.sectionTitle = "AI Builders Digest"`
+
+If no, set:
+- `obsidian.enabled = false`
+
+### Step 6: API Keys
 
 **If the user chose "stdout" or "right here" delivery:** No API keys needed at all!
-All content is fetched centrally. Skip to Step 6.
+All content is fetched centrally. Skip to Step 7.
 
 **If the user chose Telegram or Email delivery:**
 Create the .env file with only the delivery key they need:
@@ -145,7 +170,7 @@ Tell the user: "All podcast and X/Twitter content is fetched for you automatical
 from a central feed — no API keys needed for that. You only need a key for
 [Telegram/email] delivery."
 
-### Step 6: Show Sources
+### Step 7: Show Sources
 
 Show the full list of default builders and podcasts being tracked.
 Read from `config/default-sources.json` and display as a clean list.
@@ -153,7 +178,7 @@ Read from `config/default-sources.json` and display as a clean list.
 Tell the user: "The source list is curated and updated centrally. You'll
 automatically get the latest builders and podcasts without doing anything."
 
-### Step 7: Configuration Reminder
+### Step 8: Configuration Reminder
 
 "All your settings can be changed anytime through conversation:
 - 'Switch to weekly digests'
@@ -163,7 +188,7 @@ automatically get the latest builders and podcasts without doing anything."
 
 No need to edit any files — just tell me what you want."
 
-### Step 8: Set Up Cron
+### Step 9: Set Up Cron
 
 Save the config (include all fields — fill in the user's choices):
 ```bash
@@ -181,7 +206,14 @@ cat > ~/.follow-builders/config.json << 'CFGEOF'
     "email": "<email address, only if email>"
   },
   "onboardingComplete": true
-}
+  },
+  "obsidian": {
+    "enabled": "<true or false>",
+    "vaultName": "<verified vault name, only if enabled>",
+    "vaultPath": "<absolute path to vault, only if enabled>",
+    "dailyDir": "Daily",
+    "sectionTitle": "AI Builders Digest"
+  }
 CFGEOF
 ```
 
@@ -276,7 +308,7 @@ or switch to OpenClaw.
 Skip cron setup entirely. Tell the user: "Since you chose on-demand delivery,
 there's no scheduled job. Just type /ai whenever you want your digest."
 
-### Step 9: Welcome Digest
+### Step 10: Welcome Digest
 
 **DO NOT skip this step.** Immediately after setting up the cron job, generate
 and send the user their first digest so they can see what it looks like.

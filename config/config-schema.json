@@ -60,6 +60,35 @@
       "type": "boolean",
       "default": false,
       "description": "Whether the user has completed initial setup"
+    },
+    "obsidian": {
+      "type": "object",
+      "description": "Optional Obsidian Daily note archiving settings",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to also append each digest to Obsidian Daily note"
+        },
+        "vaultName": {
+          "type": "string",
+          "description": "Name of the target Obsidian Vault (optional, otherwise uses default context)"
+        },
+        "vaultPath": {
+          "type": "string",
+          "description": "Absolute path to the target Obsidian Vault on the local filesystem"
+        },
+        "dailyDir": {
+          "type": "string",
+          "default": "Daily",
+          "description": "Daily notes folder path inside the Obsidian vault"
+        },
+        "sectionTitle": {
+          "type": "string",
+          "default": "AI Builders Digest",
+          "description": "Section heading used when appending digest content"
+        }
+      }
     }
   }
 }
