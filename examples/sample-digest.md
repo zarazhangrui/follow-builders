@@ -4,9 +4,9 @@ This is an example of what your AI Builders Digest looks like.
 
 ---
 
-AI Builders Digest — March 14, 2026
+## AI Builders Digest — March 14, 2026
 
-PODCASTS
+### PODCASTS
 
 Latent Space — "Why Agents Keep Failing (And How to Fix Them)"
 Bottom line: Most agent failures aren't intelligence failures — they're tool-use failures.
@@ -34,7 +34,7 @@ Key insights:
 https://youtube.com/watch?v=example456
 
 
-X / TWITTER
+### X / TWITTER
 
 Andrej Karpathy (@karpathy)
 Shared a deep thread on why he thinks "Software 3.0" (natural language programming)
