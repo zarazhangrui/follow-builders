@@ -20,17 +20,55 @@
 //   - "stdout" (default): just prints to terminal
 // ============================================================================
 
-import { readFile } from 'fs/promises';
-import { existsSync } from 'fs';
-import { join } from 'path';
-import { homedir } from 'os';
-import { config as loadEnv } from 'dotenv';
+import { existsSync, realpathSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // -- Constants ---------------------------------------------------------------
 
-const USER_DIR = join(homedir(), '.follow-builders');
+const USER_DIR =
+  process.env.FOLLOW_BUILDERS_USER_DIR ||
+  join(homedir(), '.follow-builders');
 const CONFIG_PATH = join(USER_DIR, 'config.json');
 const ENV_PATH = join(USER_DIR, '.env');
+
+export async function loadEnvFile(path, environment = process.env) {
+  if (!existsSync(path)) return;
+
+  const contents = await readFile(path, 'utf8');
+  for (const rawLine of contents.split(/\r?\n/)) {
+    let line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    if (line.startsWith('export ')) line = line.slice(7).trim();
+
+    const separator = line.indexOf('=');
+    if (separator <= 0) continue;
+
+    const key = line.slice(0, separator).trim();
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) continue;
+    if (environment[key] !== undefined) continue;
+
+    let value = line.slice(separator + 1).trim();
+    const quote = value[0];
+    if ((quote === '"' || quote === "'") && value.endsWith(quote)) {
+      value = value.slice(1, -1);
+      if (quote === '"') {
+        value = value
+          .replace(/\\n/g, '\n')
+          .replace(/\\r/g, '\r')
+          .replace(/\\t/g, '\t')
+          .replace(/\\"/g, '"')
+          .replace(/\\\\/g, '\\');
+      }
+    } else {
+      value = value.replace(/\s+#.*$/, '').trim();
+    }
+
+    environment[key] = value;
+  }
+}
 
 // -- Read input --------------------------------------------------------------
 
@@ -153,7 +191,7 @@ async function sendEmail(text, apiKey, toEmail) {
 
 async function main() {
   // Load env and config
-  loadEnv({ path: ENV_PATH });
+  await loadEnvFile(ENV_PATH);
 
   let config = {};
   if (existsSync(CONFIG_PATH)) {
@@ -214,4 +252,13 @@ async function main() {
   }
 }
 
-main();
+const isDirectRun =
+  process.argv[1] &&
+  realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isDirectRun) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}
