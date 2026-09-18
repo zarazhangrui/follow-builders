@@ -15,7 +15,16 @@
 
 import { readFile, writeFile } from "fs/promises";
 import { existsSync } from "fs";
-import { join } from "path";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import {
+  ensurePodcastState,
+  prunePodcastFailures,
+  recordPodcastFailure,
+  recordPodcastSuccess,
+  shouldSkipPodcastAfterFailures,
+} from "./podcast-state.js";
+import { isUsableSourceUrl } from "./source-url.js";
 
 // -- Constants ---------------------------------------------------------------
 
@@ -35,7 +44,7 @@ const X_RETRY_STATUSES = new Set([500, 502, 503, 504]);
 const X_RETRY_ATTEMPTS = 3;
 
 // State file lives in the repo root so it gets committed by GitHub Actions
-const SCRIPT_DIR = decodeURIComponent(new URL(".", import.meta.url).pathname);
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const STATE_PATH = join(SCRIPT_DIR, "..", "state-feed.json");
 
 // -- State Management --------------------------------------------------------
@@ -45,15 +54,26 @@ const STATE_PATH = join(SCRIPT_DIR, "..", "state-feed.json");
 
 async function loadState() {
   if (!existsSync(STATE_PATH)) {
-    return { seenTweets: {}, seenVideos: {}, seenArticles: {} };
+    return {
+      seenTweets: {},
+      seenVideos: {},
+      failedVideos: {},
+      seenArticles: {},
+    };
   }
   try {
     const state = JSON.parse(await readFile(STATE_PATH, "utf-8"));
-    // Ensure seenArticles exists for older state files
+    if (!state.seenTweets) state.seenTweets = {};
+    ensurePodcastState(state);
     if (!state.seenArticles) state.seenArticles = {};
     return state;
   } catch {
-    return { seenTweets: {}, seenVideos: {}, seenArticles: {} };
+    return {
+      seenTweets: {},
+      seenVideos: {},
+      failedVideos: {},
+      seenArticles: {},
+    };
   }
 }
 
@@ -66,6 +86,7 @@ async function saveState(state) {
   for (const [id, ts] of Object.entries(state.seenVideos)) {
     if (ts < cutoff) delete state.seenVideos[id];
   }
+  prunePodcastFailures(state, cutoff);
   for (const [id, ts] of Object.entries(state.seenArticles || {})) {
     if (ts < cutoff) delete state.seenArticles[id];
   }
@@ -423,6 +444,12 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
           console.error(`    Skipping "${episode.title}" (already seen)`);
           continue;
         }
+        if (shouldSkipPodcastAfterFailures(state, episode.guid)) {
+          console.error(
+            `    Skipping "${episode.title}" (failure retry limit reached)`,
+          );
+          continue;
+        }
 
         console.error(
           `    Candidate: "${episode.title}" published=${episode.publishedAt || "unknown"}`,
@@ -465,9 +492,6 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
       apiKey,
     );
 
-    // Mark as seen regardless so we don't retry failed episodes daily
-    state.seenVideos[selected.guid] = Date.now();
-
     if (result.error) {
       console.error(
         `    Transcript error: ${result.error} — skipping to next candidate`,
@@ -475,6 +499,7 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
       errors.push(
         `Podcast: Transcript error for "${selected.title}": ${result.error}`,
       );
+      recordPodcastFailure(state, selected.guid, result.error);
       continue;
     }
 
@@ -482,6 +507,7 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
       console.error(
         `    Empty transcript for "${selected.title}" — skipping to next candidate`,
       );
+      recordPodcastFailure(state, selected.guid, "Empty transcript");
       continue;
     }
 
@@ -489,20 +515,30 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
       `    Selected: "${selected.title}" (transcript: ${result.transcript.length} chars)`,
     );
 
-    // Try to resolve the exact YouTube video URL for this episode. If the
-    // lookup fails (no YouTube channel configured, no title match, network
-    // error), fall back to the channel URL so the feed still works.
+    // Prefer the exact YouTube video URL. If lookup fails, use the episode's
+    // own RSS link. Never substitute a channel page for an episode source.
     const youtubeUrl = await findYouTubeEpisodeUrl(
       selected.podcast.url,
       selected.title,
     );
+    const rssEpisodeUrl = isUsableSourceUrl(selected.link)
+      ? selected.link
+      : null;
+    const episodeUrl = youtubeUrl || rssEpisodeUrl;
     if (youtubeUrl) {
       console.error(`    Matched YouTube episode URL: ${youtubeUrl}`);
+    } else if (rssEpisodeUrl) {
+      console.error(`    Using RSS episode URL: ${rssEpisodeUrl}`);
     } else {
       console.error(
-        `    No YouTube episode match found — falling back to channel URL`,
+        `    No direct episode URL found — skipping this candidate`,
       );
+      errors.push(`Podcast: No direct episode URL for "${selected.title}"`);
+      recordPodcastFailure(state, selected.guid, "No direct episode URL");
+      continue;
     }
+
+    recordPodcastSuccess(state, selected.guid);
 
     return [
       {
@@ -510,7 +546,7 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
         name: selected.podcast.name,
         title: selected.title,
         guid: selected.guid,
-        url: youtubeUrl || selected.podcast.url,
+        url: episodeUrl,
         publishedAt: selected.publishedAt,
         transcript: result.transcript,
       },
