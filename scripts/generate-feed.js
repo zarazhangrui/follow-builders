@@ -14,12 +14,20 @@
 // ============================================================================
 
 import { readFile, writeFile } from "fs/promises";
+import { setDefaultResultOrder } from "dns";
 import { existsSync } from "fs";
 import { join } from "path";
+import { fileURLToPath } from "url";
+import { execFile } from "child_process";
+import { promisify } from "util";
+
+setDefaultResultOrder("ipv4first");
+const execFileAsync = promisify(execFile);
 
 // -- Constants ---------------------------------------------------------------
 
 const POD2TXT_BASE = "https://pod2txt.vercel.app/api";
+const SUPADATA_BASE = "https://api.supadata.ai/v1";
 const X_API_BASE = "https://api.x.com/2";
 // Some RSS hosts (notably Substack) block non-browser user agents from cloud IPs.
 // Using a real Chrome UA avoids 403 errors in GitHub Actions.
@@ -28,11 +36,8 @@ const RSS_USER_AGENT =
 const TWEET_LOOKBACK_HOURS = 24;
 const PODCAST_LOOKBACK_HOURS = 336; // 14 days — podcasts publish weekly/biweekly, not daily
 const BLOG_LOOKBACK_HOURS = 72;
-const MAX_TWEETS_PER_USER = 3;
+const MAX_TWEETS_PER_USER = 5;
 const MAX_ARTICLES_PER_BLOG = 3;
-const X_USER_LOOKUP_BATCH_SIZE = 5;
-const X_RETRY_STATUSES = new Set([500, 502, 503, 504]);
-const X_RETRY_ATTEMPTS = 3;
 
 // State file lives in the repo root so it gets committed by GitHub Actions
 const SCRIPT_DIR = decodeURIComponent(new URL(".", import.meta.url).pathname);
@@ -77,6 +82,33 @@ async function saveState(state) {
 async function loadSources() {
   const sourcesPath = join(SCRIPT_DIR, "..", "config", "default-sources.json");
   return JSON.parse(await readFile(sourcesPath, "utf-8"));
+}
+
+async function fetchTextWithCurlFallback(url, fetchOptions = {}) {
+  try {
+    const res = await fetch(url, fetchOptions);
+    if (res.ok) return await res.text();
+  } catch {
+    // Fall through to curl. Node's undici can be flaky with some YouTube hosts.
+  }
+
+  const { stdout } = await execFileAsync("curl", [
+    "-L",
+    "--max-time",
+    "20",
+    "-s",
+    url,
+  ], {
+    maxBuffer: 20 * 1024 * 1024,
+  });
+  return stdout;
+}
+
+export function sourceMetadata(source) {
+  const metadata = {};
+  if (source.topics) metadata.topics = source.topics;
+  if (source.wechat) metadata.wechat = source.wechat;
+  return metadata;
 }
 
 // -- Podcast Fetching (RSS + pod2txt) ----------------------------------------
@@ -146,15 +178,13 @@ async function getYouTubeFeedUrl(channelUrl) {
   // "channelId":"UC..." pattern in the JSON blob is the most reliable.
   if (channelUrl.match(/\/@[A-Za-z0-9_.-]+/)) {
     try {
-      const res = await fetch(channelUrl, {
+      const html = await fetchTextWithCurlFallback(channelUrl, {
         headers: {
           "User-Agent": RSS_USER_AGENT,
           "Accept-Language": "en-US,en;q=0.9",
         },
         signal: AbortSignal.timeout(15000),
       });
-      if (!res.ok) return null;
-      const html = await res.text();
       const idMatch =
         html.match(/"channelId":"(UC[A-Za-z0-9_-]{20,})"/) ||
         html.match(
@@ -175,7 +205,7 @@ async function getYouTubeFeedUrl(channelUrl) {
 // Atom RSS endpoint is unavailable. YouTube's internal data shapes change
 // occasionally, so we defensively navigate both the rich-grid (channel page)
 // and playlist-video-list (playlist page) structures.
-function parseYouTubePageData(html) {
+export function parseYouTubePageData(html) {
   const videos = [];
   const m = html.match(/var\s+ytInitialData\s*=\s*({[\s\S]*?});\s*<\/script>/);
   if (!m) return videos;
@@ -198,6 +228,7 @@ function parseYouTubePageData(html) {
         if (title) {
           videos.push({
             title,
+            videoId: v.videoId,
             url: `https://www.youtube.com/watch?v=${v.videoId}`,
           });
         }
@@ -216,6 +247,7 @@ function parseYouTubePageData(html) {
         if (title) {
           videos.push({
             title,
+            videoId: v.videoId,
             url: `https://www.youtube.com/watch?v=${v.videoId}`,
           });
         }
@@ -232,14 +264,12 @@ async function fetchYouTubeVideos(channelUrl) {
   const feedUrl = await getYouTubeFeedUrl(channelUrl);
   if (feedUrl) {
     try {
-      const res = await fetch(feedUrl, {
+      const xml = await fetchTextWithCurlFallback(feedUrl, {
         headers: { "User-Agent": RSS_USER_AGENT },
         signal: AbortSignal.timeout(15000),
       });
-      if (res.ok) {
-        const videos = parseYouTubeFeed(await res.text());
-        if (videos.length > 0) return videos;
-      }
+      const videos = parseYouTubeFeed(xml);
+      if (videos.length > 0) return videos;
     } catch {
       // fall through to scraping
     }
@@ -252,22 +282,21 @@ async function fetchYouTubeVideos(channelUrl) {
     ? channelUrl
     : channelUrl.replace(/\/$/, "") + "/videos";
   try {
-    const res = await fetch(videosPageUrl, {
+    const html = await fetchTextWithCurlFallback(videosPageUrl, {
       headers: {
         "User-Agent": RSS_USER_AGENT,
         "Accept-Language": "en-US,en;q=0.9",
       },
       signal: AbortSignal.timeout(15000),
     });
-    if (!res.ok) return [];
-    return parseYouTubePageData(await res.text());
+    return parseYouTubePageData(html);
   } catch {
     return [];
   }
 }
 
-// Parses a YouTube Atom feed and returns { title, url } for each entry.
-function parseYouTubeFeed(xml) {
+// Parses a YouTube Atom feed and returns { title, videoId, url } for each entry.
+export function parseYouTubeFeed(xml) {
   const videos = [];
   const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
   let entryMatch;
@@ -278,6 +307,7 @@ function parseYouTubeFeed(xml) {
     if (titleMatch && videoIdMatch) {
       videos.push({
         title: titleMatch[1].trim(),
+        videoId: videoIdMatch[1].trim(),
         url: `https://www.youtube.com/watch?v=${videoIdMatch[1].trim()}`,
       });
     }
@@ -298,20 +328,19 @@ function normalizeTitle(t) {
 // Finds the YouTube video whose title best matches the podcast episode title.
 // Uses substring match first, then token overlap (>=50% of episode's content
 // words must appear in the video title). Returns null if no confident match.
-async function findYouTubeEpisodeUrl(channelUrl, episodeTitle) {
-  const videos = await fetchYouTubeVideos(channelUrl);
+export function matchYouTubeEpisode(videos, episodeTitle) {
   if (videos.length === 0) return null;
 
   const needle = normalizeTitle(episodeTitle);
   const needleTokens = new Set(needle.split(" ").filter((w) => w.length > 2));
   if (needleTokens.size === 0) return null;
 
-  let bestUrl = null;
+  let bestVideo = null;
   let bestScore = 0;
   for (const v of videos) {
     const hay = normalizeTitle(v.title);
     if (hay && (hay.includes(needle) || needle.includes(hay))) {
-      return v.url;
+      return { videoId: v.videoId, url: v.url };
     }
     const hayTokens = new Set(hay.split(" ").filter((w) => w.length > 2));
     let overlap = 0;
@@ -319,46 +348,136 @@ async function findYouTubeEpisodeUrl(channelUrl, episodeTitle) {
     const score = overlap / needleTokens.size;
     if (score > bestScore) {
       bestScore = score;
-      bestUrl = v.url;
+      bestVideo = v;
     }
   }
-  return bestScore >= 0.5 ? bestUrl : null;
+  return bestScore >= 0.5 && bestVideo
+    ? { videoId: bestVideo.videoId, url: bestVideo.url }
+    : null;
+}
+
+export async function findYouTubeEpisode(channelUrl, episodeTitle) {
+  const videos = await fetchYouTubeVideos(channelUrl);
+  return matchYouTubeEpisode(videos, episodeTitle);
+}
+
+// Backward-compatible URL-only helper for callers that only need a link.
+export async function findYouTubeEpisodeUrl(channelUrl, episodeTitle) {
+  const episode = await findYouTubeEpisode(channelUrl, episodeTitle);
+  return episode?.url || null;
+}
+
+export function buildPodcastFeedEntry({ selected, youtubeEpisode, transcript }) {
+  return {
+    source: "podcast",
+    name: selected.podcast.name,
+    title: selected.title,
+    guid: selected.guid,
+    videoId: youtubeEpisode?.videoId || null,
+    url: youtubeEpisode?.url || null,
+    podcastUrl: selected.link || null,
+    publishedAt: selected.publishedAt,
+    transcript,
+    ...sourceMetadata(selected.podcast),
+  };
 }
 
 // Fetches a transcript from pod2txt. The API is async: first request may
 // return "processing", so we poll until "ready" (up to 5 attempts, ~2.5 min).
-async function fetchPod2txtTranscript(rssUrl, guid, apiKey) {
+export async function fetchPod2txtTranscript(
+  rssUrl,
+  guid,
+  apiKey,
+  fetcher = fetch,
+) {
   const maxAttempts = 5;
   const pollInterval = 30000; // 30 seconds between polls
 
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const res = await fetch(`${POD2TXT_BASE}/transcript`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ feedurl: rssUrl, guid, apikey: apiKey }),
-    });
+  try {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const res = await fetcher(`${POD2TXT_BASE}/transcript`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feedurl: rssUrl, guid, apikey: apiKey }),
+      });
 
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        return { error: `HTTP ${res.status}: ${text}` };
+      }
+
+      const data = await res.json();
+
+      if (data.status === "ready" && data.url) {
+        // Transcript is ready — fetch the text from the provided URL
+        const txtRes = await fetcher(data.url);
+        if (!txtRes.ok)
+          return {
+            error: `Failed to fetch transcript text: HTTP ${txtRes.status}`,
+          };
+        const transcript = await txtRes.text();
+        return { transcript };
+      }
+
+      if (data.status === "processing") {
+        console.error(
+          `      pod2txt: processing (attempt ${attempt}/${maxAttempts}), waiting ${pollInterval / 1000}s...`,
+        );
+        if (attempt < maxAttempts) {
+          await new Promise((r) => setTimeout(r, pollInterval));
+        }
+        continue;
+      }
+
+      // Unexpected status or error from the API
+      return { error: data.message || `Unexpected status: ${data.status}` };
+    }
+  } catch (err) {
+    return { error: err.message };
+  }
+
+  return { error: "Timed out waiting for transcript processing" };
+}
+
+function normalizeTranscriptContent(content) {
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) {
+    return content
+      .map((chunk) => (typeof chunk === "string" ? chunk : chunk?.text || ""))
+      .filter(Boolean)
+      .join("\n");
+  }
+  return "";
+}
+
+function redactSecret(text, secret) {
+  if (!text || !secret) return text || "";
+  return text.split(secret).join("[REDACTED]");
+}
+
+async function fetchSupadataTranscriptJob(jobId, apiKey, fetcher) {
+  const maxAttempts = 5;
+  const pollInterval = 30000;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const res = await fetcher(`${SUPADATA_BASE}/transcript/${jobId}`, {
+      headers: { "x-api-key": apiKey },
+    });
     if (!res.ok) {
       const text = await res.text().catch(() => "");
-      return { error: `HTTP ${res.status}: ${text}` };
+      return {
+        error: `HTTP ${res.status}: ${redactSecret(text, apiKey)}`,
+        authError: res.status === 401 || res.status === 403,
+      };
     }
 
     const data = await res.json();
+    const transcript = normalizeTranscriptContent(data.content);
+    if (transcript) return { transcript };
 
-    if (data.status === "ready" && data.url) {
-      // Transcript is ready — fetch the text from the provided URL
-      const txtRes = await fetch(data.url);
-      if (!txtRes.ok)
-        return {
-          error: `Failed to fetch transcript text: HTTP ${txtRes.status}`,
-        };
-      const transcript = await txtRes.text();
-      return { transcript };
-    }
-
-    if (data.status === "processing") {
+    if (data.status === "processing" || data.status === "queued") {
       console.error(
-        `      pod2txt: processing (attempt ${attempt}/${maxAttempts}), waiting ${pollInterval / 1000}s...`,
+        `      Supadata: processing (attempt ${attempt}/${maxAttempts}), waiting ${pollInterval / 1000}s...`,
       );
       if (attempt < maxAttempts) {
         await new Promise((r) => setTimeout(r, pollInterval));
@@ -366,17 +485,49 @@ async function fetchPod2txtTranscript(rssUrl, guid, apiKey) {
       continue;
     }
 
-    // Unexpected status or error from the API
-    return { error: data.message || `Unexpected status: ${data.status}` };
+    return { error: data.message || `Unexpected job status: ${data.status}` };
   }
 
-  return { error: "Timed out waiting for transcript processing" };
+  return { error: "Timed out waiting for Supadata transcript processing" };
+}
+
+export async function fetchSupadataTranscript(videoUrl, apiKey, fetcher = fetch) {
+  try {
+    const params = new URLSearchParams({
+      url: videoUrl,
+      lang: "en",
+      text: "true",
+      mode: "native",
+    });
+    const res = await fetcher(`${SUPADATA_BASE}/transcript?${params}`, {
+      headers: { "x-api-key": apiKey },
+      signal: AbortSignal.timeout(30000),
+    });
+    if (!res.ok && res.status !== 202) {
+      const text = await res.text().catch(() => "");
+      return {
+        error: `HTTP ${res.status}: ${redactSecret(text, apiKey)}`,
+        authError: res.status === 401 || res.status === 403,
+      };
+    }
+
+    const data = await res.json();
+    const transcript = normalizeTranscriptContent(data.content);
+    if (transcript) return { transcript };
+    if (data.jobId) {
+      return fetchSupadataTranscriptJob(data.jobId, apiKey, fetcher);
+    }
+
+    return { error: data.message || "No transcript content returned" };
+  } catch (err) {
+    return { error: err.message };
+  }
 }
 
 // Main podcast fetching function. For each podcast:
 // 1. Fetches the RSS feed to discover episodes
 // 2. Filters by lookback window and dedup
-// 3. Fetches transcript via pod2txt for the newest unseen episode
+// 3. Fetches transcript for the newest unseen episode
 async function fetchPodcastContent(podcasts, apiKey, state, errors) {
   const cutoff = new Date(Date.now() - PODCAST_LOOKBACK_HOURS * 60 * 60 * 1000);
   const allCandidates = [];
@@ -455,15 +606,50 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
     console.error(`    - "${v.title}" published=${v.publishedAt || "unknown"}`);
   }
 
-  // Step 3: Try each candidate until we get a transcript from pod2txt
+  // Step 3: Try each candidate until we get a transcript.
   for (const selected of withinWindow) {
     console.error(`    Fetching transcript for "${selected.title}"...`);
 
-    const result = await fetchPod2txtTranscript(
-      selected.podcast.rssUrl,
-      selected.guid,
-      apiKey,
+    // Try to resolve the exact YouTube video URL first. Supadata's native
+    // transcript API works from the video URL, while the older pod2txt gateway
+    // works from podcast RSS GUIDs.
+    const youtubeEpisode = await findYouTubeEpisode(
+      selected.podcast.url,
+      selected.title,
     );
+    const transcriptUrl = youtubeEpisode?.url || selected.link;
+    if (youtubeEpisode?.url) {
+      console.error(`    Matched YouTube episode URL: ${youtubeEpisode.url}`);
+    } else if (selected.link) {
+      console.error(`    Using podcast episode URL for transcript lookup: ${selected.link}`);
+    } else {
+      console.error(
+        `    No YouTube episode match found — falling back to podcast RSS transcript lookup`,
+      );
+    }
+
+    let result;
+    if (apiKey?.startsWith("sd_") && transcriptUrl) {
+      result = await fetchSupadataTranscript(transcriptUrl, apiKey);
+      if (result.error && !result.authError) {
+        console.error(
+          `    Supadata transcript error: ${result.error} — trying pod2txt fallback`,
+        );
+        result = await fetchPod2txtTranscript(
+          selected.podcast.rssUrl,
+          selected.guid,
+          apiKey,
+        );
+      } else if (result.error) {
+        console.error(`    Supadata transcript error: ${result.error}`);
+      }
+    } else {
+      result = await fetchPod2txtTranscript(
+        selected.podcast.rssUrl,
+        selected.guid,
+        apiKey,
+      );
+    }
 
     // Mark as seen regardless so we don't retry failed episodes daily
     state.seenVideos[selected.guid] = Date.now();
@@ -489,32 +675,11 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
       `    Selected: "${selected.title}" (transcript: ${result.transcript.length} chars)`,
     );
 
-    // Try to resolve the exact YouTube video URL for this episode. If the
-    // lookup fails (no YouTube channel configured, no title match, network
-    // error), fall back to the channel URL so the feed still works.
-    const youtubeUrl = await findYouTubeEpisodeUrl(
-      selected.podcast.url,
-      selected.title,
-    );
-    if (youtubeUrl) {
-      console.error(`    Matched YouTube episode URL: ${youtubeUrl}`);
-    } else {
-      console.error(
-        `    No YouTube episode match found — falling back to channel URL`,
-      );
-    }
-
-    return [
-      {
-        source: "podcast",
-        name: selected.podcast.name,
-        title: selected.title,
-        guid: selected.guid,
-        url: youtubeUrl || selected.podcast.url,
-        publishedAt: selected.publishedAt,
-        transcript: result.transcript,
-      },
-    ];
+    return [buildPodcastFeedEntry({
+      selected,
+      youtubeEpisode,
+      transcript: result.transcript,
+    })];
   }
 
   console.error(`    No candidates had transcripts available`);
@@ -523,48 +688,24 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
 
 // -- X/Twitter Fetching (Official API v2) ------------------------------------
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function fetchXWithRetry(url, options) {
-  let lastResponse;
-  for (let attempt = 1; attempt <= X_RETRY_ATTEMPTS; attempt++) {
-    try {
-      const res = await fetch(url, options);
-      lastResponse = res;
-      if (!X_RETRY_STATUSES.has(res.status) || attempt === X_RETRY_ATTEMPTS) {
-        return res;
-      }
-    } catch (err) {
-      if (attempt === X_RETRY_ATTEMPTS) throw err;
-    }
-    await sleep(1000 * attempt);
-  }
-  return lastResponse;
-}
-
 async function fetchXContent(xAccounts, bearerToken, state, errors) {
   const results = [];
   const cutoff = new Date(Date.now() - TWEET_LOOKBACK_HOURS * 60 * 60 * 1000);
 
-  // Batch lookup user IDs. Smaller batches make one flaky X response less likely
-  // to wipe out the whole feed.
+  // Batch lookup all user IDs (1 API call)
   const handles = xAccounts.map((a) => a.handle);
   let userMap = {};
 
-  for (let i = 0; i < handles.length; i += X_USER_LOOKUP_BATCH_SIZE) {
-    const batch = handles.slice(i, i + X_USER_LOOKUP_BATCH_SIZE);
+  for (let i = 0; i < handles.length; i += 100) {
+    const batch = handles.slice(i, i + 100);
     try {
-      const res = await fetchXWithRetry(
+      const res = await fetch(
         `${X_API_BASE}/users/by?usernames=${batch.join(",")}&user.fields=name,description`,
         { headers: { Authorization: `Bearer ${bearerToken}` } },
       );
 
       if (!res.ok) {
-        errors.push(
-          `X API: User lookup failed for ${batch.join(",")}: HTTP ${res.status}`,
-        );
+        errors.push(`X API: User lookup failed: HTTP ${res.status}`);
         continue;
       }
 
@@ -592,7 +733,7 @@ async function fetchXContent(xAccounts, bearerToken, state, errors) {
     if (!userData) continue;
 
     try {
-      const res = await fetchXWithRetry(
+      const res = await fetch(
         `${X_API_BASE}/users/${userData.id}/tweets?` +
           `max_results=5` + // fetch 5, then filter to 3 new ones
           `&tweet.fields=created_at,public_metrics,referenced_tweets,note_tweet` +
@@ -648,6 +789,7 @@ async function fetchXContent(xAccounts, bearerToken, state, errors) {
         handle: account.handle,
         bio: userData.description,
         tweets: newTweets,
+        ...sourceMetadata(account),
       });
 
       await new Promise((r) => setTimeout(r, 200));
@@ -660,6 +802,81 @@ async function fetchXContent(xAccounts, bearerToken, state, errors) {
 }
 
 // -- Blog Fetching (HTML scraping) -------------------------------------------
+
+function decodeHtml(text) {
+  return text
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
+
+function extractXmlText(block, tagName) {
+  const escapedTag = tagName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = block.match(
+    new RegExp(`<${escapedTag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${escapedTag}>`, "i"),
+  );
+  if (!match) return null;
+
+  return decodeHtml(match[1].replace(/^<!\[CDATA\[/, "").replace(/\]\]>$/, ""))
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractFeedLink(block) {
+  const hrefMatch = block.match(/<link\b[^>]*href="([^"]+)"[^>]*>/i);
+  if (hrefMatch) return decodeHtml(hrefMatch[1].trim());
+  return extractXmlText(block, "link");
+}
+
+function toIsoDate(dateText) {
+  if (!dateText) return null;
+  const date = new Date(dateText);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
+}
+
+export function parseSyndicationFeed(xml) {
+  const articles = [];
+  const entryRegex = /<(item|entry)\b[^>]*>([\s\S]*?)<\/\1>/gi;
+  let entryMatch;
+
+  while ((entryMatch = entryRegex.exec(xml)) !== null) {
+    const block = entryMatch[2];
+    const title = extractXmlText(block, "title") || "Untitled";
+    const url = extractFeedLink(block);
+    const guid =
+      extractXmlText(block, "guid") ||
+      extractXmlText(block, "id") ||
+      url ||
+      title;
+    const dateText =
+      extractXmlText(block, "pubDate") ||
+      extractXmlText(block, "published") ||
+      extractXmlText(block, "updated");
+    const content =
+      extractXmlText(block, "content:encoded") ||
+      extractXmlText(block, "content") ||
+      extractXmlText(block, "summary") ||
+      extractXmlText(block, "description") ||
+      "";
+
+    articles.push({
+      title,
+      url,
+      guid,
+      publishedAt: toIsoDate(dateText),
+      content,
+    });
+  }
+
+  return articles.filter((article) => article.url);
+}
 
 // Scrapes the Anthropic Engineering blog index page.
 // The page is a Next.js app that embeds article data as JSON in <script> tags.
@@ -896,6 +1113,62 @@ async function fetchBlogContent(blogs, state, errors) {
     let candidates = [];
 
     try {
+      if (["rss", "atom", "feed"].includes(blog.type)) {
+        const feedUrl = blog.feedUrl || blog.indexUrl;
+        if (!feedUrl) {
+          errors.push(`Blog: No feedUrl configured for ${blog.name}`);
+          continue;
+        }
+
+        const feedRes = await fetch(feedUrl, {
+          headers: {
+            "User-Agent": RSS_USER_AGENT,
+            Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml, */*",
+          },
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!feedRes.ok) {
+          errors.push(
+            `Blog: Failed to fetch feed for ${blog.name}: HTTP ${feedRes.status}`,
+          );
+          continue;
+        }
+
+        candidates = parseSyndicationFeed(await feedRes.text());
+        const newArticles = [];
+        for (const article of candidates.slice(0, MAX_ARTICLES_PER_BLOG)) {
+          const dedupKey = article.guid || article.url;
+          if (state.seenArticles[dedupKey]) continue;
+          if (article.publishedAt && new Date(article.publishedAt) < cutoff)
+            continue;
+          newArticles.push(article);
+          if (newArticles.length >= MAX_ARTICLES_PER_BLOG) break;
+        }
+
+        if (newArticles.length === 0) {
+          console.error(`    No new feed articles found`);
+          continue;
+        }
+
+        for (const article of newArticles) {
+          results.push({
+            source: "blog",
+            name: blog.name,
+            title: article.title,
+            url: article.url,
+            publishedAt: article.publishedAt,
+            author: "",
+            description: "",
+            content: article.content || article.title,
+            ...sourceMetadata(blog),
+          });
+
+          state.seenArticles[article.guid || article.url] = Date.now();
+        }
+
+        continue;
+      }
+
       // Step 1: Discover articles from the blog index page
       const indexRes = await fetch(blog.indexUrl, {
         headers: { "User-Agent": "FollowBuilders/1.0 (feed aggregator)" },
@@ -979,6 +1252,7 @@ async function fetchBlogContent(blogs, state, errors) {
             author: extracted.author || "",
             description: article.description || "",
             content: extracted.content,
+            ...sourceMetadata(blog),
           });
 
           // Mark as seen
@@ -1042,27 +1316,15 @@ async function main() {
     console.error(`  Found ${xContent.length} builders with new tweets`);
 
     const totalTweets = xContent.reduce((sum, a) => sum + a.tweets.length, 0);
-    const xErrors = errors.filter((e) => e.startsWith("X API"));
-
-    if (xErrors.length > 0) {
-      console.error("  X API errors:");
-      for (const error of xErrors) {
-        console.error(`    - ${error}`);
-      }
-    }
-
-    if (xContent.length === 0 && xErrors.length > 0) {
-      throw new Error(
-        `X feed failed: 0 builders returned and ${xErrors.length} X API error(s) occurred`,
-      );
-    }
-
     const xFeed = {
       generatedAt: new Date().toISOString(),
       lookbackHours: TWEET_LOOKBACK_HOURS,
       x: xContent,
       stats: { xBuilders: xContent.length, totalTweets },
-      errors: xErrors.length > 0 ? xErrors : undefined,
+      errors:
+        errors.filter((e) => e.startsWith("X API")).length > 0
+          ? errors.filter((e) => e.startsWith("X API"))
+          : undefined,
     };
     await writeFile(
       join(SCRIPT_DIR, "..", "feed-x.json"),
@@ -1132,7 +1394,9 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error("Feed generation failed:", err.message);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error("Feed generation failed:", err.message);
+    process.exit(1);
+  });
+}
