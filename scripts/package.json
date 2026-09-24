@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "generate-feed": "node generate-feed.js",
-    "prepare-digest": "node prepare-digest.js"
+    "prepare-digest": "node prepare-digest.js",
+    "test": "node --test ../tests/prepare-digest.test.mjs ../tests/podcast-state.test.mjs ../tests/skill-contract.test.mjs"
   },
   "dependencies": {
     "dotenv": "^16.4.0",
