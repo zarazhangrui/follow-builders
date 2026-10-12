@@ -19,6 +19,7 @@ WhatsApp, etc.) with:
 - Full articles from official AI company blogs (Anthropic Engineering, Claude Blog)
 - Links to all original content
 - Available in English, Chinese, or bilingual
+- Optional Feishu interactive cards for cleaner mobile reading
 
 ## Quick Start
 

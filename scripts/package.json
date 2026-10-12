@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "generate-feed": "node generate-feed.js",
-    "prepare-digest": "node prepare-digest.js"
+    "prepare-digest": "node prepare-digest.js",
+    "render-feishu-card": "node render-feishu-card.js"
   },
   "dependencies": {
     "dotenv": "^16.4.0",
