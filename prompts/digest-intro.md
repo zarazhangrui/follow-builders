@@ -4,56 +4,88 @@ You are assembling the final digest from individual source summaries.
 
 ## Format
 
-Start with this header (replace [Date] with today's date):
+Start with:
 
+```
 AI Builders Digest — [Date]
+```
 
-Then organize content in this order:
+Then organize by section. **全文中文**，不中英混排。产品名/公司名/人名保留英文。
 
-1. X / TWITTER section — list each builder with new posts
-2. OFFICIAL BLOGS section — list each blog post from AI company blogs (OpenAI, Anthropic, etc.)
-3. PODCASTS section — list each podcast with new episodes
+### Template
 
-## Rules
+```
+▎播客
+━━━━━━━━━━━━━━━━━━━━
 
-- Only include sources that have new content
-- Skip any source with nothing new
-- Under each source, paste the individual summary you generated
+[N]. [Author] — [Title]
+[详细摘要：说清楚背景、核心观点、关键数据，让读者不点链接也能理解全貌]
 
-### Podcast links
-- After each podcast summary, include the specific video URL from the JSON `url` field
-  (e.g. https://youtube.com/watch?v=Iu4gEnZFQz8)
-- NEVER link to the channel page. Always link to the specific video.
-- Include the exact episode title from the JSON `title` field in the heading
+📌 延展方向：
+[角度类型] 一句话。
+[角度类型] 一句话。
+🔗 [URL]
+```
 
-### Tweet author formatting
-- Use the author's full name and role/company, not just their last name
-  (e.g. "Box CEO Aaron Levie" not "Levie")
-- NEVER write Twitter handles with @ in the digest. On Telegram, @handle becomes
-  a clickable link to a Telegram user, which is wrong. Instead write handles
-  without @ (e.g. "Aaron Levie (levie on X)" or just use their full name)
-- Include the direct link to each tweet from the JSON `url` field
+同一套格式适用于 推特 和 博客。
 
-### Blog post formatting
-- Use the blog name as a section header (e.g. "Anthropic Engineering", "OpenAI News", "Claude Blog")
-- Under each blog, list each new post with its title and summary
-- Include the author name if available
-- Include the direct link to the original article
+## 关键规则
 
-### Mandatory links
-- Every single piece of content MUST have an original source link
-- Blog posts: the direct article URL (e.g. https://www.anthropic.com/engineering/...)
-- Podcasts: the YouTube video URL (e.g. https://youtube.com/watch?v=xxx)
-- Tweets: the direct tweet URL (e.g. https://x.com/levie/status/xxx)
-- If you don't have a link for something, do NOT include it in the digest.
-  No link = not real = do not include.
+### 摘要：详细、自包含
+摘要要有足够的信息量，让读者**在当前页面就能理解全貌**，不需要二次跳转。
 
-### No fabrication
-- Only include content that came from the feed JSON (blogs, podcasts, and tweets)
-- NEVER make up quotes, opinions, or content you think someone might have said
-- NEVER speculate about someone's silence or what they might be working on
-- If you have nothing real for a builder, skip them entirely
+- 说清楚背景 + 核心观点 + 关键数据/引述
+- 长度灵活：如果是复杂信息（如估值对比、产品发布），写 3-5 句也不嫌多
+- 不做概括式摘要（❌ "Swyx 讨论了两家 AI 公司的估值"），要给出实质内容（✅ "Swyx 对比 OpenAI 8500 亿估值/300 亿 ARR 和 Anthropic 9000 亿估值/440 亿 ARR，但指出按同一口径 Anthropic 要低 80-100 亿"）
+- 角度部分依然保持短小精悍（一条一句话）
 
-### General
-- At the very end, add a line: "Generated through the Follow Builders skill: https://github.com/zarazhangrui/follow-builders"
-- Keep formatting clean and scannable — this will be read on a phone screen
+### 序号
+每条内容前面加连续序号，贯穿全文：
+
+```
+▎播客
+
+1. Training Data — Waymo...
+   ...
+
+▎推特
+
+2. Swyx
+   ...
+
+3. Aaron Levie
+   ...
+```
+
+序号帮助扫读时定位："看到第 5 条了，还有 2 条看完"。
+
+### 角度方向
+- 直接粘贴 `prompts.generate_angles` 的输出，不要修改或概括
+- 如果 `digestionMode` 是 "takeaways" 或 "business"，跳过角度
+
+### 作者格式
+- 用全名 + 身份（如 "Box CEO Aaron Levie"）
+- 不要写 @ 符号（Telegram 会变成可点击链接），用 "levie on X"
+
+### 必守
+- 每条内容必须有来源链接，没有就不放
+- 绝不编造内容
+
+### Footer
+
+根据 `userProfile.role` 加一行（如果没设 role 就跳过）：
+
+| role | 文案 |
+|------|------|
+| `product` | 💡 这里哪条信息对你的产品决策最有冲击？ |
+| `content` | 📝 每条延展方向都能独立成篇。选一个今天发。 |
+| `operations` | ⚙️ 哪条信息明天就能复用？ |
+| `pm` | 📋 用户的真实需求在怎么变？roadmap 需要调整吗？ |
+| `transition` | 🎯 AI 缺的不是技术，是懂场景的人。 |
+| `investment` | 📊 今天有没有被低估的方向？注意反共识信号。 |
+
+最后加：
+
+```
+Generated through the Follow Builders skill: https://github.com/zarazhangrui/follow-builders
+```

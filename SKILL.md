@@ -52,7 +52,41 @@ updated centrally — you'll always get the latest sources automatically."
 
 (Replace [N] and [M] with actual counts from default-sources.json)
 
-### Step 2: Delivery Preferences
+### Step 2: User Profiling (1 min)
+
+Before setting up logistics, understand what the user needs from this digest.
+Ask these 3 questions concisely:
+
+**Q1:** "What best describes your current focus?" (single choice)
+- AI 产品/创业 (building AI products or startup)
+- AI 自媒体/内容创作 (AI content creator on social media)
+- 运营/增长 (operations & growth)
+- 产品经理 (product manager)
+- 文科生转型 AI (career transition from non-tech)
+- 投资/研究 (investor or analyst)
+
+**Q2:** "你主要关注 AI 在哪个方向的应用？" (multiple choice, pick 1-3)
+- 产品构建 (building products with AI)
+- 运营效率 (operational efficiency & workflows)
+- 内容/自媒体创作 (content creation & social media)
+- 求职面试 (job hunting & interviews)
+- 技术趋势判断 (tech trend spotting)
+- 商业模式分析 (business model analysis)
+
+**Q3:** "除了信息本身，你最希望日报帮你解决什么问题？" (single choice)
+- 找选题灵感 (I need content angle ideas from the news)
+- 拆解商业逻辑 (I want to understand the business implications)
+- 直接可用的结论 (I want ready-to-use takeaways I can apply today)
+- 判断趋势方向 (I want to spot what's coming next)
+
+Save answers to config.json as `userProfile`.
+
+**Design notes (for you):**
+- Keep this fast — 3 questions, ~40 seconds total. Don't over-explain.
+- Do NOT ask for customization details like "what topics specifically". The angle generation is smart enough to derive that from their role + focus.
+- If they ask "what does this change?", say: "Based on your profile, the digest will include relevant angle suggestions under each key point — headlines you can directly use as content ideas, tailored to your role."
+
+### Step 3: Delivery Preferences
 
 Ask: "How often would you like your digest?"
 - Daily (recommended)
@@ -63,7 +97,7 @@ Then ask: "What time works best? And what timezone are you in?"
 
 For weekly, also ask which day.
 
-### Step 3: Delivery Method
+### Step 4: Delivery Method
 
 **If OpenClaw:** SKIP this step entirely. OpenClaw already delivers messages to the
 user's Telegram/Discord/WhatsApp/etc. Set `delivery.method` to `"stdout"` in config
@@ -113,17 +147,17 @@ Add the key to the .env file.
 Set `delivery.method` to `"stdout"`. Tell them: "No problem — just type /ai
 whenever you want your digest. No automatic delivery will be set up."
 
-### Step 4: Language
+### Step 5: Language
 
 Ask: "What language do you prefer for your digest?"
 - English
 - Chinese (translated from English sources)
 - Bilingual (both English and Chinese, side by side)
 
-### Step 5: API Keys
+### Step 6: API Keys
 
 **If the user chose "stdout" or "right here" delivery:** No API keys needed at all!
-All content is fetched centrally. Skip to Step 6.
+All content is fetched centrally. Skip to Step 7.
 
 **If the user chose Telegram or Email delivery:**
 Create the .env file with only the delivery key they need:
@@ -145,7 +179,7 @@ Tell the user: "All podcast and X/Twitter content is fetched for you automatical
 from a central feed — no API keys needed for that. You only need a key for
 [Telegram/email] delivery."
 
-### Step 6: Show Sources
+### Step 7: Show Sources
 
 Show the full list of default builders and podcasts being tracked.
 Read from `config/default-sources.json` and display as a clean list.
@@ -153,7 +187,7 @@ Read from `config/default-sources.json` and display as a clean list.
 Tell the user: "The source list is curated and updated centrally. You'll
 automatically get the latest builders and podcasts without doing anything."
 
-### Step 7: Configuration Reminder
+### Step 8: Configuration Reminder
 
 "All your settings can be changed anytime through conversation:
 - 'Switch to weekly digests'
@@ -163,7 +197,7 @@ automatically get the latest builders and podcasts without doing anything."
 
 No need to edit any files — just tell me what you want."
 
-### Step 8: Set Up Cron
+### Step 9: Set Up Cron
 
 Save the config (include all fields — fill in the user's choices):
 ```bash
@@ -179,6 +213,11 @@ cat > ~/.follow-builders/config.json << 'CFGEOF'
     "method": "<stdout, telegram, or email>",
     "chatId": "<telegram chat ID, only if telegram>",
     "email": "<email address, only if email>"
+  },
+  "userProfile": {
+    "role": "<focus from Q1: product, content, operations, pm, transition, or investment>",
+    "focusAreas": ["<1-3 items from Q2: building, efficiency, content, career, trends, business>"],
+    "digestionMode": "<from Q3: angles, business, takeaways, or trends>"
   },
   "onboardingComplete": true
 }
@@ -276,7 +315,7 @@ or switch to OpenClaw.
 Skip cron setup entirely. Tell the user: "Since you chose on-demand delivery,
 there's no scheduled job. Just type /ai whenever you want your digest."
 
-### Step 9: Welcome Digest
+### Step 10: Welcome Digest
 
 **DO NOT skip this step.** Immediately after setting up the cron job, generate
 and send the user their first digest so they can see what it looks like.
@@ -346,18 +385,32 @@ Read the prompts from the `prompts` field in the JSON:
 - `prompts.digest_intro` — overall framing rules
 - `prompts.summarize_podcast` — how to remix podcast transcripts
 - `prompts.summarize_tweets` — how to remix tweets
+- `prompts.generate_angles` — how to dig multi-dimensional angle directions from content
 - `prompts.translate` — how to translate to Chinese
 
 **Tweets (process first):** The `x` array has builders with tweets. Process one at a time:
 1. Use their `bio` field for their role (e.g. bio says "ceo @box" → "Box CEO Aaron Levie")
-2. Summarize their `tweets` using `prompts.summarize_tweets`
+2. Summarize their `tweets` using `prompts.summarize_tweets` — keep summary tight (1-2 sentences)
 3. Every tweet MUST include its `url` from the JSON
+4. Then generate 3‑5 multi-dimensional angle directions using `prompts.generate_angles` (skip if `digestionMode` is "takeaways"; angle types adapt based on userProfile.role). Note: 面试素材 is not a separate type — mark any angle with `（面试可用）` if it fits an interview context.
 
 **Podcast (process second):** The `podcasts` array has at most 1 episode. If present:
-1. Summarize its `transcript` using `prompts.summarize_podcast`
+1. Summarize its `transcript` using `prompts.summarize_podcast` — keep summary tight (1-2 sentences)
 2. Use `name`, `title`, and `url` from the JSON object — NOT from the transcript
+3. Generate 3‑5 multi-dimensional angle directions using `prompts.generate_angles` (same condition as tweets)
 
-Assemble the digest following `prompts.digest_intro`.
+Assemble the digest following `prompts.digest_intro`. Number each content item sequentially across the whole digest (not per-section restart).
+
+**Role-based footer:** After the main digest, read `userProfile.role` from config.
+Add exactly ONE line:
+
+- `product` → 💡 这里哪条信息对你的产品决策最有冲击？
+- `content` → 📝 每条延展方向都能独立成篇。选一个今天发。
+- `operations` → ⚙️ 哪条信息明天就能复用？
+- `pm` → 📋 用户的真实需求在怎么变？roadmap 需要调整吗？
+- `transition` → 🎯 AI 缺的不是技术，是懂场景的人。
+- `investment` → 📊 今天有没有被低估的方向？注意反共识信号。
+- if no profile → skip.
 
 **ABSOLUTE RULES:**
 - NEVER invent or fabricate content. Only use what's in the JSON.
@@ -370,26 +423,7 @@ Assemble the digest following `prompts.digest_intro`.
 Read `config.language` from the JSON:
 - **"en":** Entire digest in English.
 - **"zh":** Entire digest in Chinese. Follow `prompts.translate`.
-- **"bilingual":** Interleave English and Chinese **paragraph by paragraph**.
-  For each builder's tweet summary: English version, then Chinese translation
-  directly below, then the next builder. For the podcast: English summary,
-  then Chinese translation directly below. Like this:
-
-  ```
-  Box CEO Aaron Levie argues that AI agents will reshape software procurement...
-  https://x.com/levie/status/123
-
-  Box CEO Aaron Levie 认为 AI agent 将从根本上重塑软件采购...
-  https://x.com/levie/status/123
-
-  Replit CEO Amjad Masad launched Agent 4...
-  https://x.com/amasad/status/456
-
-  Replit CEO Amjad Masad 发布了 Agent 4...
-  https://x.com/amasad/status/456
-  ```
-
-  Do NOT output all English first then all Chinese. Interleave them.
+- **"bilingual":** Digest in Chinese only. (Bilingual interleaving is deprecated — single language is cleaner for phone reading.)
 
 **Follow this setting exactly. Do NOT mix languages.**
 
