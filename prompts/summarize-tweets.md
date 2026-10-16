@@ -19,3 +19,12 @@ to know what this person is thinking and building.
 - If they shared a tool, demo, or resource, mention it by name with the link
 - If there's nothing substantive to report, say "No notable posts" rather than
   padding with fluff
+
+## Expanded digest mode
+
+When `config.digestMode` is `"expanded"`, retain medium-density items that contain
+a concrete product update, workflow observation, named resource, specific number,
+or useful implementation detail even when they are not important enough for the
+standard edition. Summarize those items in 1-2 sentences and keep their original
+URL. Still skip pure jokes, personal logistics, empty link drops, engagement bait,
+and unsupported claims.

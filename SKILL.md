@@ -15,6 +15,10 @@ Philosophy: follow builders with original opinions, not influencers who regurgit
 (X/Twitter posts and YouTube transcripts) is fetched centrally and served via
 a public feed. Users only need API keys if they choose Telegram or email delivery.
 
+The central feed is generated from `config/default-sources.json`. GitHub Actions
+refreshes it daily at 07:17 Asia/Shanghai and also refreshes it when the central
+source registry changes.
+
 ## Detecting Platform
 
 Before doing anything, detect which platform you're running on by running:
@@ -173,6 +177,7 @@ cat > ~/.follow-builders/config.json << 'CFGEOF'
   "language": "<en, zh, or bilingual>",
   "timezone": "<IANA timezone>",
   "frequency": "<daily or weekly>",
+  "digestMode": "<standard or expanded>",
   "deliveryTime": "<HH:MM>",
   "weeklyDay": "<day of week, only if weekly>",
   "delivery": {
@@ -321,6 +326,11 @@ You do NOT fetch anything yourself.
 cd ${CLAUDE_SKILL_DIR}/scripts && node prepare-digest.js 2>/dev/null
 ```
 
+Use `node prepare-digest.js --expanded` for the expanded edition, which keeps
+more medium-density product, workflow, tool, and early-signal updates. The same
+edition can be selected persistently with `"digestMode": "expanded"` in
+`~/.follow-builders/config.json`; the default remains `standard`.
+
 The script outputs a single JSON blob with everything you need:
 - `config` — user's language and delivery preferences
 - `podcasts` — podcast episodes with full transcripts
@@ -358,6 +368,10 @@ Read the prompts from the `prompts` field in the JSON:
 2. Use `name`, `title`, and `url` from the JSON object — NOT from the transcript
 
 Assemble the digest following `prompts.digest_intro`.
+
+The prepare script has already selected `prompts.digest_intro` for the requested
+edition. Follow `config.digestMode` and do not silently switch between standard
+and expanded output.
 
 **ABSOLUTE RULES:**
 - NEVER invent or fabricate content. Only use what's in the JSON.
@@ -397,15 +411,31 @@ Read `config.language` from the JSON:
 
 Read `config.delivery.method` from the JSON:
 
+First write the final digest text to `/tmp/fb-digest.md`, then call
+`deliver.js`. The delivery script always exports a Markdown copy before sending.
+Default export path:
+
+```text
+data/YYYY-MM-DD/digest.md
+```
+
+Expanded output defaults to `data/YYYY-MM-DD/digest-expanded.md`.
+
+Use `--output <path>` only when the user explicitly asks for a custom export
+file or directory. If `<path>` has no file extension, treat it as a directory and
+save `digest.md` inside it.
+
 **If "telegram" or "email":**
 ```bash
-echo '<your digest text>' > /tmp/fb-digest.txt
-cd ${CLAUDE_SKILL_DIR}/scripts && node deliver.js --file /tmp/fb-digest.txt 2>/dev/null
+cd ${CLAUDE_SKILL_DIR}/scripts && node deliver.js --file /tmp/fb-digest.md 2>/dev/null
 ```
 If delivery fails, show the digest in the terminal as fallback.
 
 **If "stdout" (default):**
-Just output the digest directly.
+```bash
+cd ${CLAUDE_SKILL_DIR}/scripts && node deliver.js --file /tmp/fb-digest.md
+```
+Then show the digest text to the user and mention the saved Markdown path.
 
 ---
 
@@ -414,15 +444,25 @@ Just output the digest directly.
 When the user says something that sounds like a settings change, handle it:
 
 ### Source Changes
-The source list is managed centrally and cannot be modified by users.
-If a user asks to add or remove sources, tell them: "The source list is curated
-centrally and updates automatically. If you'd like to suggest a source, you can
-open an issue at https://github.com/zarazhangrui/follow-builders."
+The central source registry is `config/default-sources.json`. When maintaining
+this repository, add or remove sources there, validate the JSON, and commit and
+push that file. The GitHub Action then regenerates the central feed; editing only
+`~/.follow-builders/config.json` or generated `feed-*.json` does not publish a
+source change. For a suggestion without repository access, open an issue at
+https://github.com/zarazhangrui/follow-builders.
+
+The registry currently contains 36 X builders, 6 podcasts, and 4 official blogs.
 
 ### Schedule Changes
 - "Switch to weekly/daily" → Update `frequency` in config.json
 - "Change time to X" → Update `deliveryTime` in config.json
 - "Change timezone to X" → Update `timezone` in config.json, also update the cron job
+
+### Digest Edition Changes
+- "Show the expanded digest" → Run `node prepare-digest.js --expanded` and pass
+  `--expanded` to `deliver.js` when exporting it
+- "Use expanded digest by default" → Set `digestMode` to `expanded` in config.json
+- "Use the concise digest" → Set `digestMode` to `standard` or pass `--standard`
 
 ### Language Changes
 - "Switch to Chinese/English/bilingual" → Update `language` in config.json

@@ -11,7 +11,7 @@
 每日或每周推送到你常用的通讯工具（Telegram、Discord、WhatsApp 等），包含：
 
 - 顶级 AI 播客新节目的精华摘要
-- 26 位精选 AI 建造者在 X/Twitter 上的关键观点和洞察
+- 36 位精选 AI 建造者在 X/Twitter 上的关键观点和洞察
 - AI 公司官方博客的完整文章（Anthropic Engineering、Claude Blog）
 - 所有原始内容的链接
 - 支持英文、中文或双语版本
@@ -54,7 +54,17 @@ Skill 使用纯文本 prompt 文件来控制内容的摘要方式。你可以通
 - `summarize-tweets.md` — X/Twitter 帖子的摘要方式
 - `summarize-blogs.md` — 博客文章的摘要方式
 - `digest-intro.md` — 整体摘要的格式和语气
+- `digest-intro-expanded.md` — 扩展版摘要规则，保留更多中等信息密度动态
 - `translate.md` — 英文内容翻译为中文的方式
+
+显式生成扩展版：
+
+```bash
+node scripts/prepare-digest.js --expanded
+node scripts/deliver.js --file /tmp/fb-digest-expanded.md --expanded
+```
+
+扩展版默认保存为 `data/YYYY-MM-DD/digest-expanded.md`。
 
 这些都是纯文本指令，不是代码。修改后下次推送即生效。
 
@@ -68,8 +78,8 @@ Skill 使用纯文本 prompt 文件来控制内容的摘要方式。你可以通
 - [The MAD Podcast with Matt Turck](https://www.youtube.com/@DataDrivenNYC)
 - [AI & I by Every](https://www.youtube.com/playlist?list=PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL)
 
-### X 上的 AI 建造者（26位）
-[Andrej Karpathy](https://x.com/karpathy), [Swyx](https://x.com/swyx), [Josh Woodward](https://x.com/joshwoodward), [Boris Cherny](https://x.com/bcherny), [Thibault Sottiaux](https://x.com/thsottiaux), [Peter Yang](https://x.com/petergyang), [Nan Yu](https://x.com/thenanyu), [Madhu Guru](https://x.com/realmadhuguru), [Amanda Askell](https://x.com/AmandaAskell), [Cat Wu](https://x.com/_catwu), [Thariq](https://x.com/trq212), [Google Labs](https://x.com/GoogleLabs), [Amjad Masad](https://x.com/amasad), [Guillermo Rauch](https://x.com/rauchg), [Alex Albert](https://x.com/alexalbert__), [Aaron Levie](https://x.com/levie), [Ryo Lu](https://x.com/ryolu_), [Garry Tan](https://x.com/garrytan), [Matt Turck](https://x.com/mattturck), [Zara Zhang](https://x.com/zarazhangrui), [Nikunj Kothari](https://x.com/nikunj), [Peter Steinberger](https://x.com/steipete), [Dan Shipper](https://x.com/danshipper), [Aditya Agarwal](https://x.com/adityaag), [Sam Altman](https://x.com/sama), [Claude](https://x.com/claudeai)
+### X 上的 AI 建造者（36位）
+[Andrej Karpathy](https://x.com/karpathy), [Swyx](https://x.com/swyx), [Josh Woodward](https://x.com/joshwoodward), [Boris Cherny](https://x.com/bcherny), [Thibault Sottiaux](https://x.com/thsottiaux), [Kevin Weil](https://x.com/kevinweil), [OpenAI Developers](https://x.com/OpenAIDevs), [Anthropic](https://x.com/AnthropicAI), [Peter Yang](https://x.com/petergyang), [Nan Yu](https://x.com/thenanyu), [Madhu Guru](https://x.com/realmadhuguru), [Amanda Askell](https://x.com/AmandaAskell), [Cat Wu](https://x.com/_catwu), [Thariq](https://x.com/trq212), [Google Labs](https://x.com/GoogleLabs), [Amjad Masad](https://x.com/amasad), [Guillermo Rauch](https://x.com/rauchg), [Alex Albert](https://x.com/alexalbert__), [Aaron Levie](https://x.com/levie), [Ryo Lu](https://x.com/ryolu_), [Garry Tan](https://x.com/garrytan), [Matt Turck](https://x.com/mattturck), [Zara Zhang](https://x.com/zarazhangrui), [Nikunj Kothari](https://x.com/nikunj), [Peter Steinberger](https://x.com/steipete), [Dan Shipper](https://x.com/danshipper), [Aditya Agarwal](https://x.com/adityaag), [Sam Altman](https://x.com/sama), [Claude](https://x.com/claudeai), [Matt Van Horn](https://x.com/mvanhorn), [Simon Willison](https://x.com/simonw), [Harrison Chase](https://x.com/hwchase17), [Cognition](https://x.com/cognition_labs), [Cursor](https://x.com/cursor_ai), [LangChain](https://x.com/LangChainAI), [LlamaIndex](https://x.com/llama_index)
 
 ### 官方博客（2个）
 - [Anthropic Engineering](https://www.anthropic.com/engineering) — Anthropic 团队的技术深度文章
@@ -105,7 +115,19 @@ cd ~/.claude/skills/follow-builders/scripts && npm install
 1. 中心化 feed 每日更新，抓取所有信息源的最新内容（博客文章通过网页抓取，YouTube 字幕通过 Supadata，X/Twitter 通过官方 API）
 2. 你的 agent 获取 feed——一次 HTTP 请求，不需要 API key
 3. 你的 agent 根据你的偏好将原始内容重新混编为易消化的摘要
-4. 摘要推送到你的通讯工具（或直接在聊天中显示）
+4. 摘要保存为 Markdown，并推送到你的通讯工具（或直接在聊天中显示）
+
+每次生成的摘要默认会导出到：
+
+```text
+data/YYYY-MM-DD/digest.md
+```
+
+高级用户也可以在调用投递脚本时指定导出位置：
+
+```bash
+node scripts/deliver.js --file /tmp/fb-digest.md --output data/2026-05-12
+```
 
 查看 [examples/sample-digest.md](examples/sample-digest.md) 了解输出示例。
 
