@@ -42,15 +42,23 @@ const PROMPT_FILES = [
 // -- Fetch helpers -----------------------------------------------------------
 
 async function fetchJSON(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
 }
 
 async function fetchText(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.text();
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return res.text();
+  } catch {
+    return null;
+  }
 }
 
 // -- Main --------------------------------------------------------------------
@@ -136,6 +144,14 @@ async function main() {
   }
 
   // 4. Build the output — everything the LLM needs in one blob
+  const localFeedDir = join(scriptDir, '..');
+  const localFeedX = existsSync(join(localFeedDir, 'feed-x.json')) ? JSON.parse(await readFile(join(localFeedDir, 'feed-x.json'), 'utf-8')) : null;
+  const localFeedPodcasts = existsSync(join(localFeedDir, 'feed-podcasts.json')) ? JSON.parse(await readFile(join(localFeedDir, 'feed-podcasts.json'), 'utf-8')) : null;
+  const localFeedBlogs = existsSync(join(localFeedDir, 'feed-blogs.json')) ? JSON.parse(await readFile(join(localFeedDir, 'feed-blogs.json'), 'utf-8')) : null;
+  const effectiveFeedX = feedX || localFeedX;
+  const effectiveFeedPodcasts = feedPodcasts || localFeedPodcasts;
+  const effectiveFeedBlogs = feedBlogs || localFeedBlogs;
+
   const output = {
     status: 'ok',
     generatedAt: new Date().toISOString(),
@@ -148,17 +164,17 @@ async function main() {
     },
 
     // Content to remix
-    podcasts: feedPodcasts?.podcasts || [],
-    x: feedX?.x || [],
-    blogs: feedBlogs?.blogs || [],
+    podcasts: effectiveFeedPodcasts?.podcasts || [],
+    x: effectiveFeedX?.x || [],
+    blogs: effectiveFeedBlogs?.blogs || [],
 
     // Stats for the LLM to reference
     stats: {
-      podcastEpisodes: feedPodcasts?.podcasts?.length || 0,
-      xBuilders: feedX?.x?.length || 0,
-      totalTweets: (feedX?.x || []).reduce((sum, a) => sum + a.tweets.length, 0),
-      blogPosts: feedBlogs?.blogs?.length || 0,
-      feedGeneratedAt: feedX?.generatedAt || feedPodcasts?.generatedAt || feedBlogs?.generatedAt || null
+      podcastEpisodes: effectiveFeedPodcasts?.podcasts?.length || 0,
+      xBuilders: effectiveFeedX?.x?.length || 0,
+      totalTweets: (effectiveFeedX?.x || []).reduce((sum, a) => sum + a.tweets.length, 0),
+      blogPosts: effectiveFeedBlogs?.blogs?.length || 0,
+      feedGeneratedAt: effectiveFeedX?.generatedAt || effectiveFeedPodcasts?.generatedAt || effectiveFeedBlogs?.generatedAt || null
     },
 
     // Prompts — the LLM reads these and follows the instructions
