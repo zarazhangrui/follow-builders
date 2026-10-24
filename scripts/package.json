@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "generate-feed": "node generate-feed.js",
-    "prepare-digest": "node prepare-digest.js"
+    "prepare-digest": "node prepare-digest.js",
+    "sync-plugin-skill": "node sync-plugin-skill.js",
+    "check-plugin-skill": "node sync-plugin-skill.js --check",
+    "test": "node --test"
   },
   "dependencies": {
-    "dotenv": "^16.4.0",
     "proper-lockfile": "^4.1.0"
   }
 }
