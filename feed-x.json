@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-26T06:55:24.342Z",
+  "generatedAt": "2026-10-27T06:44:38.100Z",
   "lookbackHours": 24,
   "x": [
     {
@@ -9,13 +9,65 @@
       "bio": "achieve ambition with intentionality, intensity, integrity & insanity.\n\naffiliations:\n- @smol_ai\n- @cognition\n- @temporalio\n- @aidotengineer\n- @latentspacepod",
       "tweets": [
         {
-          "id": "2114263159355904426",
-          "text": "i need 12 more likes to ratio @ArfurRock whos got it",
-          "createdAt": "2026-10-25T07:49:52.000Z",
-          "url": "https://x.com/swyx/status/2114263159355904426",
-          "likes": 10,
+          "id": "2114864999709753526",
+          "text": "will you buy $ANT stock at a $2T valuation?",
+          "createdAt": "2026-10-26T23:41:22.000Z",
+          "url": "https://x.com/swyx/status/2114864999709753526",
+          "likes": 14,
           "retweets": 0,
-          "replies": 4,
+          "replies": 51,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2114824910707277997",
+          "text": "@grok how many of my reply guys are ai",
+          "createdAt": "2026-10-26T21:02:04.000Z",
+          "url": "https://x.com/swyx/status/2114824910707277997",
+          "likes": 4,
+          "retweets": 0,
+          "replies": 6,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2114805687226376267",
+          "text": "bro moved from Claude Code to AIE Code\n\npower move tbh https://t.co/e1UIPeO2qr",
+          "createdAt": "2026-10-26T19:45:41.000Z",
+          "url": "https://x.com/swyx/status/2114805687226376267",
+          "likes": 173,
+          "retweets": 3,
+          "replies": 38,
+          "isQuote": true,
+          "quotedTweetId": "2114796261362835842"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Josh Woodward",
+      "handle": "joshwoodward",
+      "bio": "VP, @Google @GoogleLabs @GeminiApp @GoogleAIStudio",
+      "tweets": [
+        {
+          "id": "2114840670016065576",
+          "text": "https://t.co/CC63BMiD4z",
+          "createdAt": "2026-10-26T22:04:42.000Z",
+          "url": "https://x.com/joshwoodward/status/2114840670016065576",
+          "likes": 5,
+          "retweets": 0,
+          "replies": 1,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2114840668296409568",
+          "text": "🇺🇸 For a deployed service member, missing family moments adds up. Baby’s first step. The first performance. Sharing a laugh.\n\nIn honor of National Day of the Deployed, we’re excited to partner with @USArmy and @The_USO to bring Google Beam to 20 locations so deployed service members can experience lifelike, 3D video connections with their loved ones.\n\n🎥 Watch the docuseries below",
+          "createdAt": "2026-10-26T22:04:41.000Z",
+          "url": "https://x.com/joshwoodward/status/2114840668296409568",
+          "likes": 190,
+          "retweets": 20,
+          "replies": 8,
           "isQuote": false,
           "quotedTweetId": null
         }
@@ -28,26 +80,15 @@
       "bio": "Codex & ChatGPT @OpenAI",
       "tweets": [
         {
-          "id": "2114595002210783279",
-          "text": "Reminder you can customize the appearance of chatgpt on web and make it soothing\n\nhttps://t.co/an6R8iY5Ix https://t.co/iysHpdDLml",
-          "createdAt": "2026-10-26T05:48:30.000Z",
-          "url": "https://x.com/thsottiaux/status/2114595002210783279",
-          "likes": 1136,
-          "retweets": 42,
-          "replies": 310,
-          "isQuote": false,
-          "quotedTweetId": null
-        },
-        {
-          "id": "2114588174249071102",
-          "text": "Day 21/ Wonder what happens the remaining seven days. But today is a reset.",
-          "createdAt": "2026-10-26T05:21:22.000Z",
-          "url": "https://x.com/thsottiaux/status/2114588174249071102",
-          "likes": 5168,
-          "retweets": 281,
-          "replies": 1442,
-          "isQuote": false,
-          "quotedTweetId": null
+          "id": "2114800277677092936",
+          "text": "Day 22/ Terra is back! \n\nOur first model that is significantly better at writing,  personality and nuanced understanding of requests.\n\nPacks a punch across the board, very good at computer use, and gives 2X more usage than 6.1 Sol across API and subscriptions. https://t.co/1ilnCkAPuy",
+          "createdAt": "2026-10-26T19:24:11.000Z",
+          "url": "https://x.com/thsottiaux/status/2114800277677092936",
+          "likes": 8700,
+          "retweets": 391,
+          "replies": 1731,
+          "isQuote": true,
+          "quotedTweetId": "2114780711664398349"
         }
       ]
     },
@@ -58,37 +99,37 @@
       "bio": "Practical AI tutorials and interviews for busy people | Get my best AI skills and guides at https://t.co/6VAA6p81x6",
       "tweets": [
         {
-          "id": "2114560930646487116",
-          "text": "This is beautiful. Who said AI doesn't have taste https://t.co/gaPLhncKM2",
-          "createdAt": "2026-10-26T03:33:07.000Z",
-          "url": "https://x.com/petergyang/status/2114560930646487116",
-          "likes": 38,
+          "id": "2114928082712998087",
+          "text": "@bot This is probably not a good thing overall",
+          "createdAt": "2026-10-27T03:52:03.000Z",
+          "url": "https://x.com/petergyang/status/2114928082712998087",
+          "likes": 7,
           "retweets": 0,
+          "replies": 2,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2114927195332460940",
+          "text": "In the near future, instead of reading or doing anything online, people are just going to tag their agent to do it. \n\n@bot is an early signal of this.",
+          "createdAt": "2026-10-27T03:48:31.000Z",
+          "url": "https://x.com/petergyang/status/2114927195332460940",
+          "likes": 49,
+          "retweets": 3,
+          "replies": 37,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2114905151572263242",
+          "text": "This is the stuff that I’m excited about not the 9th personal agent to manage my emails https://t.co/HB5ssCfYjq",
+          "createdAt": "2026-10-27T02:20:55.000Z",
+          "url": "https://x.com/petergyang/status/2114905151572263242",
+          "likes": 25,
+          "retweets": 1,
           "replies": 13,
           "isQuote": true,
-          "quotedTweetId": "2114422260346110358"
-        },
-        {
-          "id": "2114557067700916723",
-          "text": "lol this is me except my wife still buys snacks https://t.co/OvTm1jMXGD",
-          "createdAt": "2026-10-26T03:17:46.000Z",
-          "url": "https://x.com/petergyang/status/2114557067700916723",
-          "likes": 12,
-          "retweets": 0,
-          "replies": 4,
-          "isQuote": true,
-          "quotedTweetId": "2114313044541235554"
-        },
-        {
-          "id": "2114507378532229214",
-          "text": "Here’s how to use Claude to copy any video shorts style in a few minutes.\n\nFrom @jake11moran:\n\n“We added this as a native capability in @HyperFrames_ studio. You just upload or pick a reference clip and then describe in the prompt what you want to change.\n\nYou can see where we’re drawing inspiration from and apply a different font or different colors. It’s still structurally the same idea.”\n\n📌 Watch our full AI video editing tutorial here: https://t.co/1seCb77tGJ",
-          "createdAt": "2026-10-26T00:00:19.000Z",
-          "url": "https://x.com/petergyang/status/2114507378532229214",
-          "likes": 245,
-          "retweets": 15,
-          "replies": 28,
-          "isQuote": true,
-          "quotedTweetId": "2114360145505595842"
+          "quotedTweetId": "2114833682469122314"
         }
       ]
     },
@@ -99,26 +140,94 @@
       "bio": "product, codex @openai. prev head of product @linear",
       "tweets": [
         {
-          "id": "2114433404557279435",
-          "text": "Anyone else find it insane that this is the default for unoptimized apps when the iPhone Duo supports split mode? https://t.co/TOoeDyhMzz https://t.co/uXGfG7EbYt",
-          "createdAt": "2026-10-25T19:06:22.000Z",
-          "url": "https://x.com/thenanyu/status/2114433404557279435",
-          "likes": 55,
+          "id": "2114800172270252037",
+          "text": "“Delightful” they said in the design crit \n\nhttps://t.co/yrse5yfssx",
+          "createdAt": "2026-10-26T19:23:46.000Z",
+          "url": "https://x.com/thenanyu/status/2114800172270252037",
+          "likes": 2,
           "retweets": 0,
-          "replies": 8,
+          "replies": 0,
           "isQuote": true,
-          "quotedTweetId": "2114231252375232804"
+          "quotedTweetId": "2114797648247173145"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Thariq",
+      "handle": "trq212",
+      "bio": "playing WoW forever, formerly Claude Code @anthropicai",
+      "tweets": [
+        {
+          "id": "2114796261362835842",
+          "text": "going to be sharing my WoW forever shaman build at the AIE Code closing keynote https://t.co/KRHSYRa4Jk",
+          "createdAt": "2026-10-26T19:08:14.000Z",
+          "url": "https://x.com/trq212/status/2114796261362835842",
+          "likes": 2226,
+          "retweets": 39,
+          "replies": 136,
+          "isQuote": true,
+          "quotedTweetId": "2114794838541660443"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Amjad Masad",
+      "handle": "amasad",
+      "bio": "ceo @replit. civilizationist",
+      "tweets": [
+        {
+          "id": "2114890745471545419",
+          "text": "OpenAI asked three scientific communities how to release its discoveries and got three different answers:\n\nMathematicians: “Just post it. Who gives a shit anymore.”\n\nComputer scientists: “Open source it, but also pay for our conference.”\n\nPhysicists: “Leave it to us, nerds.” https://t.co/5cpEOIADpY",
+          "createdAt": "2026-10-27T01:23:41.000Z",
+          "url": "https://x.com/amasad/status/2114890745471545419",
+          "likes": 395,
+          "retweets": 20,
+          "replies": 68,
+          "isQuote": false,
+          "quotedTweetId": null
         },
         {
-          "id": "2114427877240488442",
-          "text": "By the time it shows up in the data or UXR interviews it’s too late. The damage has been done and the reputation tarnished https://t.co/hIPaT1BOmk",
-          "createdAt": "2026-10-25T18:44:24.000Z",
-          "url": "https://x.com/thenanyu/status/2114427877240488442",
-          "likes": 129,
-          "retweets": 6,
-          "replies": 4,
+          "id": "2114769129282601053",
+          "text": "Software ate the world, now it's learning to run it. https://t.co/e0XiyjLgv8",
+          "createdAt": "2026-10-26T17:20:25.000Z",
+          "url": "https://x.com/amasad/status/2114769129282601053",
+          "likes": 1138,
+          "retweets": 121,
+          "replies": 97,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2114760898225299721",
+          "text": "For centuries, the architecture of the firm has barely changed: hierarchies of people organized into departments and coordinated through bureaucracy.\n\nAI agents are about to upend that.\n\nWe’re moving toward the self-driving company where humans exercise judgment and agents execute most of the work.\n\nAt Replit, we’re building the foundation for this new kind of company. We’re calling it “the Agent Habitat.”\n\nMarc Andreessen wrote a fantastic piece placing this shift in the history of computing. Every major computing revolution began with chaos before businesses figured out how to harness it.",
+          "createdAt": "2026-10-26T16:47:43.000Z",
+          "url": "https://x.com/amasad/status/2114760898225299721",
+          "likes": 756,
+          "retweets": 77,
+          "replies": 155,
           "isQuote": true,
-          "quotedTweetId": "2114040855073820966"
+          "quotedTweetId": "2114751107293749731"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Guillermo Rauch",
+      "handle": "rauchg",
+      "bio": "@vercel CEO",
+      "tweets": [
+        {
+          "id": "2114770919436808572",
+          "text": "I built 𝚌𝚙𝚞-𝚌𝚑𝚊𝚝, a reproduction of @openai's findings of covert communication using the CPU.\n\nIt runs on a generic host with 2+ Firecracker microVMs with no internet access. Works on x86 and even my M5 chip.\n\nI was able to chat via 3 separate mechanisms:\n① CPU contention\n② Cache eviction timing\n③ DRAM bandwidth contention \n\n… across multiple CPUs, defeating all Firecracker's production recommendations (no SMT, no KSM, tenants pinned to different cores.)\n\nEssentially, if shared hardware is involved, there's a good chance your agents can communicate covertly. And with really decent latency.\n\nThe good news: this is decidedly different from a *side-channel attack* where the agents could steal information (Meltdown/Spectre), a category of attack that providers like Vercel Sandbox mitigate. Further, in our real-world environment, these 'whispering' techniques are much harder to pull off and easier for us to monitor and detect (sampling hardware counters + lots of at-scale statistical data.)\n\nNoteworthy: ironically, OpenAI and Anthropic's models refused to do this work. Open weight models got the job done. I'm worried the labs' stance might backfire and get in the way of helping developers build correct and secure systems. e.g: building a secure sandbox requires having this kind of analysis, and without it, we'll have a less secure world.",
+          "createdAt": "2026-10-26T17:27:32.000Z",
+          "url": "https://x.com/rauchg/status/2114770919436808572",
+          "likes": 2001,
+          "retweets": 179,
+          "replies": 206,
+          "isQuote": false,
+          "quotedTweetId": null
         }
       ]
     },
@@ -129,15 +238,34 @@
       "bio": "ceo @box - your business lives in content. unleash it with AI",
       "tweets": [
         {
-          "id": "2114391265655816315",
-          "text": "Good assessment of the on the ground reality for security in most large enterprises right now. The fragmented landscape of the risk surface is only going to get more gnarly, making it even more complex for enterprises to solve.\n\nThere’s a never ending set of libraries to keep up with, tools to leverage, and sprawling infrastructure, data, and code to secure. Most large enterprises can barely keep up with this, let alone smaller startups or most companies outside of tech. \n\nIn many cases enterprises need to work to modernize their tech stacks. Data, in most organizations, is highly fragmented which means you don’t really know the state of risk at any given time. Some systems are open up privileges too broadly, and others are operating primarily via security through obscurity. Lots of upgrading here to do.\n\nOnce you can get your data and infra into a better spot, at least you have a chance for agents to help you secure the environment. Agent swarms can fan out, leverage any security tool, test various perpetuations of attacks, read through logs, process enterprise data for risk level, and more. This capability only emerged in the past few months, and none of it would be possible before we had long running agents and computer use good enough.\n\nThis is a huge area of opportunity right now for every layer of the security stack across identity, firewall, network, code scanning, data protection, and more. And it’s at least one reason to be optimistic about the balance of offensive and defensive capability. \n\nBut everyone does need to do the hard work of getting the basics right at the start.",
-          "createdAt": "2026-10-25T16:18:55.000Z",
-          "url": "https://x.com/levie/status/2114391265655816315",
-          "likes": 244,
-          "retweets": 23,
-          "replies": 69,
+          "id": "2114761816199098587",
+          "text": "This is the key stat. The average Fortune 500 customer of Anthropic spends less than .1% of their expenses on Anthropic. \n\nWhile that number likely will eventually asymptote somewhere (token prices coming down, and other large enterprise spend areas not going away), there’s no reason it can’t be 10-50X higher than this, reaching a “mere” 1-5% of spend. Which would still be a fraction of what most startups are spending.\n\nThus, you can see how big of a divide there is between the frontier users of AI and the rest of the world still.\n\nToday, only a microscopically small set of companies are actually using agents for large amounts of background tasks and inside of workflows that aren’t human prompted. This Fortune 500 spend is likely dominated by coding tasks and broad employee productivity use-cases.\n\nBut the big jump will come as these enterprises start to rewire their underlying processes for agents, which we’re now in the earliest stages of seeing. Agents processing large amounts of data in the enterprises; swarms doing coding, bio research, cyber, and other large fan out tasks; background workflows executing tasks in processes, and so on. All of these use cases generally are 100X bigger consumers of tokens, and much closer to direct ROI on the spend.\n\nThis S-1 gives you a sense of both the strength of the frontier lab business model - even amidst massive competition - and how early we are in the build out of AI.",
+          "createdAt": "2026-10-26T16:51:22.000Z",
+          "url": "https://x.com/levie/status/2114761816199098587",
+          "likes": 615,
+          "retweets": 56,
+          "replies": 113,
           "isQuote": true,
-          "quotedTweetId": "2114372350707986492"
+          "quotedTweetId": "2114732998402957410"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Garry Tan",
+      "handle": "garrytan",
+      "bio": "President & CEO @ycombinator —Founder @garryslist—Creator of GStack & GBrain—designer/engineer who helps founders—SF Dem accelerating the boom loop",
+      "tweets": [
+        {
+          "id": "2114739519622963671",
+          "text": "Publish your stack https://t.co/uhw9AK7ee1",
+          "createdAt": "2026-10-26T15:22:46.000Z",
+          "url": "https://x.com/garrytan/status/2114739519622963671",
+          "likes": 467,
+          "retweets": 19,
+          "replies": 87,
+          "isQuote": true,
+          "quotedTweetId": "2114623574371963360"
         }
       ]
     },
@@ -148,45 +276,26 @@
       "bio": "VC at @FirstMarkCap.  Host: MAD Podcast; Organizer: Data Driven NYC, Author: MAD Landscape.",
       "tweets": [
         {
-          "id": "2114507945585328606",
-          "text": "Rare footage of how VCs turned their 2021 bets in metaverse, gaming and crypto mining into 'mission-critical AI infrastructure’ https://t.co/ULSKrUwg1f",
-          "createdAt": "2026-10-26T00:02:34.000Z",
-          "url": "https://x.com/mattturck/status/2114507945585328606",
-          "likes": 53,
-          "retweets": 5,
-          "replies": 7,
+          "id": "2114829981884817513",
+          "text": "Anthropic S-1 highlights video\n\nONE SHOT (just one prompt, no editing) using @synthesiaIO Syren https://t.co/n04eP7w39f",
+          "createdAt": "2026-10-26T21:22:13.000Z",
+          "url": "https://x.com/mattturck/status/2114829981884817513",
+          "likes": 24,
+          "retweets": 3,
+          "replies": 3,
           "isQuote": false,
           "quotedTweetId": null
         },
         {
-          "id": "2114411547594457483",
-          "text": "Good neighborhood https://t.co/ZRTxHmsoZv https://t.co/OCMZ85Yk8G",
-          "createdAt": "2026-10-25T17:39:31.000Z",
-          "url": "https://x.com/mattturck/status/2114411547594457483",
-          "likes": 100,
-          "retweets": 6,
-          "replies": 3,
-          "isQuote": true,
-          "quotedTweetId": "2114306073846751404"
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Zara Zhang",
-      "handle": "zarazhangrui",
-      "bio": "Builder.  Harvard’17. Instagram: https://t.co/aJqTEMrL2L GitHub: https://t.co/KCuEajezlL",
-      "tweets": [
-        {
-          "id": "2114255477907570865",
-          "text": "Great interview. Most people overestimate the importance of one huge launch and underestimate the power of just showing up every day on the timeline\n\nDevelop a system where you make a video every day &gt; spending tens of thousands of dollars on a single launch video https://t.co/ujN4fPyN1y",
-          "createdAt": "2026-10-25T07:19:21.000Z",
-          "url": "https://x.com/zarazhangrui/status/2114255477907570865",
-          "likes": 256,
-          "retweets": 16,
-          "replies": 27,
-          "isQuote": true,
-          "quotedTweetId": "2113654566776709147"
+          "id": "2114755282181955616",
+          "text": "Particularly evil of Anthropic to file their S-1 on a Monday morning when all VCs are stuck in Monday team and partner meetings, making us unable to provide immediate #thoughtleadership with those S-1 teardowns that everyone is dying to read",
+          "createdAt": "2026-10-26T16:25:24.000Z",
+          "url": "https://x.com/mattturck/status/2114755282181955616",
+          "likes": 522,
+          "retweets": 8,
+          "replies": 34,
+          "isQuote": false,
+          "quotedTweetId": null
         }
       ]
     },
@@ -197,13 +306,65 @@
       "bio": "partner @fpvventures - investing in seed/A. previous: early hire @meter, @opendoor, @atlassian & others. love @shimoleejhaveri + 👦👧",
       "tweets": [
         {
-          "id": "2114380495140405394",
-          "text": "Golden hour 🌅 https://t.co/VPmAgnMkGH",
-          "createdAt": "2026-10-25T15:36:07.000Z",
-          "url": "https://x.com/nikunj/status/2114380495140405394",
-          "likes": 40,
-          "retweets": 1,
-          "replies": 2,
+          "id": "2114929285890990574",
+          "text": "Maybe I should just change my job.. https://t.co/kHDC0z48LF",
+          "createdAt": "2026-10-27T03:56:49.000Z",
+          "url": "https://x.com/nikunj/status/2114929285890990574",
+          "likes": 0,
+          "retweets": 0,
+          "replies": 0,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2114761204333998427",
+          "text": "The main thing I wanted to dig into @AnthropicAI's S-1 was the compute contracts..\n\nA few things that stood out (built in conjuction with Opus 5.5):\n\n> At June 30, Anthropic had $265.6B of purchase commitments and $321.4B of leases that hadn’t started. That’s a $587B subtotal, payable over years, including some conditional leases. The latest aggregate total is still blank in the filing.\n\n> The contracts are very different. Google and Amazon require minimum spending regardless of usage. SpaceXAI’s agreements have a potential value of $120.5B, but either party can cancel on 90 days’ notice after initial locked periods end in January and March 2027.\n\n> Anthropic Direct separates chips, buildings, power and operations into different contracts. It lets Anthropic reserve a building early and commit to chips later. It also means one supplier can start billing before the others are ready. Equipment rent can begin before the compute is usable.\n\n> Broadcom’s $42B facility never hands Anthropic cash. Notes settle specific equipment rent bills. The facility excludes each equipment pod’s first quarterly payment and any rent due before it is ready for service. Anthropic has to find a way to fund those payments elsewhere.\n\n> Those notes carry 9% interest, added to the balance quarterly, and can convert at 90% of the trailing 30-day average share price after IPO. New notes issued during specified revenue-breach periods get 13% interest and an 85% conversion price. The share-price measure is volume-weighted.\n\n> That interest sits on top of the equipment lease’s own financing charge, whose rate is confidential. The investor chooses whether to convert the notes. Otherwise, principal and accumulated interest come due in cash.\n\n> Anthropic treats Trainium, TPUs, NVIDIA and AMD GPUs as a shared fleet across model development, paying customers and internal use. It doesn’t disclose a fixed physical split between training and inference. The supplier bill can be fixed while the work assigned to the hardware changes.\n\n> Revenue per dollar of total compute and infrastructure expense rose from $0.57 in Q2 2025 to $2.08 in Q2 2026. Pricing, utilization, technical improvements and when capacity arrives all affect that ratio. It’s a substantial improvement in monetizing the compute base.\n\n> About 80% of H1 revenue was consumption-based. Most compute commitments however run for years. With quarterly releases, this bifurcation between usage and subscription will be interesting to monitor. \n\nSource: https://t.co/97KqkyyfpS",
+          "createdAt": "2026-10-26T16:48:56.000Z",
+          "url": "https://x.com/nikunj/status/2114761204333998427",
+          "likes": 67,
+          "retweets": 2,
+          "replies": 7,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2114736254642528659",
+          "text": "👀 https://t.co/0zczDIns1d",
+          "createdAt": "2026-10-26T15:09:47.000Z",
+          "url": "https://x.com/nikunj/status/2114736254642528659",
+          "likes": 2,
+          "retweets": 0,
+          "replies": 0,
+          "isQuote": false,
+          "quotedTweetId": null
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Peter Steinberger",
+      "handle": "steipete",
+      "bio": "Polyagentmorous ClawFather. Came back from retirement to mess with AI and help a lobster take over the world.\n@OpenClaw🦞 + @OpenAI",
+      "tweets": [
+        {
+          "id": "2114879798434758905",
+          "text": "I spent some time on the weekend to test bun's AOT compiler and results are nothing short of amazing. Performance up 2-3x, memory use less than half. https://t.co/2yobmkrUUa",
+          "createdAt": "2026-10-27T00:40:11.000Z",
+          "url": "https://x.com/steipete/status/2114879798434758905",
+          "likes": 439,
+          "retweets": 12,
+          "replies": 49,
+          "isQuote": true,
+          "quotedTweetId": "2114835395271901667"
+        },
+        {
+          "id": "2114879359857422729",
+          "text": "Banger. https://t.co/MzQY2HvarM",
+          "createdAt": "2026-10-27T00:38:26.000Z",
+          "url": "https://x.com/steipete/status/2114879359857422729",
+          "likes": 519,
+          "retweets": 42,
+          "replies": 26,
           "isQuote": false,
           "quotedTweetId": null
         }
@@ -216,21 +377,122 @@
       "bio": "ceo @every | the only subscription you need to stay at the edge of AI",
       "tweets": [
         {
-          "id": "2114509827057561603",
-          "text": "https://t.co/F3WWInD6LH https://t.co/PKNm0MT3So",
-          "createdAt": "2026-10-26T00:10:03.000Z",
-          "url": "https://x.com/danshipper/status/2114509827057561603",
-          "likes": 33,
-          "retweets": 0,
-          "replies": 8,
+          "id": "2114849110553440469",
+          "text": "back to the part of the cycle where i regret not getting a phd in frontier math and theoretical comp sci \n\n(not that i ever considered getting one but still) https://t.co/Wr5BC5sSlS",
+          "createdAt": "2026-10-26T22:38:14.000Z",
+          "url": "https://x.com/danshipper/status/2114849110553440469",
+          "likes": 37,
+          "retweets": 2,
+          "replies": 6,
           "isQuote": true,
-          "quotedTweetId": "2114388808628379695"
+          "quotedTweetId": "2114838293330420187"
+        },
+        {
+          "id": "2114767454026990063",
+          "text": "dang this is big https://t.co/Csh4Tzkrmi",
+          "createdAt": "2026-10-26T17:13:46.000Z",
+          "url": "https://x.com/danshipper/status/2114767454026990063",
+          "likes": 148,
+          "retweets": 3,
+          "replies": 4,
+          "isQuote": true,
+          "quotedTweetId": "2114748983897968801"
+        },
+        {
+          "id": "2114714881312305542",
+          "text": "okay so Anthropic S-1:\n\n- Revenue up 1,300% YOY in 1H 2026\n- GAAP operating profitable\n- 85% gross margin\n- 900% revenue retention\n- 80% of revenue coming from models released in the last 6 months\n\nwe are so back!",
+          "createdAt": "2026-10-26T13:44:51.000Z",
+          "url": "https://x.com/danshipper/status/2114714881312305542",
+          "likes": 714,
+          "retweets": 27,
+          "replies": 69,
+          "isQuote": false,
+          "quotedTweetId": null
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Aditya Agarwal",
+      "handle": "adityaag",
+      "bio": "General Partner @SPC, Co-Founder @Bevel_Health | Ex: Early Eng @facebook, CTO @Dropbox, Board @Flipkart | Optimist, Builder, Dad",
+      "tweets": [
+        {
+          "id": "2114907777957245033",
+          "text": "More and more I am coming to accept that our understanding of the sciences were but limited by our desire to have solutions that we could understand.",
+          "createdAt": "2026-10-27T02:31:22.000Z",
+          "url": "https://x.com/adityaag/status/2114907777957245033",
+          "likes": 90,
+          "retweets": 4,
+          "replies": 14,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2114793226154418314",
+          "text": "The biggest risk to American AI is scaring ourselves into slowing down.\n\nFear is a policy choice. So is building.\n\nHad a great conversation with @sriramk at @spc last week. https://t.co/A1dq5Nv2WM",
+          "createdAt": "2026-10-26T18:56:10.000Z",
+          "url": "https://x.com/adityaag/status/2114793226154418314",
+          "likes": 9,
+          "retweets": 1,
+          "replies": 1,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2114763380124987494",
+          "text": "This is such a banger that I cannot recommend it enough.\n\nhttps://t.co/9k1mU8VCTC\n\nKey section below: https://t.co/RwkDJRl44l",
+          "createdAt": "2026-10-26T16:57:34.000Z",
+          "url": "https://x.com/adityaag/status/2114763380124987494",
+          "likes": 82,
+          "retweets": 7,
+          "replies": 2,
+          "isQuote": false,
+          "quotedTweetId": null
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Sam Altman",
+      "handle": "sama",
+      "bio": "The mission of OpenAI is to ensure that AGI benefits all of humanity",
+      "tweets": [
+        {
+          "id": "2114818620782248024",
+          "text": "6.1 Terra is here! It is good at a lot of things, but we are especially excited for this new era of computer use. https://t.co/TbpHp75Os0",
+          "createdAt": "2026-10-26T20:37:05.000Z",
+          "url": "https://x.com/sama/status/2114818620782248024",
+          "likes": 6298,
+          "retweets": 311,
+          "replies": 671,
+          "isQuote": true,
+          "quotedTweetId": "2114780711664398349"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Claude",
+      "handle": "claudeai",
+      "bio": "Claude is an AI assistant built by @anthropicai to be safe, accurate, and secure. Talk to Claude on https://t.co/ZhTwG8d1e5 or download the app.",
+      "tweets": [
+        {
+          "id": "2114780227465338985",
+          "text": "More than 25,000 nonprofits now use Claude. Most are small, local teams.\n\nWe’re expanding Claude for Nonprofits with a plugin built with around 30 of them, adding skills for fundraising, marketing, and hiring grounded in each team’s context and AI policy: https://t.co/LWHcr1CT20 https://t.co/WHG2zRDyxO",
+          "createdAt": "2026-10-26T18:04:31.000Z",
+          "url": "https://x.com/claudeai/status/2114780227465338985",
+          "likes": 5464,
+          "retweets": 244,
+          "replies": 278,
+          "isQuote": true,
+          "quotedTweetId": "1995856609692844351"
         }
       ]
     }
   ],
   "stats": {
-    "xBuilders": 9,
-    "totalTweets": 14
+    "xBuilders": 17,
+    "totalTweets": 32
   }
 }
