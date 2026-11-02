@@ -1,7 +1,26 @@
 {
-  "generatedAt": "2026-11-01T06:26:17.261Z",
+  "generatedAt": "2026-11-02T06:35:38.590Z",
   "lookbackHours": 24,
   "x": [
+    {
+      "source": "x",
+      "name": "Andrej Karpathy",
+      "handle": "karpathy",
+      "bio": "",
+      "tweets": [
+        {
+          "id": "2116957135661945283",
+          "text": "Weekend hack: HackerTube. I was annoyed with YouTube's recommendations so I had Claude filter down 43M comments over 20 years of HN to 6,454 videos that keep being recommended. *Significantly* better viewing experience, ~2 hours with Opus 5.5:\nhttps://t.co/JIhXN7OSh1\n\n- Excellent recs without any logins (state is kept in local browser session)\n- Thumbnail is a representative frame from middle of the video instead of the super duper A/B test hyper-optimized user uploads\n- Underlying data from the comment analysis as one zip file, point your Claude at it and ask for your own version\n- HackerTube Longs ✊\n\nA bit more on the process:\nI use Claude Code (desktop app for Mac), Opus 5.5 on Medium effort as my default. I only talk to Claude and have it do everything, the only \"manual work\" I helped with in tandem was in the browser (reminiscent of MenuGen): 1) I had to create some kind of API key from Google Cloud UI to query YouTube for video metadata, 2) I booted up a VPS box for serving and 3) I bought the domain name. Once the box was up I gave Claude the IP and told it update, secure, harden, deploy and optimize the code, and it did the whole thing.\n\nMany awesome projects that would have normally taken weeks/months even can now be few-shotted for breakfast. What else are we not thinking of.",
+          "createdAt": "2026-11-01T18:14:46.000Z",
+          "url": "https://x.com/karpathy/status/2116957135661945283",
+          "likes": 36797,
+          "retweets": 3269,
+          "replies": 1497,
+          "isQuote": false,
+          "quotedTweetId": null
+        }
+      ]
+    },
     {
       "source": "x",
       "name": "Swyx",
@@ -9,35 +28,13 @@
       "bio": "achieve ambition with intentionality, intensity, integrity & insanity.\n\naffiliations:\n- @smol_ai\n- @cognition\n- @temporalio\n- @aidotengineer\n- @latentspacepod",
       "tweets": [
         {
-          "id": "2116773135668404286",
-          "text": "btw @karpathy uses medium on opus 5.5 on his latest project (Hackertube launched today).\n\noverall i think having strong opinions on effort levels is like the tabs vs spaces of our time. just tweak to taste. altho mine is definitely superior to yours. https://t.co/oSCPvlogKc https://t.co/3OIWb03BtY",
-          "createdAt": "2026-11-01T06:03:37.000Z",
-          "url": "https://x.com/swyx/status/2116773135668404286",
-          "likes": 35,
-          "retweets": 0,
-          "replies": 29,
-          "isQuote": true,
-          "quotedTweetId": "2116642586387730593"
-        },
-        {
-          "id": "2116642586387730593",
-          "text": "join me all the way on the light side guys\n\nlow effort + critique loop &gt; superultramaxhighwhatever\n\n(for the throughput-constrained; see swyxio/skills/babysit-runs) https://t.co/TuAWCwUPR1",
-          "createdAt": "2026-10-31T21:24:52.000Z",
-          "url": "https://x.com/swyx/status/2116642586387730593",
-          "likes": 135,
-          "retweets": 0,
-          "replies": 156,
-          "isQuote": true,
-          "quotedTweetId": "2116420089411145913"
-        },
-        {
-          "id": "2116544052267205093",
-          "text": "direct clip: https://t.co/fcuFuFRIpO",
-          "createdAt": "2026-10-31T14:53:20.000Z",
-          "url": "https://x.com/swyx/status/2116544052267205093",
-          "likes": 14,
-          "retweets": 0,
-          "replies": 6,
+          "id": "2116782055665402157",
+          "text": "@karpathy https://t.co/ff9Go6a7Zd url",
+          "createdAt": "2026-11-01T06:39:04.000Z",
+          "url": "https://x.com/swyx/status/2116782055665402157",
+          "likes": 21,
+          "retweets": 3,
+          "replies": 3,
           "isQuote": false,
           "quotedTweetId": null
         }
@@ -50,13 +47,35 @@
       "bio": "Codex & ChatGPT @OpenAI",
       "tweets": [
         {
-          "id": "2116692529970311254",
-          "text": "Banked 1/2",
-          "createdAt": "2026-11-01T00:43:20.000Z",
-          "url": "https://x.com/thsottiaux/status/2116692529970311254",
-          "likes": 6582,
-          "retweets": 181,
-          "replies": 1024,
+          "id": "2117035794678546764",
+          "text": "Day 28/ Banked 2/2",
+          "createdAt": "2026-11-01T23:27:20.000Z",
+          "url": "https://x.com/thsottiaux/status/2117035794678546764",
+          "likes": 7495,
+          "retweets": 233,
+          "replies": 1342,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2116936205623611781",
+          "text": "My dog just patched that bug we couldn’t find for two weeks. Clever dog",
+          "createdAt": "2026-11-01T16:51:36.000Z",
+          "url": "https://x.com/thsottiaux/status/2116936205623611781",
+          "likes": 509,
+          "retweets": 1,
+          "replies": 32,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2116936031866077423",
+          "text": "My dog sent you the meeting notes from yesterday, did you see them?",
+          "createdAt": "2026-11-01T16:50:55.000Z",
+          "url": "https://x.com/thsottiaux/status/2116936031866077423",
+          "likes": 403,
+          "retweets": 1,
+          "replies": 18,
           "isQuote": false,
           "quotedTweetId": null
         }
@@ -69,37 +88,97 @@
       "bio": "Practical AI tutorials and interviews for busy people | Get my best AI skills and guides at https://t.co/6VAA6p81x6",
       "tweets": [
         {
-          "id": "2116754343315841471",
-          "text": "Is it weird if I prefer listening to this over Spotify https://t.co/lH3wixKArx",
-          "createdAt": "2026-11-01T04:48:57.000Z",
-          "url": "https://x.com/petergyang/status/2116754343315841471",
-          "likes": 13,
+          "id": "2117059131349868790",
+          "text": "Upcoming episodes of Behind the Craft:\n\n1. Ashley Alexander\n\nAshley is VP of Product at @OpenAI. We had a heart-to-heart conversation about what it's like to care for parents through cancer and where ChatGPT and AI can help.\n\n2. Nate Parrott\n\n@nateparrott is the @AnthropicAI designer behind Claude Design, Dashboard, Motion, and more. He was refreshingly honest about how to get Claude to avoid designing AI slop with a live walkthrough of a real example.\n\n3. Matt Pocock\n\nMatt's AI skills for working with coding agents have 300K+ (!) GitHub stars. He teaches an excellent course on engineering fundamentals, and I can't wait to learn from him how to build software factories the right way.\n\n4. Jacob Sansbury\n\n@jsnnsa, according to my friend and a16z partner @illscience, has built the most AI-pilled gaming company in the world with just 10 people and $32M/year in Claude spend. Excited to dig into all this with him.\n\nWith all my interviews, I try to find people who are builders and practitioners who can talk about topics that I genuinely care about.\n\n📌 Subscribe to get all the episodes soon:\nhttps://t.co/NSTj7ijxE0\n\nThanks for your support!",
+          "createdAt": "2026-11-02T01:00:04.000Z",
+          "url": "https://x.com/petergyang/status/2117059131349868790",
+          "likes": 40,
           "retweets": 0,
-          "replies": 7,
+          "replies": 19,
           "isQuote": false,
           "quotedTweetId": null
         },
         {
-          "id": "2116733034926100841",
-          "text": "Don't particularly care about the trick or treat part, just being able to dress up as whatever you want is the best",
-          "createdAt": "2026-11-01T03:24:17.000Z",
-          "url": "https://x.com/petergyang/status/2116733034926100841",
-          "likes": 3,
+          "id": "2116987415319740756",
+          "text": "\"It really makes you question, why do you want a person in your product? Is your product something that needs a UI?\"\n\nFrom @jacalulu (product director at @GoogleLabs):\n\n\"Anything that involves me creating something. Anything where I want to learn something, there might be a reason for me to interact.\n\nAnytime I want to be entertained or consume something, I'm still the one using the product.\n\nBut there are definitely products that I use today that I would be more than happy to not use, or at least not be the main person interacting with the interface.\"\n\n📌 Watch our full episode here: https://t.co/8hLt6x6atQ",
+          "createdAt": "2026-11-01T20:15:06.000Z",
+          "url": "https://x.com/petergyang/status/2116987415319740756",
+          "likes": 17,
           "retweets": 0,
-          "replies": 3,
+          "replies": 17,
+          "isQuote": true,
+          "quotedTweetId": "2116921336006410550"
+        },
+        {
+          "id": "2116946320674152810",
+          "text": "I wish I could just use one AI tool but right now there are clear winners in each category below:\n\nBrowser/computer use = ChatGPT + Codex\nDesign/video editing/\"taste\" = Claude\n24/7 agents and scheduled jobs = Grok Bot\n\nAlso, Gemini is underrated for writing but need to test it more.",
+          "createdAt": "2026-11-01T17:31:48.000Z",
+          "url": "https://x.com/petergyang/status/2116946320674152810",
+          "likes": 190,
+          "retweets": 6,
+          "replies": 82,
+          "isQuote": false,
+          "quotedTweetId": null
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Thariq",
+      "handle": "trq212",
+      "bio": "playing WoW forever, formerly Claude Code @anthropicai",
+      "tweets": [
+        {
+          "id": "2116977363728867664",
+          "text": "also had a little highlight intro video\n\nI like how its all coming together! hoping to have a vertical slice sometime next week https://t.co/YAurDfYM5S",
+          "createdAt": "2026-11-01T19:35:09.000Z",
+          "url": "https://x.com/trq212/status/2116977363728867664",
+          "likes": 43,
+          "retweets": 0,
+          "replies": 5,
           "isQuote": false,
           "quotedTweetId": null
         },
         {
-          "id": "2116732887265656978",
-          "text": "Halloween is honestly the best holiday and should be held every quarter",
-          "createdAt": "2026-11-01T03:23:41.000Z",
-          "url": "https://x.com/petergyang/status/2116732887265656978",
-          "likes": 25,
-          "retweets": 0,
-          "replies": 7,
-          "isQuote": false,
-          "quotedTweetId": null
+          "id": "2116976789046350040",
+          "text": "adding a new character: a taekwondo master that fights with fire\n\nI also updated the art style from 3d models to use generated sprites https://t.co/4F60NS4TQy https://t.co/hLIVplRPrW",
+          "createdAt": "2026-11-01T19:32:52.000Z",
+          "url": "https://x.com/trq212/status/2116976789046350040",
+          "likes": 990,
+          "retweets": 16,
+          "replies": 93,
+          "isQuote": true,
+          "quotedTweetId": "2105333496768319969"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Amjad Masad",
+      "handle": "amasad",
+      "bio": "ceo @replit. civilizationist",
+      "tweets": [
+        {
+          "id": "2117010858845089805",
+          "text": "If you’re enjoying a subsidized AI subscription get ready to get rug pulled. https://t.co/XCjMc61pir",
+          "createdAt": "2026-11-01T21:48:15.000Z",
+          "url": "https://x.com/amasad/status/2117010858845089805",
+          "likes": 2266,
+          "retweets": 93,
+          "replies": 176,
+          "isQuote": true,
+          "quotedTweetId": "2116996456204640264"
+        },
+        {
+          "id": "2116998155925360965",
+          "text": "You can enable this on Replit with one toggle. If you enable the “feedback widget” on your site, users’ feedback become prompts for the agents to build. https://t.co/QLBwKenews",
+          "createdAt": "2026-11-01T20:57:46.000Z",
+          "url": "https://x.com/amasad/status/2116998155925360965",
+          "likes": 245,
+          "retweets": 9,
+          "replies": 76,
+          "isQuote": true,
+          "quotedTweetId": "2116636967517798672"
         }
       ]
     },
@@ -110,13 +189,35 @@
       "bio": "@vercel CEO",
       "tweets": [
         {
-          "id": "2116710688550994042",
-          "text": "This would go so hard in SF https://t.co/RgE7UIADws",
-          "createdAt": "2026-11-01T01:55:29.000Z",
-          "url": "https://x.com/rauchg/status/2116710688550994042",
-          "likes": 673,
-          "retweets": 18,
-          "replies": 48,
+          "id": "2117039740096847920",
+          "text": "F1 is basically the perfect competition for our times. The celebration of extraordinary technology and extraordinary human ability. That’s what Vercel stands for! (also: winning) https://t.co/XkxVDnmWjE",
+          "createdAt": "2026-11-01T23:43:01.000Z",
+          "url": "https://x.com/rauchg/status/2117039740096847920",
+          "likes": 555,
+          "retweets": 13,
+          "replies": 35,
+          "isQuote": true,
+          "quotedTweetId": "2117038247549231138"
+        },
+        {
+          "id": "2117000819623243925",
+          "text": "Own your intelligence.\n\nAnyone that opposes this has something to sell you (perhaps your own intelligence back to you.)\n\nLocal models need to continue proliferating. The “absolute unit” massive models may be out of reach for now locally, so your best option is to, indeed, keep your options open. Own your harness, data, connections, runtime: your agents. Embrace open source.",
+          "createdAt": "2026-11-01T21:08:22.000Z",
+          "url": "https://x.com/rauchg/status/2117000819623243925",
+          "likes": 2251,
+          "retweets": 222,
+          "replies": 242,
+          "isQuote": false,
+          "quotedTweetId": null
+        },
+        {
+          "id": "2116988333096370443",
+          "text": "Working with Gemini on https://t.co/3Z4NESzNKd is hilarious 😂😂\n\nOther than being SUPER EXCITED!, I've been testing it on two high complexity projects and it's doing great. https://t.co/Vb16Fbyats",
+          "createdAt": "2026-11-01T20:18:45.000Z",
+          "url": "https://x.com/rauchg/status/2116988333096370443",
+          "likes": 381,
+          "retweets": 9,
+          "replies": 69,
           "isQuote": false,
           "quotedTweetId": null
         }
@@ -129,15 +230,15 @@
       "bio": "ceo @box - your business lives in content. unleash it with AI",
       "tweets": [
         {
-          "id": "2116652002830963114",
-          "text": "This is one of the better litmus tests for whether you’re pushing your use of AI enough or not. \n\nUp until maybe six months ago probably the best you could do with AI was pull off something you already would produce, but just doing it a little faster. But now we’re entering a point where the output of working with AI can and should dramatically exceed what you would been able to do before, in a fraction of the time.\n\nThe product prototype should not only be fully functional and interactive, but it should probably have meaningfully better features than it would have had before. The engineering architecture should be able to deliver performance gains that you wouldn’t have been able to go after otherwise. \n\nThe research for a project should consume every single fact on the subject across every dimension of analysis possible. The business process you implement with AI should operate entirely differently and learn from all its past failures in a way no human could. \n\nWe’re unquestionably entering a period where AI will be smarter than us on most axes. Perhaps not on every dimension that matters (intelligence is still very jagged), but at least on enough dimensions that when we combine it with what we’re good at, you get qualitatively different outcomes.\n\nSo the simple test is: if you could have done what you’re doing before AI, you’re likely not pushing it enough.",
-          "createdAt": "2026-10-31T22:02:17.000Z",
-          "url": "https://x.com/levie/status/2116652002830963114",
-          "likes": 618,
-          "retweets": 53,
-          "replies": 107,
+          "id": "2117134917847093491",
+          "text": "Increasingly this will be the new job description for a lot of roles, not just coding. We’re clearly moving from a world where agents help us do our work incrementally better or faster, to us helping agents do their work.\n\nThis turns everyone in one of these positions to that of a manager of a team of agents, instead of an individual contributor with just some added leverage from AI. The biggest areas of impact will be information-heavy jobs, like coding, cybersecurity, legal work, biotech, engineering, and many other fields. \n\nAnd as a result, in these jobs your leverage will begin to be decoupled from the normal ratio of hours spent working to output generated. For essentially the history of knowledge work the main variable you had to play with was hours of work done (assuming fixed level talent/coordination/strategy). \n\nNow we’ve separated these variables because agents can parallelize work for us, to in theory execute as much as we need to pull off whatever goal we’re trying to accomplish. The people and organizations that discover this sooner, and orient their operations around it, will see compounding gains in their workflows.",
+          "createdAt": "2026-11-02T06:01:13.000Z",
+          "url": "https://x.com/levie/status/2117134917847093491",
+          "likes": 67,
+          "retweets": 9,
+          "replies": 31,
           "isQuote": true,
-          "quotedTweetId": "2116567219199234317"
+          "quotedTweetId": "2116512351491084344"
         }
       ]
     },
@@ -148,70 +249,92 @@
       "bio": "President & CEO @ycombinator —Founder @garryslist—Creator of GStack & GBrain—designer/engineer who helps founders—SF Dem accelerating the boom loop",
       "tweets": [
         {
-          "id": "2116640529232609515",
-          "text": "> Why does the worst rise to the top in a society rife with broken politics? \n\n“When the plan fails—and it always fails—coercion is needed. You need people willing to do what honest people refuse to do. The system doesn't promote the best; it selects those with no scruples. And to rally a majority around the plan, nothing works better than a common enemy: the rich, the foreigner, the dissenter.”",
-          "createdAt": "2026-10-31T21:16:42.000Z",
-          "url": "https://x.com/garrytan/status/2116640529232609515",
-          "likes": 119,
-          "retweets": 10,
-          "replies": 19,
-          "isQuote": true,
-          "quotedTweetId": "2116285524516229287"
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Matt Turck",
-      "handle": "mattturck",
-      "bio": "VC at @FirstMarkCap.  Host: MAD Podcast; Organizer: Data Driven NYC, Author: MAD Landscape.",
-      "tweets": [
-        {
-          "id": "2116653171741470990",
-          "text": "A classic that never goes out of style 🎃👻 https://t.co/4AiSR3Qg4L",
-          "createdAt": "2026-10-31T22:06:56.000Z",
-          "url": "https://x.com/mattturck/status/2116653171741470990",
-          "likes": 17,
-          "retweets": 1,
-          "replies": 5,
-          "isQuote": false,
-          "quotedTweetId": null
-        }
-      ]
-    },
-    {
-      "source": "x",
-      "name": "Nikunj Kothari",
-      "handle": "nikunj",
-      "bio": "partner @fpvventures - investing in seed/A. previous: early hire @meter, @opendoor, @atlassian & others. love @shimoleejhaveri + 👦👧",
-      "tweets": [
-        {
-          "id": "2116624458198982668",
-          "text": "First snow is always special ❄️ https://t.co/FzWYVB4HUl",
-          "createdAt": "2026-10-31T20:12:50.000Z",
-          "url": "https://x.com/nikunj/status/2116624458198982668",
-          "likes": 74,
-          "retweets": 0,
-          "replies": 8,
+          "id": "2117137390016073977",
+          "text": "Particle-1 is as good as much larger models for agentic retrieval but 1/23 the price\n\nhttps://t.co/1CmqlXOx8D https://t.co/7s33EuSO0L",
+          "createdAt": "2026-11-02T06:11:02.000Z",
+          "url": "https://x.com/garrytan/status/2117137390016073977",
+          "likes": 30,
+          "retweets": 3,
+          "replies": 14,
           "isQuote": false,
           "quotedTweetId": null
         },
         {
-          "id": "2116554844207198501",
-          "text": "what do you mean you dressed up as cybersecurity awareness month for halloween\n\ni hate sf https://t.co/TLitKBVgUu",
-          "createdAt": "2026-10-31T15:36:13.000Z",
-          "url": "https://x.com/nikunj/status/2116554844207198501",
-          "likes": 6,
-          "retweets": 0,
-          "replies": 4,
-          "isQuote": false,
-          "quotedTweetId": null
+          "id": "2116941191526895975",
+          "text": "Practical robotics is nigh https://t.co/uFs7HoCLvs",
+          "createdAt": "2026-11-01T17:11:25.000Z",
+          "url": "https://x.com/garrytan/status/2116941191526895975",
+          "likes": 296,
+          "retweets": 9,
+          "replies": 53,
+          "isQuote": true,
+          "quotedTweetId": "2116727410972590380"
+        },
+        {
+          "id": "2116909591607099793",
+          "text": "YC is the YC for hard tech https://t.co/M9UWjjHuJo",
+          "createdAt": "2026-11-01T15:05:51.000Z",
+          "url": "https://x.com/garrytan/status/2116909591607099793",
+          "likes": 498,
+          "retweets": 27,
+          "replies": 59,
+          "isQuote": true,
+          "quotedTweetId": "2115835503379681765"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Zara Zhang",
+      "handle": "zarazhangrui",
+      "bio": "Builder.  Harvard’17. Instagram: https://t.co/aJqTEMrL2L GitHub: https://t.co/KCuEajezlL",
+      "tweets": [
+        {
+          "id": "2117086544586780867",
+          "text": "What if your Linktree were an actual tree https://t.co/3ozuquLIIC https://t.co/WEzBKd6aaF",
+          "createdAt": "2026-11-02T02:49:00.000Z",
+          "url": "https://x.com/zarazhangrui/status/2117086544586780867",
+          "likes": 83,
+          "retweets": 2,
+          "replies": 16,
+          "isQuote": true,
+          "quotedTweetId": "2081103577590718865"
+        }
+      ]
+    },
+    {
+      "source": "x",
+      "name": "Dan Shipper",
+      "handle": "danshipper",
+      "bio": "ceo @every | the only subscription you need to stay at the edge of AI",
+      "tweets": [
+        {
+          "id": "2117014507083948453",
+          "text": "argon cooks https://t.co/RmZ0FeQLpM",
+          "createdAt": "2026-11-01T22:02:45.000Z",
+          "url": "https://x.com/danshipper/status/2117014507083948453",
+          "likes": 116,
+          "retweets": 2,
+          "replies": 6,
+          "isQuote": true,
+          "quotedTweetId": "2116435070856876209"
+        },
+        {
+          "id": "2116978123044688304",
+          "text": "this is anti competitive and not cool https://t.co/3hu26UpLkX",
+          "createdAt": "2026-11-01T19:38:10.000Z",
+          "url": "https://x.com/danshipper/status/2116978123044688304",
+          "likes": 108,
+          "retweets": 6,
+          "replies": 21,
+          "isQuote": true,
+          "quotedTweetId": "2116958944723665173"
         }
       ]
     }
   ],
   "stats": {
-    "xBuilders": 8,
-    "totalTweets": 13
+    "xBuilders": 11,
+    "totalTweets": 22
   }
 }
