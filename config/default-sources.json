@@ -45,6 +45,34 @@
       "indexUrl": "https://claude.com/blog",
       "articleBaseUrl": "https://claude.com/blog/",
       "fetchMethod": "http"
+    },
+    {
+      "name": "Jason Lee (Ruby China)",
+      "type": "scrape",
+      "indexUrl": "https://ruby-china.org/huacnlee/topics",
+      "articleBaseUrl": "https://ruby-china.org/topics/",
+      "fetchMethod": "http"
+    },
+    {
+      "name": "Hitoshi Harada (Blog EN)",
+      "type": "scrape",
+      "indexUrl": "https://umitanuki.hatenablog.com/",
+      "articleBaseUrl": "https://umitanuki.hatenablog.com/entry/",
+      "fetchMethod": "http"
+    },
+    {
+      "name": "Hitoshi Harada (Blog JP)",
+      "type": "scrape",
+      "indexUrl": "https://umitanuki.hatenadiary.jp/",
+      "articleBaseUrl": "https://umitanuki.hatenadiary.jp/entry/",
+      "fetchMethod": "http"
+    },
+    {
+      "name": "Drift Updates (Noah Prince)",
+      "type": "scrape",
+      "indexUrl": "https://www.drift.trade/updates",
+      "articleBaseUrl": "https://www.drift.trade/updates/",
+      "fetchMethod": "http"
     }
   ],
   "x_accounts": [
