@@ -12,13 +12,24 @@ Then organize content in this order:
 
 1. X / TWITTER section — list each builder with new posts
 2. OFFICIAL BLOGS section — list each blog post from AI company blogs (OpenAI, Anthropic, etc.)
-3. PODCASTS section — list each podcast with new episodes
+3. PODCASTS section — list each podcast episode present in the feed
 
 ## Rules
 
 - Only include sources that have new content
 - Skip any source with nothing new
 - Under each source, paste the individual summary you generated
+
+### No duplication (critical)
+- Each item in the feed appears EXACTLY ONCE in the digest. One tweet/builder = one
+  block. One blog post = one block. One podcast episode = one block.
+- NEVER repeat the same summary, paragraph, or "Key insights" list two or three times.
+- The PODCASTS section usually has only ONE episode in the feed. Write a single summary
+  for it and move on. Do NOT pad the section by restating the same episode under a new
+  heading, and do NOT split one episode's transcript into multiple "episode" entries —
+  a single conversation is one episode, however many topics it covers.
+- Before finishing, scan your draft: if any block says essentially the same thing as an
+  earlier block, delete the duplicate.
 
 ### Podcast links
 - After each podcast summary, include the specific video URL from the JSON `url` field
