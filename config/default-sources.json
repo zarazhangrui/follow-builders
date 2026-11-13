@@ -48,31 +48,153 @@
     }
   ],
   "x_accounts": [
-    { "name": "Andrej Karpathy", "handle": "karpathy" },
-    { "name": "Swyx", "handle": "swyx" },
-    { "name": "Josh Woodward", "handle": "joshwoodward" },
-    { "name": "Boris Cherny", "handle": "bcherny" },
-    { "name": "Thibault Sottiaux", "handle": "thsottiaux" },
-    { "name": "Peter Yang", "handle": "petergyang" },
-    { "name": "Nan Yu", "handle": "thenanyu" },
-    { "name": "Madhu Guru", "handle": "realmadhuguru" },
-    { "name": "Amanda Askell", "handle": "AmandaAskell" },
-    { "name": "Cat Wu", "handle": "_catwu" },
-    { "name": "Thariq", "handle": "trq212" },
-    { "name": "Google Labs", "handle": "GoogleLabs" },
-    { "name": "Amjad Masad", "handle": "amasad" },
-    { "name": "Guillermo Rauch", "handle": "rauchg" },
-    { "name": "Alex Albert", "handle": "alexalbert__" },
-    { "name": "Aaron Levie", "handle": "levie" },
-    { "name": "Ryo Lu", "handle": "ryolu_" },
-    { "name": "Garry Tan", "handle": "garrytan" },
-    { "name": "Matt Turck", "handle": "mattturck" },
-    { "name": "Zara Zhang", "handle": "zarazhangrui" },
-    { "name": "Nikunj Kothari", "handle": "nikunj" },
-    { "name": "Peter Steinberger", "handle": "steipete" },
-    { "name": "Dan Shipper", "handle": "danshipper" },
-    { "name": "Aditya Agarwal", "handle": "adityaag" },
-    { "name": "Sam Altman", "handle": "sama" },
-    { "name": "Claude", "handle": "claudeai" }
+    {
+      "name": "Andrej Karpathy",
+      "handle": "karpathy"
+    },
+    {
+      "name": "Swyx",
+      "handle": "swyx"
+    },
+    {
+      "name": "Josh Woodward",
+      "handle": "joshwoodward"
+    },
+    {
+      "name": "Boris Cherny",
+      "handle": "bcherny"
+    },
+    {
+      "name": "Thibault Sottiaux",
+      "handle": "thsottiaux"
+    },
+    {
+      "name": "Peter Yang",
+      "handle": "petergyang"
+    },
+    {
+      "name": "Cat Wu",
+      "handle": "_catwu"
+    },
+    {
+      "name": "Thariq",
+      "handle": "trq212"
+    },
+    {
+      "name": "Amjad Masad",
+      "handle": "amasad"
+    },
+    {
+      "name": "Guillermo Rauch",
+      "handle": "rauchg"
+    },
+    {
+      "name": "Bereket Engida",
+      "handle": "bereketengida"
+    },
+    {
+      "name": "Erik Dunteman",
+      "handle": "erikdunteman"
+    },
+    {
+      "name": "Nelson Elhage",
+      "handle": "nelhage"
+    },
+    {
+      "name": "Mathew Pregasen",
+      "handle": "mathewpregasen"
+    },
+    {
+      "name": "Alessandro Palci",
+      "handle": "alessandropalci"
+    },
+    {
+      "name": "Kai-Fu Lee",
+      "handle": "kaifulee"
+    },
+    {
+      "name": "Richard Socher",
+      "handle": "RichardSocher"
+    },
+    {
+      "name": "Matt Turck",
+      "handle": "mattturck"
+    },
+    {
+      "name": "Jay Baxter",
+      "handle": "jaybaxter"
+    },
+    {
+      "name": "Eugene Yan",
+      "handle": "eugeneyan"
+    },
+    {
+      "name": "Timothy Chung",
+      "handle": "timothydc"
+    },
+    {
+      "name": "Aaron Levie",
+      "handle": "levie"
+    },
+    {
+      "name": "Lex Fridman",
+      "handle": "lexfridman"
+    },
+    {
+      "name": "Sam Altman",
+      "handle": "sama"
+    },
+    {
+      "name": "Claude",
+      "handle": "AnthropicAI"
+    },
+    {
+      "name": "Matt Turck",
+      "handle": "mattturck"
+    },
+    {
+      "name": "Aswath Damodaran",
+      "handle": "Adamodaran"
+    },
+    {
+      "name": "Patrick Moorhead",
+      "handle": "PatrickMoorhead"
+    },
+    {
+      "name": "Dan Nenni",
+      "handle": "DanNenni"
+    },
+    {
+      "name": "SemiAnalysis",
+      "handle": "SemiAnalysis"
+    },
+    {
+      "name": "Elon Musk",
+      "handle": "elonmusk"
+    },
+    {
+      "name": "Ross Young",
+      "handle": "DSCCRoss"
+    },
+    {
+      "name": "Michael Mauboussin",
+      "handle": "mmauboussin"
+    },
+    {
+      "name": "JB Straubel",
+      "handle": "JB_Straubel"
+    },
+    {
+      "name": "Sam Jaffe",
+      "handle": "SamJaffe"
+    },
+    {
+      "name": "Yann LeCun",
+      "handle": "ylecun"
+    },
+    {
+      "name": "Benedict Evans",
+      "handle": "BenedictEvans"
+    }
   ]
 }
