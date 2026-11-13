@@ -10,6 +10,8 @@
 //   echo "digest text" | node deliver.js
 //   node deliver.js --message "digest text"
 //   node deliver.js --file /path/to/digest.txt
+//   node deliver.js --file /path/to/digest.txt --output data/2026-05-12
+//   node deliver.js --file /path/to/digest.txt --no-export
 //
 // The script reads delivery config from ~/.follow-builders/config.json
 // and API keys from ~/.follow-builders/.env
@@ -20,35 +22,111 @@
 //   - "stdout" (default): just prints to terminal
 // ============================================================================
 
-import { readFile } from 'fs/promises';
+import { mkdir, readFile, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
-import { join } from 'path';
+import { dirname, extname, isAbsolute, join, resolve } from 'path';
 import { homedir } from 'os';
-import { config as loadEnv } from 'dotenv';
 
 // -- Constants ---------------------------------------------------------------
 
 const USER_DIR = join(homedir(), '.follow-builders');
 const CONFIG_PATH = join(USER_DIR, 'config.json');
 const ENV_PATH = join(USER_DIR, '.env');
+const SCRIPT_DIR = decodeURIComponent(new URL('.', import.meta.url).pathname);
+const SKILL_DIR = join(SCRIPT_DIR, '..');
+const DIGEST_FILENAME = 'digest.md';
+
+// -- CLI helpers -------------------------------------------------------------
+
+function getArgValue(name) {
+  const args = process.argv.slice(2);
+  const idx = args.indexOf(name);
+  if (idx !== -1 && args[idx + 1]) return args[idx + 1];
+  return null;
+}
+
+function hasArg(name) {
+  return process.argv.slice(2).includes(name);
+}
+
+function expandPath(filePath) {
+  if (filePath === '~') return homedir();
+  if (filePath.startsWith('~/')) return join(homedir(), filePath.slice(2));
+  return filePath;
+}
+
+function resolveOutputPath(outputArg, dateStamp, digestMode = 'standard') {
+  if (!outputArg) {
+    const filename = digestMode === 'expanded' ? 'digest-expanded.md' : DIGEST_FILENAME;
+    return join(SKILL_DIR, 'data', dateStamp, filename);
+  }
+
+  const expanded = expandPath(outputArg);
+  const absolute = isAbsolute(expanded) ? expanded : resolve(process.cwd(), expanded);
+
+  // Treat paths without a file extension as directories.
+  if (!extname(absolute)) {
+    const filename = digestMode === 'expanded' ? 'digest-expanded.md' : DIGEST_FILENAME;
+    return join(absolute, filename);
+  }
+  return absolute;
+}
+
+function dateStampFor(timezone) {
+  if (!timezone) return new Date().toISOString().slice(0, 10);
+
+  try {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(new Date());
+
+    const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return `${values.year}-${values.month}-${values.day}`;
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+}
+
+async function loadEnvFile(envPath) {
+  if (!existsSync(envPath)) return;
+
+  const text = await readFile(envPath, 'utf-8');
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+
+    const key = line.slice(0, eq).trim();
+    let value = line.slice(eq + 1).trim();
+    if (!key || process.env[key] !== undefined) continue;
+
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    process.env[key] = value;
+  }
+}
 
 // -- Read input --------------------------------------------------------------
 
 // The digest text can come from stdin, --message flag, or --file flag
 async function getDigestText() {
-  const args = process.argv.slice(2);
-
   // Check --message flag
-  const msgIdx = args.indexOf('--message');
-  if (msgIdx !== -1 && args[msgIdx + 1]) {
-    return args[msgIdx + 1];
-  }
+  const message = getArgValue('--message');
+  if (message) return message;
 
   // Check --file flag
-  const fileIdx = args.indexOf('--file');
-  if (fileIdx !== -1 && args[fileIdx + 1]) {
-    return await readFile(args[fileIdx + 1], 'utf-8');
-  }
+  const file = getArgValue('--file');
+  if (file) return await readFile(file, 'utf-8');
 
   // Read from stdin
   const chunks = [];
@@ -56,6 +134,24 @@ async function getDigestText() {
     chunks.push(chunk);
   }
   return Buffer.concat(chunks).toString('utf-8');
+}
+
+// -- Markdown Export ---------------------------------------------------------
+
+async function exportDigest(text, config) {
+  if (hasArg('--no-export')) return null;
+
+  const outputArg = getArgValue('--output');
+  const timezone = config.timezone || process.env.TZ;
+  const digestMode = hasArg('--expanded') || config.digestMode === 'expanded'
+    ? 'expanded'
+    : 'standard';
+  const outputPath = resolveOutputPath(outputArg, dateStampFor(timezone), digestMode);
+
+  await mkdir(dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, text, 'utf-8');
+
+  return outputPath;
 }
 
 // -- Telegram Delivery -------------------------------------------------------
@@ -153,7 +249,7 @@ async function sendEmail(text, apiKey, toEmail) {
 
 async function main() {
   // Load env and config
-  loadEnv({ path: ENV_PATH });
+  await loadEnvFile(ENV_PATH);
 
   let config = {};
   if (existsSync(CONFIG_PATH)) {
@@ -169,6 +265,8 @@ async function main() {
   }
 
   try {
+    const exportPath = await exportDigest(digestText, config);
+
     switch (delivery.method) {
       case 'telegram': {
         const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -179,7 +277,8 @@ async function main() {
         console.log(JSON.stringify({
           status: 'ok',
           method: 'telegram',
-          message: 'Digest sent to Telegram'
+          message: 'Digest sent to Telegram',
+          exportPath
         }));
         break;
       }
@@ -193,7 +292,8 @@ async function main() {
         console.log(JSON.stringify({
           status: 'ok',
           method: 'email',
-          message: `Digest sent to ${toEmail}`
+          message: `Digest sent to ${toEmail}`,
+          exportPath
         }));
         break;
       }
@@ -202,6 +302,7 @@ async function main() {
       default:
         // Just print to terminal — the agent or OpenClaw handles delivery
         console.log(digestText);
+        if (exportPath) console.error(`Saved digest to ${exportPath}`);
         break;
     }
   } catch (err) {
