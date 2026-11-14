@@ -325,17 +325,26 @@ The script outputs a single JSON blob with everything you need:
 - `config` — user's language and delivery preferences
 - `podcasts` — podcast episodes with full transcripts
 - `x` — builders with their recent tweets (text, URLs, bios)
+- `blogs` — official blog posts with article content and original URLs
 - `prompts` — the remix instructions to follow
 - `stats` — counts of episodes and tweets
-- `errors` — non-fatal issues (IGNORE these)
+- `sourceStatus` — per-source fetch health, age, and stale status
+- `errors` — non-fatal issues; inspect them and report relevant source failures briefly
 
 If the script fails entirely (no JSON output), tell the user to check their
 internet connection. Otherwise, use whatever content is in the JSON.
 
 ### Step 3: Check for content
 
-If `stats.podcastEpisodes` is 0 AND `stats.xBuilders` is 0, tell the user:
-"No new updates from your builders today. Check back tomorrow!" Then stop.
+Check `sourceStatus` and `errors` before interpreting zero counts. A failed source is
+not evidence of "no updates"; report the retrieval problem and summarize any sources
+that did succeed. Treat `sourceStatus.<source>.stale: true` as unavailable for today's
+digest; do not summarize stale content as a new update. Only say "No new updates" when
+all relevant sources were fetched successfully, none are stale, and
+`stats.podcastEpisodes`, `stats.xBuilders`, and `stats.blogPosts` are all 0.
+
+Every included item must have its original URL from the JSON. For podcasts, only use a
+direct episode/video URL; a YouTube channel or playlist page is not an episode source.
 
 ### Step 4: Remix content
 
@@ -346,6 +355,7 @@ Read the prompts from the `prompts` field in the JSON:
 - `prompts.digest_intro` — overall framing rules
 - `prompts.summarize_podcast` — how to remix podcast transcripts
 - `prompts.summarize_tweets` — how to remix tweets
+- `prompts.summarize_blogs` — how to remix official blog posts
 - `prompts.translate` — how to translate to Chinese
 
 **Tweets (process first):** The `x` array has builders with tweets. Process one at a time:
@@ -353,7 +363,12 @@ Read the prompts from the `prompts` field in the JSON:
 2. Summarize their `tweets` using `prompts.summarize_tweets`
 3. Every tweet MUST include its `url` from the JSON
 
-**Podcast (process second):** The `podcasts` array has at most 1 episode. If present:
+**Blogs (process second):** The `blogs` array has official posts. Process one at a time:
+1. Summarize its `content` using `prompts.summarize_blogs`
+2. Use `source`, `title`, `author`, `publishedAt`, and `url` from the JSON object
+3. Every blog item MUST include its `url` from the JSON
+
+**Podcast (process third):** The `podcasts` array has at most 1 episode. If present:
 1. Summarize its `transcript` using `prompts.summarize_podcast`
 2. Use `name`, `title`, and `url` from the JSON object — NOT from the transcript
 
