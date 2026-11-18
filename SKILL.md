@@ -126,7 +126,7 @@ Ask: "What language do you prefer for your digest?"
 All content is fetched centrally. Skip to Step 6.
 
 **If the user chose Telegram or Email delivery:**
-Create the .env file with only the delivery key they need:
+Create the .env file with the delivery key they need:
 
 ```bash
 mkdir -p ~/.follow-builders
@@ -136,14 +136,21 @@ cat > ~/.follow-builders/.env << 'ENVEOF'
 
 # Resend API key (only if using email delivery)
 # RESEND_API_KEY=paste_your_key_here
+
+# Anthropic API key — required for OpenClaw. Also required on non-persistent
+# platforms (Claude Code, Cursor, etc.) so the cron-triggered remix step
+# (remix-digest.js) has an LLM to call when no agent is attached.
+# ANTHROPIC_API_KEY=paste_your_key_here
 ENVEOF
 ```
 
-Uncomment only the line they need. Open the file for them to paste the key.
+Uncomment the lines they need. Open the file for them to paste the keys.
 
 Tell the user: "All podcast and X/Twitter content is fetched for you automatically
-from a central feed — no API keys needed for that. You only need a key for
-[Telegram/email] delivery."
+from a central feed — no API keys needed for that. You need a key for
+[Telegram/email] delivery, and (if you're on a non-persistent agent like this one)
+an Anthropic API key so your scheduled digest can still be remixed by an LLM when
+no agent is running."
 
 ### Step 6: Show Sources
 
@@ -262,15 +269,28 @@ Common errors and fixes:
 Do NOT proceed to the welcome digest step until the cron delivery has been verified.
 
 **Non-persistent agent + Telegram or Email delivery:**
-Use system crontab so it runs even when the terminal is closed:
+
+Cron runs with no agent attached, so the pipeline needs its own way to do the
+LLM remix step. `remix-digest.js` handles this by calling the Anthropic API
+directly with the same prompts you'd otherwise apply by hand. This requires
+an `ANTHROPIC_API_KEY` in `~/.follow-builders/.env` — ask the user for one if
+they want automated Telegram/Email delivery (get one at
+https://console.anthropic.com/settings/keys). Add it to the .env file the same
+way as the delivery keys in Step 5.
+
+Use system crontab so the pipeline runs even when the terminal is closed:
 ```bash
 SKILL_DIR="<absolute path to the skill directory>"
-(crontab -l 2>/dev/null; echo "<cron expression> cd $SKILL_DIR/scripts && node prepare-digest.js 2>/dev/null | node deliver.js 2>/dev/null") | crontab -
+(crontab -l 2>/dev/null; echo "<cron expression> cd $SKILL_DIR/scripts && node prepare-digest.js 2>/dev/null | node remix-digest.js 2>/dev/null | node deliver.js 2>/dev/null") | crontab -
 ```
-Note: this runs the prepare script and pipes its output directly to delivery,
-bypassing the agent entirely. The digest won't be remixed by an LLM — it will
-deliver the raw JSON. For full remixed digests, the user should use /ai manually
-or switch to OpenClaw.
+
+If `ANTHROPIC_API_KEY` is missing or the API call fails, `remix-digest.js`
+fails closed — it prints nothing to stdout (so `deliver.js` sees an empty
+digest and skips sending) rather than forwarding the raw JSON blob. If the
+user declines to provide a key, tell them: "Without an Anthropic API key,
+I can't remix the digest unattended, so automated delivery would either send
+nothing or raw data. You can still run /ai manually anytime, or switch to
+OpenClaw for automatic delivery without needing this key."
 
 **Non-persistent agent + on-demand only (no Telegram/Email):**
 Skip cron setup entirely. Tell the user: "Since you chose on-demand delivery,
