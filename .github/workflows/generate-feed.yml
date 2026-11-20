@@ -1,9 +1,12 @@
 name: Generate Feeds
 
 on:
+  push:
+    paths:
+      - "config/default-sources.json"
   schedule:
-    # All feeds (tweets, podcasts, blogs): once daily at 6:17am UTC
-    - cron: '17 6 * * *'
+    # All feeds: 07:17 Asia/Shanghai (23:17 UTC on the previous day).
+    - cron: '17 23 * * *'
   workflow_dispatch:
     inputs:
       mode:
