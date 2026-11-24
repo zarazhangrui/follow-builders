@@ -45,6 +45,20 @@
       "indexUrl": "https://claude.com/blog",
       "articleBaseUrl": "https://claude.com/blog/",
       "fetchMethod": "http"
+    },
+    {
+      "name": "SemiAnalysis",
+      "type": "scrape",
+      "indexUrl": "https://semianalysis.com/feed/",
+      "articleBaseUrl": "https://semianalysis.com/",
+      "fetchMethod": "http"
+    },
+    {
+      "name": "Baillie Gifford Insights",
+      "type": "scrape",
+      "indexUrl": "https://www.bailliegifford.com/en/uk/institutional-investor/insights",
+      "articleBaseUrl": "https://www.bailliegifford.com/",
+      "fetchMethod": "http"
     }
   ],
   "x_accounts": [
@@ -73,6 +87,7 @@
     { "name": "Dan Shipper", "handle": "danshipper" },
     { "name": "Aditya Agarwal", "handle": "adityaag" },
     { "name": "Sam Altman", "handle": "sama" },
-    { "name": "Claude", "handle": "claudeai" }
+    { "name": "Claude", "handle": "claudeai" },
+    { "name": "Dylan Patel", "handle": "dylan522p" }
   ]
 }
