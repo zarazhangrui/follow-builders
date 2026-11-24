@@ -25,6 +25,12 @@
       "default": "daily",
       "description": "How often to deliver the digest"
     },
+    "digestMode": {
+      "type": "string",
+      "enum": ["standard", "expanded"],
+      "default": "standard",
+      "description": "Digest breadth: standard concise edition or expanded edition with medium-density items"
+    },
     "deliveryTime": {
       "type": "string",
       "default": "08:00",
