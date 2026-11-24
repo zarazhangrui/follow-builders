@@ -73,6 +73,12 @@
     { "name": "Dan Shipper", "handle": "danshipper" },
     { "name": "Aditya Agarwal", "handle": "adityaag" },
     { "name": "Sam Altman", "handle": "sama" },
-    { "name": "Claude", "handle": "claudeai" }
+    { "name": "Claude", "handle": "claudeai" },
+    { "name": "Fei-Fei Li", "handle": "drfeifei" },
+    { "name": "Yangqing Jia", "handle": "jiayq" },
+    { "name": "Kaiming He", "handle": "kaiming0415" },
+    { "name": "Andrew Ng", "handle": "AndrewYNg" },
+    { "name": "Yi Tay", "handle": "yi_tay" },
+    { "name": "Saining Xie", "handle": "sainingxie" }
   ]
 }
