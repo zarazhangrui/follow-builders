@@ -53,6 +53,20 @@
         "email": {
           "type": "string",
           "description": "Email address to send digest to (only for email method)"
+        },
+        "channel": {
+          "type": "string",
+          "enum": ["feishu"],
+          "description": "Optional in-chat delivery channel override for stdout mode. Currently used for direct Feishu card delivery."
+        },
+        "target": {
+          "type": "string",
+          "description": "Target open_id or chat_id for direct channel delivery when method is stdout and a channel-specific renderer is used."
+        },
+        "format": {
+          "type": "string",
+          "enum": ["plain_text", "interactive_card"],
+          "description": "Preferred rendering format for stdout chat delivery. Use interactive_card for Feishu card-based digests."
         }
       }
     },

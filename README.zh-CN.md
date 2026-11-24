@@ -15,6 +15,7 @@
 - AI 公司官方博客的完整文章（Anthropic Engineering、Claude Blog）
 - 所有原始内容的链接
 - 支持英文、中文或双语版本
+- 可选的飞书 interactive card 阅读模式，更适合移动端早报
 
 ## 快速开始
 
