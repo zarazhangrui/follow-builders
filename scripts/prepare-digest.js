@@ -20,6 +20,8 @@ import { readFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 
 // -- Constants ---------------------------------------------------------------
 
@@ -38,19 +40,54 @@ const PROMPT_FILES = [
   'digest-intro.md',
   'translate.md'
 ];
+const FETCH_TIMEOUT_MS = 15000;
+const execFileAsync = promisify(execFile);
 
 // -- Fetch helpers -----------------------------------------------------------
 
+async function fetchWithTimeout(url) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function curlFetch(url) {
+  const { stdout } = await execFileAsync('curl', ['-L', '--fail', '--silent', '--show-error', '--max-time', '20', url], {
+    maxBuffer: 10 * 1024 * 1024
+  });
+  return stdout;
+}
+
 async function fetchJSON(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const res = await fetchWithTimeout(url);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    try {
+      return JSON.parse(await curlFetch(url));
+    } catch {
+      return null;
+    }
+  }
 }
 
 async function fetchText(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.text();
+  try {
+    const res = await fetchWithTimeout(url);
+    if (!res.ok) return null;
+    return res.text();
+  } catch {
+    try {
+      return await curlFetch(url);
+    } catch {
+      return null;
+    }
+  }
 }
 
 // -- Main --------------------------------------------------------------------
