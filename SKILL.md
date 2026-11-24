@@ -356,10 +356,14 @@ Read the prompts from the `prompts` field in the JSON:
 **Podcast (process second):** The `podcasts` array has at most 1 episode. If present:
 1. Summarize its `transcript` using `prompts.summarize_podcast`
 2. Use `name`, `title`, and `url` from the JSON object — NOT from the transcript
+3. Write ONE summary block for that one episode. Do NOT repeat it, and do NOT split a
+   single episode's transcript into multiple entries — one conversation is one episode.
 
 Assemble the digest following `prompts.digest_intro`.
 
 **ABSOLUTE RULES:**
+- NEVER repeat an item. Each tweet, blog post, and podcast episode appears exactly once.
+  No restating the same summary under a second heading.
 - NEVER invent or fabricate content. Only use what's in the JSON.
 - Every piece of content MUST have its URL. No URL = do not include.
 - Do NOT guess job titles. Use the `bio` field or just the person's name.
