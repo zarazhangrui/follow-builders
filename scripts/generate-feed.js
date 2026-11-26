@@ -739,6 +739,92 @@ function parseClaudeBlogIndex(html) {
   return articles;
 }
 
+// Generic blog index parser for arbitrary blog sources.
+// Discovers article links whose resolved href starts with the blog's
+// articleBaseUrl. Tries JSON-LD ItemList first, then falls back to a
+// plain <a href> scan. Titles are best-effort (link text when usable).
+function parseGenericBlogIndex(html, blog) {
+  const articles = [];
+  const seen = new Set();
+  const baseUrl = blog.articleBaseUrl || blog.indexUrl;
+
+  // Strategy 1: JSON-LD ItemList structured data
+  const jsonLdRegex =
+    /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi;
+  let ldMatch;
+  while ((ldMatch = jsonLdRegex.exec(html)) !== null) {
+    try {
+      const ld = JSON.parse(ldMatch[1]);
+      const lists = [];
+      const visit = (node) => {
+        if (!node || typeof node !== "object") return;
+        if (Array.isArray(node)) {
+          node.forEach(visit);
+          return;
+        }
+        if (node["@type"] === "ItemList" && Array.isArray(node.itemListElement))
+          lists.push(node);
+        if (node["@graph"]) visit(node["@graph"]);
+      };
+      visit(ld);
+      for (const list of lists) {
+        for (const item of list.itemListElement) {
+          const it = item.item || item;
+          const url = it.url || it["@id"] || "";
+          if (!url || !url.startsWith(baseUrl) || seen.has(url)) continue;
+          seen.add(url);
+          articles.push({
+            title: it.headline || it.name || "",
+            url,
+            publishedAt: it.datePublished || null,
+            description: it.description || "",
+          });
+        }
+      }
+      if (articles.length > 0) return articles;
+    } catch {
+      // Not valid JSON-LD, continue scanning
+    }
+  }
+
+  // Strategy 2: scan <a href> for links under articleBaseUrl
+  const originMatch = baseUrl.match(/^(https?:\/\/[^/]+)/);
+  const origin = originMatch ? originMatch[1] : "";
+  const linkRegex = /<a\s[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+  let linkMatch;
+  while ((linkMatch = linkRegex.exec(html)) !== null) {
+    let href = linkMatch[1].trim();
+    if (!href || href.startsWith("#") || href.startsWith("javascript:"))
+      continue;
+    // Resolve root-relative links against the blog origin
+    if (href.startsWith("/") && origin) href = origin + href;
+    // Drop URL fragments so /topics/1 and /topics/1#reply-2 dedup together
+    href = href.split("#")[0];
+    if (!href.startsWith(baseUrl)) continue;
+    // Skip the index/base URL itself
+    if (href.replace(/\/$/, "") === baseUrl.replace(/\/$/, "")) continue;
+    if (seen.has(href)) continue;
+    seen.add(href);
+    const text = linkMatch[2]
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&nbsp;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    articles.push({
+      title: text.length >= 3 && text.length <= 150 ? text : "",
+      url: href,
+      publishedAt: null,
+      description: "",
+    });
+  }
+  return articles;
+}
+
 // Extracts the main text content from an Anthropic Engineering article page.
 // Tries the embedded JSON first (Next.js SSR data), then falls back to
 // stripping HTML tags from the article body.
@@ -883,6 +969,109 @@ function extractClaudeBlogArticleContent(html) {
   return { title, author, publishedAt, content };
 }
 
+// Generic extractor for personal/company blogs without a dedicated parser.
+// Strategy: JSON-LD metadata first (BlogPosting / Article / DiscussionForumPosting),
+// then fall back to <h1> for the title and <article>/<main>/whole-page for text.
+function extractGenericArticleContent(html) {
+  let title = "";
+  let author = "";
+  let publishedAt = null;
+  let content = "";
+
+  // JSON-LD structured data (covers Hatena Blog, most modern blog platforms)
+  const jsonLdRegex =
+    /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi;
+  let jsonLdMatch;
+  while ((jsonLdMatch = jsonLdRegex.exec(html)) !== null) {
+    try {
+      let ld = JSON.parse(jsonLdMatch[1]);
+      // Some sites wrap the item in an @graph array
+      if (ld["@graph"] && Array.isArray(ld["@graph"])) {
+        const found = ld["@graph"].find(
+          (g) =>
+            g &&
+            typeof g === "object" &&
+            ["BlogPosting", "Article", "DiscussionForumPosting", "NewsArticle"].includes(
+              g["@type"],
+            ),
+        );
+        if (found) ld = found;
+        else continue;
+      }
+      if (
+        ["BlogPosting", "Article", "DiscussionForumPosting", "NewsArticle"].includes(
+          ld["@type"],
+        )
+      ) {
+        title = ld.headline || ld.name || "";
+        author =
+          (typeof ld.author === "string" ? ld.author : ld.author?.name) || "";
+        publishedAt = ld.datePublished || ld.dateCreated || null;
+        if (typeof ld.articleBody === "string" && ld.articleBody.trim()) {
+          content = ld.articleBody.trim();
+        }
+        break;
+      }
+    } catch {
+      // Not valid JSON-LD, skip
+    }
+  }
+
+  // Title fallback: first <h1>, then the document <title> tag
+  // (some sites like drift.trade render headings as styled divs)
+  if (!title) {
+    const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+    if (h1Match)
+      title = h1Match[1]
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&nbsp;/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+  }
+  if (!title) {
+    const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    if (titleMatch) {
+      title = titleMatch[1]
+        .replace(/<[^>]+>/g, "")
+        .replace(/&amp;/g, "&")
+        .replace(/&#39;/g, "'")
+        .replace(/&quot;/g, '"')
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+  }
+
+  // Content fallbacks: <article> → <main> → whole page
+  if (!content) {
+    const regionMatch =
+      html.match(/<article[\s\S]*?>([\s\S]*?)<\/article>/i) ||
+      html.match(/<main[\s\S]*?>([\s\S]*?)<\/main>/i);
+    const source = regionMatch ? regionMatch[1] : html;
+    content = source
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[\s\S]*?<\/style>/gi, "")
+      .replace(/<nav[\s\S]*?<\/nav>/gi, "")
+      .replace(/<footer[\s\S]*?<\/footer>/gi, "")
+      .replace(/<header[\s\S]*?<\/header>/gi, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&nbsp;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  return { title, author, publishedAt, content };
+}
+
 // Main blog fetching orchestrator.
 // For each blog source in the config, discovers new articles, deduplicates
 // against previously seen URLs, fetches full article content, and returns
@@ -896,9 +1085,19 @@ async function fetchBlogContent(blogs, state, errors) {
     let candidates = [];
 
     try {
-      // Step 1: Discover articles from the blog index page
+      // Step 1: Discover articles from the blog index page.
+      // Known blogs work with the plain aggregator UA; other sites
+      // (ruby-china, drift.trade, ...) block non-browser UAs, so use a
+      // browser UA for the generic path.
+      const isKnownBlog =
+        blog.indexUrl.includes("anthropic.com") ||
+        blog.indexUrl.includes("claude.com");
       const indexRes = await fetch(blog.indexUrl, {
-        headers: { "User-Agent": "FollowBuilders/1.0 (feed aggregator)" },
+        headers: {
+          "User-Agent": isKnownBlog
+            ? "FollowBuilders/1.0 (feed aggregator)"
+            : RSS_USER_AGENT,
+        },
       });
       if (!indexRes.ok) {
         errors.push(
@@ -913,6 +1112,8 @@ async function fetchBlogContent(blogs, state, errors) {
         candidates = parseAnthropicEngineeringIndex(indexHtml);
       } else if (blog.indexUrl.includes("claude.com")) {
         candidates = parseClaudeBlogIndex(indexHtml);
+      } else {
+        candidates = parseGenericBlogIndex(indexHtml, blog);
       }
 
       // Step 2: Filter to unseen articles, cap at MAX_ARTICLES_PER_BLOG.
@@ -944,9 +1145,14 @@ async function fetchBlogContent(blogs, state, errors) {
       // Step 3: Fetch full article content for each new article
       for (const article of newArticles) {
         try {
-          // Fetch the full article page
+          // Fetch the full article page (browser UA on the generic path,
+          // same reasoning as the index fetch above)
           const articleRes = await fetch(article.url, {
-            headers: { "User-Agent": "FollowBuilders/1.0 (feed aggregator)" },
+            headers: {
+              "User-Agent": isKnownBlog
+                ? "FollowBuilders/1.0 (feed aggregator)"
+                : RSS_USER_AGENT,
+            },
           });
           if (!articleRes.ok) {
             errors.push(
@@ -962,10 +1168,24 @@ async function fetchBlogContent(blogs, state, errors) {
             extracted = extractAnthropicArticleContent(articleHtml);
           } else if (article.url.includes("claude.com/blog")) {
             extracted = extractClaudeBlogArticleContent(articleHtml);
+          } else {
+            extracted = extractGenericArticleContent(articleHtml);
           }
 
           if (!extracted || !extracted.content) {
             errors.push(`Blog: No content extracted from ${article.url}`);
+            continue;
+          }
+
+          // Index listings on generic blogs often carry no dates, so a
+          // date discovered on the article page gets its lookback check
+          // here. Mark seen either way so old articles are not refetched
+          // on every run (e.g. dormant blogs).
+          if (
+            extracted.publishedAt &&
+            new Date(extracted.publishedAt) < cutoff
+          ) {
+            state.seenArticles[article.url] = Date.now();
             continue;
           }
 

@@ -45,6 +45,34 @@
       "indexUrl": "https://claude.com/blog",
       "articleBaseUrl": "https://claude.com/blog/",
       "fetchMethod": "http"
+    },
+    {
+      "name": "Jason Lee (Ruby China)",
+      "type": "scrape",
+      "indexUrl": "https://ruby-china.org/huacnlee/topics",
+      "articleBaseUrl": "https://ruby-china.org/topics/",
+      "fetchMethod": "http"
+    },
+    {
+      "name": "Hitoshi Harada (Blog EN)",
+      "type": "scrape",
+      "indexUrl": "https://umitanuki.hatenablog.com/",
+      "articleBaseUrl": "https://umitanuki.hatenablog.com/entry/",
+      "fetchMethod": "http"
+    },
+    {
+      "name": "Hitoshi Harada (Blog JP)",
+      "type": "scrape",
+      "indexUrl": "https://umitanuki.hatenadiary.jp/",
+      "articleBaseUrl": "https://umitanuki.hatenadiary.jp/entry/",
+      "fetchMethod": "http"
+    },
+    {
+      "name": "Drift Updates (Noah Prince)",
+      "type": "scrape",
+      "indexUrl": "https://www.drift.trade/updates",
+      "articleBaseUrl": "https://www.drift.trade/updates/",
+      "fetchMethod": "http"
     }
   ],
   "x_accounts": [
@@ -73,6 +101,20 @@
     { "name": "Dan Shipper", "handle": "danshipper" },
     { "name": "Aditya Agarwal", "handle": "adityaag" },
     { "name": "Sam Altman", "handle": "sama" },
-    { "name": "Claude", "handle": "claudeai" }
+    { "name": "Claude", "handle": "claudeai" },
+    { "name": "Jason Lee", "handle": "huacnlee" },
+    { "name": "Hitoshi Harada", "handle": "umitanuki" },
+    { "name": "Yoni Assia", "handle": "yoniassia" },
+    { "name": "Star Xu", "handle": "star_okx" },
+    { "name": "Lennix Lai", "handle": "LennixOKX" },
+    { "name": "Armani Ferrante", "handle": "armaniferrante" },
+    { "name": "Jannick Malling", "handle": "malling" },
+    { "name": "Eddie Zhang", "handle": "epic_edge_" },
+    { "name": "Siong Ong", "handle": "sssionggg" },
+    { "name": "Jeff Yan", "handle": "chameleon_jeff" },
+    { "name": "Vladimir Novakovski", "handle": "vnovakovski" },
+    { "name": "iliensinc", "handle": "iliensinc" },
+    { "name": "xulian.hl", "handle": "xulian_hl" },
+    { "name": "Noah Prince", "handle": "redacted_noah" }
   ]
 }
