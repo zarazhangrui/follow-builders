@@ -1,4 +1,4 @@
-**English** | [中文](README.zh-CN.md)
+**English** | [中文](README.zh-CN.md) | [日本語](README.ja.md)
 
 # Follow Builders, Not Influencers
 
